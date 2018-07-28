@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="WithBtnEditText">
         <attr name="btn_visible" format="boolean" />
+        <attr name="edit_hint" format="string" />
     </declare-styleable>
 </resources>

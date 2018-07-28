@@ -1,12 +1,18 @@
 package com.example.carson.yjenglish.login.view;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,6 +29,7 @@ import com.example.carson.yjenglish.login.LoginTask;
 import com.example.carson.yjenglish.login.model.LoginInfo;
 import com.example.carson.yjenglish.login.model.LoginModule;
 import com.example.carson.yjenglish.login.presenter.LoginPresenter;
+import com.example.carson.yjenglish.register.RegisterActivity;
 
 public class LoginActivity extends AppCompatActivity implements LoginContract.View, View.OnClickListener {
 
@@ -60,13 +67,15 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         wechat = findViewById(R.id.btn_login_wechat);
         qq = findViewById(R.id.btn_login_qq);
 
+        phone.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)}); //最大输入长度
+        password.getText().setFilters(new InputFilter[]{new InputFilter.LengthFilter(15)}); //最大输入长度
+
         checkCodeLoginClick();
-
-
 
         mDialog = new ProgressDialog(this);
         mDialog.setTitle("正在登录中");
         login.setOnClickListener(this);
+        register.setOnClickListener(this);
 
         //mvp模块拼装
         LoginTask loginTask = LoginTask.getInstance();
@@ -182,7 +191,24 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
                 mPresenter.getLoginInfo(new LoginModule
                         (phone.getText().toString(), password.getText().toString()));
                 break;
+            case R.id.btn_register:
+                startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
+                overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                break;
         }
     }
 
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (Build.VERSION.SDK_INT >= 19) {
+            View decorView = getWindow().getDecorView();
+            int option = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+            decorView.setSystemUiVisibility(option);
+            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
+    }
 }

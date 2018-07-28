@@ -27,6 +27,7 @@ public class WithBtnEditText extends RelativeLayout {
     private final int TYPE_NUMBER = 2;
 
     private boolean isVisible;
+    private String textHint;
 
     public WithBtnEditText(Context context) {
         super(context);
@@ -39,6 +40,7 @@ public class WithBtnEditText extends RelativeLayout {
                 R.styleable.WithBtnEditText);
         //默认不显示btn
         isVisible = a.getBoolean(R.styleable.WithBtnEditText_btn_visible, false);
+        textHint = a.getString(R.styleable.WithBtnEditText_edit_hint);
         a.recycle();
         initView(context);
     }
@@ -54,6 +56,9 @@ public class WithBtnEditText extends RelativeLayout {
         mBtn = findViewById(R.id.btn_send_code);
         mRoot = findViewById(R.id.root_send_code);
         setBtnIsVisible(isVisible);
+        if (textHint != null) {
+            content.setHint(textHint);
+        }
         setInputType(TYPE_TEXT_PASSWORD);
     }
 

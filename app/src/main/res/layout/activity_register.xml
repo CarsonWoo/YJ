@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ecfafe"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="true"
+    tools:context="com.example.carson.yjenglish.register.RegisterActivity">
+
+    <ImageView
+        android:id="@+id/register_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_back"
+        android:layout_margin="7dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="32sp"
+        android:textColor="@color/colorAccent"
+        android:text="@string/register"
+        android:textStyle="bold"
+        android:layout_marginTop="7dp"
+        android:layout_marginStart="30dp"
+        app:layout_constraintTop_toBottomOf="@id/register_back"
+        app:layout_constraintStart_toStartOf="parent"/>
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorAccent"
+        android:text="@string/please_write_down_phone"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/tv1"
+        app:layout_constraintStart_toStartOf="@id/tv1"
+        />
+    
+    <EditText
+        android:id="@+id/edit_phone"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:background="@drawable/shape_round_rect_edit"
+        android:textColor="@color/colorText"
+        android:textColorHint="@color/colorTextHint"
+        android:hint="@string/edit_phone"
+        android:textSize="18sp"
+        android:paddingStart="18dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingEnd="10dp"
+        android:inputType="phone"
+        android:layout_marginStart="40dp"
+        android:layout_marginEnd="40dp"
+        android:layout_marginTop="150dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv1"
+        />
+
+    <EditText
+        android:id="@+id/edit_password"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/shape_round_rect_edit"
+        android:textColor="@color/colorText"
+        android:textColorHint="@color/colorTextHint"
+        android:paddingStart="18dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingEnd="10dp"
+        android:textSize="18sp"
+        android:inputType="textPassword"
+        android:hint="@string/edit_password"
+        android:drawableEnd="@drawable/ic_cover"
+        app:layout_constraintStart_toStartOf="@id/edit_phone"
+        app:layout_constraintEnd_toEndOf="@id/edit_phone"
+        app:layout_constraintTop_toBottomOf="@id/edit_phone"
+        />
+
+    <com.example.carson.yjenglish.customviews.WithBtnEditText
+        android:id="@+id/edit_code"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:edit_hint="请输入验证码"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="@id/edit_password"
+        app:layout_constraintTop_toBottomOf="@id/edit_password"
+        app:layout_constraintEnd_toEndOf="@id/edit_password"
+        />
+
+    <Button
+        android:id="@+id/btn_confirm"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:text="@string/confirm"
+        android:background="@drawable/shape_round_rect_btn_main"
+        android:layout_marginStart="38dp"
+        android:layout_marginEnd="38dp"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edit_code"
+        />
+
+</android.support.constraint.ConstraintLayout>
