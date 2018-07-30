@@ -1,20 +1,15 @@
 package com.example.carson.yjenglish.login.view;
 
-import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
-import android.os.CountDownTimer;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputFilter;
-import android.text.TextUtils;
-import android.text.TextWatcher;
+import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -23,31 +18,35 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.customviews.WithBtnEditText;
+import com.example.carson.yjenglish.customviews.BaselineTextView;
+import com.example.carson.yjenglish.customviews.PasswordEditText;
+import com.example.carson.yjenglish.login.ForgetActivity;
 import com.example.carson.yjenglish.login.LoginContract;
 import com.example.carson.yjenglish.login.LoginTask;
 import com.example.carson.yjenglish.login.model.LoginInfo;
 import com.example.carson.yjenglish.login.model.LoginModule;
 import com.example.carson.yjenglish.login.presenter.LoginPresenter;
-import com.example.carson.yjenglish.register.RegisterActivity;
+import com.example.carson.yjenglish.register.view.RegisterActivity;
 
 public class LoginActivity extends AppCompatActivity implements LoginContract.View, View.OnClickListener {
 
     private final String TAG = "Login";
 
-    private final int TYPE_TEXT_PASSWORD = 1;
-    private final int TYPE_NUMBER = 2;
+    private final int TYPE_SHOW_PASSWORD = InputType.TYPE_CLASS_TEXT;
+    private final int TYPE_HIDE_PASSWORD = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
 
     private EditText phone;
-    private WithBtnEditText password;
+    private PasswordEditText password;
     private TextView codeLogin;
     private TextView forget;
-    private Button login, register, wechat, qq;
+    private Button login;
+    private BaselineTextView register;
     private Dialog mDialog;
     private LoginContract.Presenter mPresenter;
     private LoginPresenter loginPresenter;
 
-    private int clickCount = 0;
+    private int clickCount = 0;//计数是否显示密码框
+    private int isShowPassword = 0;//计数是否显示password
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,23 +63,19 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         forget = findViewById(R.id.tv_forget_password);
         login = findViewById(R.id.btn_login);
         register = findViewById(R.id.btn_register);
-        wechat = findViewById(R.id.btn_login_wechat);
-        qq = findViewById(R.id.btn_login_qq);
 
         phone.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)}); //最大输入长度
-        password.getText().setFilters(new InputFilter[]{new InputFilter.LengthFilter(15)}); //最大输入长度
+        password.getText().setFilters(new InputFilter[]{new InputFilter.LengthFilter(15)}); //最大密码输入长度
 
         checkCodeLoginClick();
+        checkShowPassword();
 
         mDialog = new ProgressDialog(this);
         mDialog.setTitle("正在登录中");
         login.setOnClickListener(this);
         register.setOnClickListener(this);
+        forget.setOnClickListener(this);
 
-        //mvp模块拼装
-        LoginTask loginTask = LoginTask.getInstance();
-        loginPresenter = new LoginPresenter(this, loginTask);
-        this.setPresenter(loginPresenter);
     }
 
     private void checkCodeLoginClick() {
@@ -89,64 +84,44 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
             public void onClick(View view) {
                 clickCount += 1;
                 password.getText().clear();
-                //若为奇数 则显示btn
+                //若为奇数 则隐藏
                 if (clickCount % 2 != 0) {
-                    setPasswordClickable(true);
+                    password.setVisibility(View.INVISIBLE);
+                    codeLogin.setText("密码登录");
+                    forget.setVisibility(View.INVISIBLE);
+                    forget.setEnabled(false);
+                    password.setInputType(TYPE_HIDE_PASSWORD);
+                    isShowPassword = 0;
                 } else {
-                    setPasswordClickable(false);
+                    codeLogin.setText(R.string.code_login);
+                    forget.setVisibility(View.VISIBLE);
+                    forget.setEnabled(true);
+                    password.setVisibility(View.VISIBLE);
                 }
             }
         });
     }
 
-    private void setPasswordClickable(boolean clickable) {
-        if (clickable) {
-            password.setInputType(TYPE_NUMBER);
-            password.setBtnIsVisible(true);
-            password.setBtnClickStatus(true);
-            password.setHint("请输入验证码");
-            password.setBtnText("发送验证码");
-            password.setBtnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (!phone.getText().toString().isEmpty()) {
-                        //TODO 联网操作
-                        Log.e(TAG, "send code");
-                        //进行倒数 且必须禁止返回到输入密码的状态
-                        codeLogin.setEnabled(false);
-                        codeLogin.setClickable(false);
-                        codeLogin.setAlpha(0.5f);
-                        startCountDown();
-                    } else {
-                        Snackbar.make(login, "请先输入手机号", Snackbar.LENGTH_SHORT).show();
-                    }
+    private void checkShowPassword() {
+        password.setShowClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isShowPassword += 1;
+                if (isShowPassword % 2 != 0) {
+                    setPasswordVisible(true);
+                } else {
+                    setPasswordVisible(false);
                 }
-            });
-        } else {
-            password.setInputType(TYPE_TEXT_PASSWORD);
-            password.setBtnIsVisible(true);
-            password.setBtnClickStatus(false);
-            password.setHint("请输入密码");
-        }
+            }
+        });
     }
 
-    private void startCountDown() {
-        CountDownTimer timer = new CountDownTimer(60 * 1000, 1000) {
-            @Override
-            public void onTick(long l) {
-                password.setBtnClickStatus(false);
-                password.setBtnText(l / 1000 + "S");
-            }
-
-            @Override
-            public void onFinish() {
-                password.setBtnClickStatus(true);
-                password.setBtnText("重新发送");
-                codeLogin.setEnabled(true);
-                codeLogin.setClickable(true);
-                codeLogin.setAlpha(1.0f);
-            }
-        }.start();
+    private void setPasswordVisible(boolean clickable) {
+        if (clickable) {
+            password.setInputType(TYPE_SHOW_PASSWORD);
+        } else {
+            password.setInputType(TYPE_HIDE_PASSWORD);
+        }
     }
 
     @Override
@@ -184,10 +159,20 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_login:
-                if (phone.getText().toString().isEmpty() || password.getText().toString().isEmpty()) {
-                    Snackbar.make(login, "请输入手机或密码", Snackbar.LENGTH_SHORT).show();
+                //需判断直接登录还是验证码登录
+                if (password.getVisibility() == View.INVISIBLE) {
+                    //doCodeTask 访问验证码url
                     return;
                 }
+                if (phone.getText().toString().isEmpty() || password.getText().toString().isEmpty()) {
+                    Toast.makeText(getApplicationContext(), "请先输入手机或密码噢", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                //mvp模块拼装
+                LoginTask loginTask = LoginTask.getInstance();
+                loginPresenter = new LoginPresenter(LoginActivity.this, loginTask);
+                this.setPresenter(loginPresenter);
                 mPresenter.getLoginInfo(new LoginModule
                         (phone.getText().toString(), password.getText().toString()));
                 break;
@@ -195,20 +180,31 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
                 startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
                 overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                 break;
+            case R.id.tv_forget_password:
+                Intent toForget = new Intent(LoginActivity.this, ForgetActivity.class);
+                toForget.putExtra("type", 0);
+                startActivity(toForget);
+                overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                break;
         }
     }
 
     @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        if (Build.VERSION.SDK_INT >= 19) {
-            View decorView = getWindow().getDecorView();
-            int option = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-            decorView.setSystemUiVisibility(option);
-            getWindow().setNavigationBarColor(Color.TRANSPARENT);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
-        }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
     }
+
+    //    @Override
+//    public void onWindowFocusChanged(boolean hasFocus) {
+//        super.onWindowFocusChanged(hasFocus);
+//        if (Build.VERSION.SDK_INT >= 19) {
+//            View decorView = getWindow().getDecorView();
+//            int option = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+//            decorView.setSystemUiVisibility(option);
+//            getWindow().setNavigationBarColor(Color.TRANSPARENT);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        }
+//    }
 }

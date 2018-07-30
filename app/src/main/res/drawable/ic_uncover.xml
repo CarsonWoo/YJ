@@ -6,11 +6,11 @@
     android:viewportHeight="12">
 
     <path
-        android:fillColor="@color/colorUnselected"
+        android:fillColor="@color/colorAccent"
         android:strokeWidth="1"
         android:strokeLineCap="round"
         android:strokeLineJoin="round"
-        android:pathData="M 6 5.5 A 1.5 1.5 1 1 0 6.1 5.5
+        android:pathData="M 6 5 A 2 2 1 1 0 6.1 5
                     M 0.4 7 Q 6 -2 11.6 7 Q 6 16 0.4 7" />
 
 </vector>

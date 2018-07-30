@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:id="@+id/root_send_code"
+    android:background="@drawable/shape_round_rect_edit"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText
+        android:id="@+id/edit_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:background="@null"
+        android:textColor="@color/colorText"
+        android:textColorHint="@color/colorTextHint"
+        android:drawablePadding="10dp"
+        android:textSize="16sp"
+        android:inputType="textPassword"
+        android:drawableStart="@drawable/ic_password"
+        android:hint="@string/edit_password"
+        android:layout_toLeftOf="@id/btn_show_password"
+        />
+
+    <ImageView
+        android:id="@+id/btn_show_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_cover"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="10dp"
+        />
+
+</RelativeLayout>

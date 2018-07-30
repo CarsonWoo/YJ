@@ -2,13 +2,18 @@
     <string name="app_name">YJEnglish</string>
     <string name="edit_phone">请输入手机号</string>
     <string name="edit_password">请输入密码</string>
-    <string name="code_login">手机验证码登录</string>
+    <string name="code_login">验证码登录</string>
     <string name="forget_password">忘记密码?</string>
     <string name="login">登录</string>
-    <string name="wechat_login">微信登录</string>
-    <string name="qq_login">QQ登录</string>
-    <string name="test_use">试用一下</string>
+    <string name="wechat_login">微信</string>
+    <string name="qq_login">QQ</string>
+    <string name="test_use">随便逛逛</string>
     <string name="please_write_down_phone">请填写您的手机号</string>
     <string name="register">注册</string>
     <string name="confirm">确定</string>
+    <string name="click2register">点击注册</string>
+    <string name="register2login">已有账号? 直接登录</string>
+    <string name="find_password">找回密码</string>
+    <string name="edit_code">请输入验证码</string>
+    <string name="reload_code">重新获取验证码</string>
 </resources>

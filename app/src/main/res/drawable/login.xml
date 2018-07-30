@@ -1,0 +1,16 @@
+<vector android:autoMirrored="true" android:height="24dp"
+    android:viewportHeight="1334" android:viewportWidth="750"
+    android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
+    <path android:fillColor="#fff" android:name="圆角矩形 2" android:pathData="m322 156h112c11 0 20 9 20 20v112c0 11 -9 20 -20 20h-112c-11 0 -20 -9 -20 -20v-112c0 -11 9 -20 20 -20z"/>
+    <path android:fillColor="#5ee1c9" android:name="椭圆 1" android:pathData="m378 188c1.7 0 3 1.3 3 3c0 1.7 -1.3 3 -3 3c-1.7 0 -3 -1.3 -3 -3c0 -1.7 1.3 -3 3 -3zm0 -4c-3.9 0 -7 3.1 -7 7c0 3.9 3.1 7 7 7c3.9 0 7 -3.1 7 -7c0 -3.9 -3.1 -7 -7 -7z"/>
+    <path android:fillColor="#fff" android:name="形状 1" android:pathData="m211 1127v-1h122v1h-122z"/>
+    <path android:fillColor="#fff" android:name="形状 1 拷贝" android:pathData="m407 1127v-1h122v1h-122z"/>
+    <path android:fillColor="#5ee1c9" android:name="圆角矩形 2 拷贝" android:pathData="m70 697h610c11 0 20 9 20 20v68c0 11 -9 20 -20 20h-610c-11 0 -20 -9 -20 -20v-68c0 -11 9 -20 20 -20z"/>
+    <path android:fillColor="#fff" android:name="圆角矩形 2" android:pathData="m-34 403h818c11 0 20 9 20 20v81c0 11 -9 20 -20 20h-818c-11 0 -20 -9 -20 -20v-81c0 -11 9 -20 20 -20z"/>
+    <path android:fillColor="#eee" android:name="圆角矩形 2" android:pathData="m784 404c10.5 0 19 8.5 19 19v81c0 10.5 -8.5 19 -19 19h-818c-10.5 0 -19 -8.5 -19 -19v-81c0 -10.5 8.5 -19 19 -19zm-818 -1c-11 0 -20 9 -20 20v81c0 11 9 20 20 20h818c11 0 20 -9 20 -20v-81c0 -11 -9 -20 -20 -20z"/>
+    <path android:fillColor="#fff" android:name="圆角矩形 2 拷贝 2" android:pathData="m-34 524h818c11 0 20 9 20 20v81c0 11 -9 20 -20 20h-818c-11 0 -20 -9 -20 -20v-81c0 -11 9 -20 20 -20z"/>
+    <path android:fillAlpha="0.1" android:fillColor="#000"
+        android:name="圆角矩形 2 拷贝 4" android:pathData="m223 956h306c11 0 20 9 20 20v23c0 11 -9 20 -20 20h-306c-11 0 -20 -9 -20 -20v-23c0 -11 9 -20 20 -20z"/>
+    <path android:fillColor="#fff" android:name="椭圆 2" android:pathData="m483 1167c24.9 0 45 20.1 45 45c0 24.9 -20.1 45 -45 45c-24.9 0 -45 -20.1 -45 -45c0 -24.9 20.1 -45 45 -45zm0 -1c-25.4 0 -46 20.6 -46 46c0 25.4 20.6 46 46 46c25.4 0 46 -20.6 46 -46c0 -25.4 -20.6 -46 -46 -46z"/>
+    <path android:fillColor="#fff" android:name="椭圆 2 拷贝" android:pathData="m263 1167c24.9 0 45 20.1 45 45c0 24.9 -20.1 45 -45 45c-24.9 0 -45 -20.1 -45 -45c0 -24.9 20.1 -45 45 -45zm0 -1c-25.4 0 -46 20.6 -46 46c0 25.4 20.6 46 46 46c25.4 0 46 -20.6 46 -46c0 -25.4 -20.6 -46 -46 -46z"/>
+</vector>
