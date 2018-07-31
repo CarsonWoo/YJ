@@ -1,11 +1,14 @@
-package com.example.carson.yjenglish.login;
+package com.example.carson.yjenglish.login.view;
 
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,16 +17,32 @@ import android.widget.Toast;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.checkcode.view.CodeActivity;
 import com.example.carson.yjenglish.customviews.PasswordEditText;
+import com.example.carson.yjenglish.login.ForgetContract;
+import com.example.carson.yjenglish.login.ForgetTask;
+import com.example.carson.yjenglish.login.model.ForgetModel;
+import com.example.carson.yjenglish.login.presenter.ForgetPresenter;
+import com.example.carson.yjenglish.uitls.CommonInfo;
 
-public class ForgetActivity extends AppCompatActivity implements View.OnClickListener {
+public class ForgetActivity extends AppCompatActivity implements View.OnClickListener,
+        ForgetContract.View {
 
     //判断从哪里跳转来
     private final int INTENT_FROM_CODE = 1;
     private final int INTENT_FROM_LOGIN = 0;
 
+    private final int RESULT_FORGET_OK = 102;
+
     private ImageView back;
     private PasswordEditText phone;
     private Button confirm;
+
+    private String phoneStr;
+    private int code;
+
+    private Dialog mDialog;
+
+    private ForgetContract.Presenter mPresenter;
+    private ForgetPresenter forgetPresenter;
 
     private int mIntentType;//默认为从login来
 
@@ -66,6 +85,11 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private void initPasswordView() {
+        phoneStr = getIntent().getStringExtra("phone");
+        code = getIntent().getIntExtra("code", 0);
+        mDialog = new ProgressDialog(this);
+        mDialog.setTitle("正在上传中");
+
         phone.setInputType(InputType.TYPE_CLASS_TEXT
                 | InputType.TYPE_TEXT_VARIATION_PASSWORD);
         phone.getText().setFilters(new InputFilter[]{new InputFilter.LengthFilter(15)});
@@ -92,7 +116,6 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
             case R.id.btn_confirm:
                 if (mIntentType == INTENT_FROM_LOGIN) {
                     if (checkEnable()) {
-                        //TODO 进行验证 跳转 并传输手机号码的信息
                         Intent toCode = new Intent(ForgetActivity.this,
                                 CodeActivity.class);
                         toCode.putExtra("phone", phone.getText().toString());
@@ -104,10 +127,7 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
                     }
                 } else {
                     if (checkEnable()) {
-                        //TODO 上传服务器新密码 并进行跳转到登录界面
-                        //假设成功 跳转回登录页面
-                        setResult(RESULT_OK);
-                        onBackPressed();
+                        executeTask();
                     } else {
                         Toast.makeText(getApplicationContext(), "请先填写密码", Toast.LENGTH_SHORT).show();
                     }
@@ -117,6 +137,13 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
                 onBackPressed();
                 break;
         }
+    }
+
+    private void executeTask() {
+        ForgetTask task = ForgetTask.getInstance();
+        forgetPresenter = new ForgetPresenter(task, this);
+        this.setPresenter(forgetPresenter);
+        mPresenter.getCommonInfo(new ForgetModel(phoneStr, phone.getText().toString(), code));
     }
 
     private boolean checkEnable() {
@@ -141,7 +168,46 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == 2 && resultCode == RESULT_OK) {
-            onBackPressed();
+            if (data != null) {
+                data.putExtra("phone", phone.getText().toString());
+                setResult(RESULT_FORGET_OK, data);
+                onBackPressed();
+            }
+
+        }
+    }
+
+    @Override
+    public void setPresenter(ForgetContract.Presenter presenter) {
+        this.mPresenter = presenter;
+    }
+
+    @Override
+    public void showLoading() {
+        mDialog.show();
+    }
+
+    @Override
+    public void hideLoading() {
+        mDialog.dismiss();
+    }
+
+    @Override
+    public void showError(String msg) {
+        Log.e("ForgetAty", msg);
+    }
+
+    @Override
+    public void setCommonInfo(CommonInfo commonInfo) {
+        if (commonInfo != null) {
+            int checkCode = commonInfo.getCode();
+            if (checkCode == 200) {
+                //成功 跳转回登录页面
+                Intent backIntent = new Intent();
+                backIntent.putExtra("password", phone.getText().toString());
+                setResult(RESULT_OK, backIntent);
+                onBackPressed();
+            }
         }
     }
 }

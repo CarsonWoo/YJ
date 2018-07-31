@@ -16,4 +16,9 @@ public interface LoginService {
     @POST("login")
     Observable<LoginInfo> getLoginResponse(@Field("username") String username,
                                            @Field("password") String password);
+
+    @FormUrlEncoded
+    @POST("login")
+    Observable<LoginInfo> getLoginResponse(@Field("username") String username,
+                                           @Field("code") int code);
 }

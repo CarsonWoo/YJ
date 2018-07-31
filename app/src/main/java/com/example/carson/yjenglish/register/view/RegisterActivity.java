@@ -3,6 +3,7 @@ package com.example.carson.yjenglish.register.view;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
@@ -21,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.checkcode.view.CodeActivity;
 import com.example.carson.yjenglish.customviews.PasswordEditText;
 import com.example.carson.yjenglish.register.RegisterContract;
 import com.example.carson.yjenglish.register.RegisterTask;
@@ -34,6 +36,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
     private final int TYPE_SHOW_PASSWORD = InputType.TYPE_CLASS_TEXT;
     private final int TYPE_HIDE_PASSWORD = InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD;
+
+    private final int RESULT_REGISTER_OK = 101;
 
     private TextView back;
     private EditText phone;
@@ -60,6 +64,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         confirm = findViewById(R.id.btn_confirm);
 
         mDialog = new ProgressDialog(this);
+        mDialog.setTitle("正在注册中");
 
         back.setOnClickListener(this);
         confirm.setOnClickListener(this);
@@ -103,12 +108,13 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "请先输入您的注册信息", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                //doCodeTask 访问验证码url 并进行跳转
-                RegisterTask task = RegisterTask.getInstance();
-                registerPresenter = new RegisterPresenter(task, RegisterActivity.this);
-                this.setPresenter(registerPresenter);
-                mPresenter.getRegisterResponse(new RegisterModel(phone.getText().toString(),
-                        password.getText().toString()));
+                Intent toCode = new Intent(RegisterActivity.this, CodeActivity.class);
+                toCode.putExtra("type", 1);
+                toCode.putExtra("phone", phone.getText().toString());
+                startActivityForResult(toCode, 1);
+                overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                break;
+            default:
                 break;
         }
     }
@@ -132,7 +138,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void getResponse(RegisterInfo info) {
         if (info != null) {
             String msg = info.getMsg();
-            //TODO 进行跳转工作
+            //TODO 进行跳转工作 还可以设置账号密码自动填写
+            //onBackPressed();
         }
     }
 
@@ -140,6 +147,21 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     public void hideLoading() {
         if (mDialog.isShowing()) {
             mDialog.dismiss();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_REGISTER_OK) {
+            if (data != null) {
+                confirm.setEnabled(false);
+                RegisterTask task = RegisterTask.getInstance();
+                registerPresenter = new RegisterPresenter(task, RegisterActivity.this);
+                this.setPresenter(registerPresenter);
+                mPresenter.getRegisterResponse(new RegisterModel(phone.getText().toString(),
+                        password.getText().toString(), data.getIntExtra("code", 0)));
+            }
         }
     }
 }

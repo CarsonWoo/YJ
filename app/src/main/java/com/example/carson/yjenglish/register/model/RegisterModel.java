@@ -7,9 +7,11 @@ package com.example.carson.yjenglish.register.model;
 public class RegisterModel {
     private String phone;
     private String password;
-    public RegisterModel(String phone, String password) {
+    private int code;
+    public RegisterModel(String phone, String password, int code) {
         this.password = password;
         this.phone = phone;
+        this.code = code;
     }
 
     public String getPhone() {
@@ -26,5 +28,13 @@ public class RegisterModel {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
     }
 }

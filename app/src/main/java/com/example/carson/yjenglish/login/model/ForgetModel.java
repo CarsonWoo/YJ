@@ -1,32 +1,25 @@
 package com.example.carson.yjenglish.login.model;
 
 /**
- * Created by 84594 on 2018/7/28.
+ * Created by 84594 on 2018/7/31.
  */
 
-public class LoginModule {
-    //TODO 要将username替换成对应的key
-    private String username;
+public class ForgetModel {
+    private String phone;
     private String password;
-
     private int code;
-
-    public LoginModule(String username, String password) {
-        this.username = username;
+    public ForgetModel(String phone, String password, int code) {
         this.password = password;
-    }
-
-    public LoginModule(String username, int code) {
+        this.phone = phone;
         this.code = code;
-        this.username = username;
     }
 
-    public String getUsername() {
-        return username;
+    public String getPhone() {
+        return phone;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 
     public String getPassword() {

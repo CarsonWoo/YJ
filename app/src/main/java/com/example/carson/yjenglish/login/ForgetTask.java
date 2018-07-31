@@ -1,41 +1,35 @@
 package com.example.carson.yjenglish.login;
 
-import com.example.carson.yjenglish.login.model.LoginInfo;
-import com.example.carson.yjenglish.login.model.LoginModule;
+import com.example.carson.yjenglish.login.model.ForgetModel;
 import com.example.carson.yjenglish.net.LoadTasksCallback;
 import com.example.carson.yjenglish.net.NetTask;
+import com.example.carson.yjenglish.uitls.CommonInfo;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by 84594 on 2018/7/28.
+ * Created by 84594 on 2018/7/31.
  */
 
-public class LoginTask implements NetTask<LoginModule> {
-    private static LoginTask INSTANCE = null;
-    //TODO 要将HOST替换
+public class ForgetTask implements NetTask<ForgetModel> {
+
+    private static ForgetTask INSTANCE = null;
     private static final String HOST = "";
     private Retrofit retrofit;
 
-    private static final int TYPE_PASSWORD = 0;
-    private static final int TYPE_CODE = 1;
-    private int type;
-
-    private LoginTask(int type) {
-        this.type = type;
+    private ForgetTask() {
         createRetrofit();
     }
 
-    public static LoginTask getInstance(int type) {
+    public static ForgetTask getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new LoginTask(type);
+            INSTANCE = new ForgetTask();
         }
         return INSTANCE;
     }
@@ -49,17 +43,10 @@ public class LoginTask implements NetTask<LoginModule> {
     }
 
     @Override
-    public Subscription execute(LoginModule module, final LoadTasksCallback callback) {
-        LoginService loginService = retrofit.create(LoginService.class);
-        Observable<LoginInfo> mObservable;
-        Subscription subscription;
-        if (type == TYPE_CODE) {
-            mObservable = loginService.getLoginResponse(module.getUsername(), module.getCode());
-        } else {
-            mObservable = loginService.getLoginResponse(module.getUsername(), module.getPassword());
-        }
-        subscription = mObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Subscriber<LoginInfo>() {
+    public Subscription execute(ForgetModel data, final LoadTasksCallback callback) {
+        ForgetService forgetService = retrofit.create(ForgetService.class);
+        Subscription subscription = forgetService.getResponse(data).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<CommonInfo>() {
                     @Override
                     public void onStart() {
                         callback.onStart();
@@ -76,8 +63,8 @@ public class LoginTask implements NetTask<LoginModule> {
                     }
 
                     @Override
-                    public void onNext(LoginInfo loginInfo) {
-                        callback.onSuccess(loginInfo);
+                    public void onNext(CommonInfo info) {
+                        callback.onSuccess(info);
                     }
                 });
         return subscription;

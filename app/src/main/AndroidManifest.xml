@@ -3,6 +3,7 @@
     package="com.example.carson.yjenglish">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_SMS" />
 
     <application
         android:allowBackup="true"
@@ -35,7 +36,7 @@
             android:theme="@style/TransparentTheme" />
         <activity android:name=".checkcode.view.CodeActivity"
             android:theme="@style/TransparentTheme"/>
-        <activity android:name=".login.ForgetActivity"
+        <activity android:name=".login.view.ForgetActivity"
             android:theme="@style/TransparentTheme"/>
     </application>
 

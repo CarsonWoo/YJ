@@ -93,4 +93,8 @@ public class PasswordEditText extends RelativeLayout {
         content.setHint(textHint);
     }
 
+    public void setText(String text) {
+        content.setText(text);
+    }
+
 }
