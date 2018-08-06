@@ -14,7 +14,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 
-import com.example.carson.yjenglish.customviews.BadgeView;
 import com.example.carson.yjenglish.discover.DiscoverFragment;
 import com.example.carson.yjenglish.home.view.HomeFragment;
 import com.example.carson.yjenglish.home.view.WordListAty;
@@ -48,8 +47,6 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
 
 
     }
-
-
 
     private void initViews() {
         tabLayout = findViewById(R.id.tab_layout);
@@ -161,7 +158,7 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            tabLayout.getTabAt(3).setIcon(R.drawable.ic_msg_unsel_notification);
+            tabLayout.getTabAt(3).setIcon(R.drawable.selector_msg_notification);
         }
     }
 

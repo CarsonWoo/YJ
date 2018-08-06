@@ -1,4 +1,4 @@
-package com.example.carson.yjenglish.uitls;
+package com.example.carson.yjenglish.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;

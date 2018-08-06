@@ -82,6 +82,9 @@ public class TVFragment extends Fragment {
         TVItem tvItem = new TVItem();
         tvItem.setWord("travel");
         tvItem.setSoundMark("[ˈtrævəl]");
+        tvItem.setCommentNum("321");
+        tvItem.setPlayNum("1.3w");
+        tvItem.setLikeNum("999+");
         for (int i = 0; i < 4; i ++) {
             mItemList.add(tvItem);
         }

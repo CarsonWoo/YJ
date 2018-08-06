@@ -1,11 +1,9 @@
 package com.example.carson.yjenglish.login;
 
 import com.example.carson.yjenglish.login.model.ForgetModel;
-import com.example.carson.yjenglish.uitls.CommonInfo;
+import com.example.carson.yjenglish.utils.CommonInfo;
 
 import retrofit2.http.Body;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 import rx.Observable;
 

@@ -3,7 +3,7 @@ package com.example.carson.yjenglish.login;
 import com.example.carson.yjenglish.login.model.ForgetModel;
 import com.example.carson.yjenglish.net.LoadTasksCallback;
 import com.example.carson.yjenglish.net.NetTask;
-import com.example.carson.yjenglish.uitls.CommonInfo;
+import com.example.carson.yjenglish.utils.CommonInfo;
 
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;

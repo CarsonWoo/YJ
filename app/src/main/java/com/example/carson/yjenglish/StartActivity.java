@@ -1,18 +1,15 @@
 package com.example.carson.yjenglish;
 
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
-import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
 import com.example.carson.yjenglish.login.view.LoginActivity;
-import com.example.carson.yjenglish.uitls.UserConfig;
+import com.example.carson.yjenglish.utils.UserConfig;
 
 public class StartActivity extends AppCompatActivity {
 

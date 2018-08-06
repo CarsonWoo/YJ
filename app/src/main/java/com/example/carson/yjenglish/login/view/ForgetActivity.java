@@ -21,7 +21,7 @@ import com.example.carson.yjenglish.login.ForgetContract;
 import com.example.carson.yjenglish.login.ForgetTask;
 import com.example.carson.yjenglish.login.model.ForgetModel;
 import com.example.carson.yjenglish.login.presenter.ForgetPresenter;
-import com.example.carson.yjenglish.uitls.CommonInfo;
+import com.example.carson.yjenglish.utils.CommonInfo;
 
 public class ForgetActivity extends AppCompatActivity implements View.OnClickListener,
         ForgetContract.View {

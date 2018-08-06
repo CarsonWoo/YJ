@@ -1,4 +1,4 @@
-package com.example.carson.yjenglish.uitls;
+package com.example.carson.yjenglish.utils;
 
 /**
  * Created by 84594 on 2018/7/31.

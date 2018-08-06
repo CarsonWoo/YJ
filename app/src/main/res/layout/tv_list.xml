@@ -78,7 +78,7 @@
             android:layout_toLeftOf="@id/like_num"
             android:layout_marginEnd="3dp"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_comment_gray"
+            android:src="@drawable/ic_like_black_stroke"
             />
 
         <TextView
