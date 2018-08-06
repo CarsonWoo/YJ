@@ -13,4 +13,12 @@
     <declare-styleable name="CodeView">
         <attr name="setText" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="MyProgressView">
+        <attr name="progress" format="float"/>
+    </declare-styleable>
+
+    <declare-styleable name="RoundRectImageView">
+        <attr name="radius" format="float" />
+    </declare-styleable>
 </resources>

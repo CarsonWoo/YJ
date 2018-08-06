@@ -210,4 +210,12 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
             }
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (forgetPresenter != null) {
+            forgetPresenter.unsubscribe();
+        }
+    }
 }

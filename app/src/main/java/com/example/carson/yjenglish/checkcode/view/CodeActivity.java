@@ -201,6 +201,9 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
         if (mContent != null) {
             this.getContentResolver().unregisterContentObserver(mContent);
         }
+        if (codePresenter != null) {
+            codePresenter.unsubscribe();
+        }
     }
 
     @Override

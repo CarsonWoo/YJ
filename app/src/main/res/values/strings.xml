@@ -16,4 +16,18 @@
     <string name="find_password">找回密码</string>
     <string name="edit_code">请输入验证码</string>
     <string name="reload_code">重新获取验证码</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="start_remember">开始背单词</string>
+    <string name="music_area_name">语境随身听</string>
+    <string name="already_rememeber">已背单词</string>
+    <string name="sign_in_daily">打卡</string>
+    <string name="more_20">再来20个</string>
+    <string name="already_handle">已掌握单词</string>
+    <string name="non_ready">未背单词</string>
+    <string name="show_meaning">释义</string>
+    <string name="recover">Recover</string>
+    <string name="pass">Pass</string>
+    <string name="my_comment">我的评论</string>
 </resources>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="10dp"
+    android:layout_marginBottom="10dp"
+    android:background="@android:color/white"
+    android:layout_height="260dp">
+
+    <FrameLayout
+        android:id="@+id/video"
+        android:background="#eef"
+        android:layout_width="match_parent"
+        android:layout_height="200dp" />
+
+    <ImageView
+        android:id="@+id/item_video_play"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_play"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/rl_click_view"
+        />
+
+    <RelativeLayout
+        android:id="@+id/rl_click_view"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        >
+
+        <TextView
+            android:id="@+id/word"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="travel[ˈtrævəl]"
+            android:textColor="@color/colorTextWord"
+            android:textSize="18sp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            />
+
+        <com.example.carson.yjenglish.customviews.SoundMarkTextView
+            android:id="@+id/soundmark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="[ˈtrævəl]"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="10dp"
+            android:layout_below="@id/word"
+            />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/comment_num"
+            android:layout_marginEnd="3dp"
+            android:src="@drawable/ic_comment_black"
+            />
+
+        <TextView
+            android:id="@+id/comment_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/like_num"
+            android:layout_marginEnd="45dp"
+            android:text="999+"
+            />
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_toLeftOf="@id/like_num"
+            android:layout_marginEnd="3dp"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_comment_gray"
+            />
+
+        <TextView
+            android:id="@+id/like_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="true"
+            android:text="1.3w"
+            android:layout_marginEnd="8dp"
+            />
+
+    </RelativeLayout>
+
+
+
+</android.support.constraint.ConstraintLayout>

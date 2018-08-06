@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:id="@+id/root_send_code"
-    android:background="@drawable/shape_round_rect_edit"
+    android:background="@drawable/round_rect_edit"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 

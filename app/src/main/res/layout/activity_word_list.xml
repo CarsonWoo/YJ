@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#f9feff"
+    android:fitsSystemWindows="true"
+    android:clipToPadding="true"
+    tools:context="com.example.carson.yjenglish.home.view.WordListAty">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="38dp"
+        android:gravity="center_vertical">
+
+        <ImageView
+            android:id="@+id/back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_left"
+            android:layout_marginStart="5dp"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="单词列表"
+            android:textSize="18sp"
+            android:textColor="#eb000000"
+            />
+
+    </RelativeLayout>
+    
+    <android.support.design.widget.TabLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:background="@android:color/white"
+        android:layout_marginTop="50dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tabTextColor="@color/colorTextHint"
+        app:tabSelectedTextColor="@color/colorAccent"
+        app:tabGravity="fill"
+        app:tabIndicatorHeight="0dp"
+        >
+        <android.support.design.widget.TabItem
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/already_rememeber"/>
+        <android.support.design.widget.TabItem
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/already_handle"
+            />
+        <android.support.design.widget.TabItem
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/non_ready"/>
+    </android.support.design.widget.TabLayout>
+
+    <TextView
+        android:id="@+id/word_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="单词总数：8"
+        android:textColor="@color/colorTextHint"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toBottomOf="@id/tab_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:paddingBottom="150dp"
+        app:layout_constraintTop_toBottomOf="@id/word_count"
+        />
+
+</android.support.constraint.ConstraintLayout>

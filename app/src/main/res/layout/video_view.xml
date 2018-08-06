@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/my_video_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="#16e8fffa">
+
+    <com.pili.pldroid.player.widget.PLVideoTextureView
+        android:id="@+id/video_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <View
+        android:id="@+id/video_click"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#00ffffff" />
+
+    <ImageView
+        android:id="@+id/video_playpause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_play"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <LinearLayout
+        android:id="@+id/video_control_ll"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#53cccccc"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="3dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <ImageView
+            android:id="@+id/video_control_play_pause"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_play" />
+
+        <SeekBar
+            android:id="@+id/video_seekbar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/video_full_screen"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_fullscreen" />
+
+    </LinearLayout>
+
+
+
+</android.support.constraint.ConstraintLayout>

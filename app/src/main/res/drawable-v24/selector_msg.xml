@@ -3,5 +3,4 @@
 
     <item android:state_selected="false" android:drawable="@drawable/ic_msg_unsel" />
     <item android:state_selected="true" android:drawable="@drawable/ic_msg_sel" />
-
 </selector>

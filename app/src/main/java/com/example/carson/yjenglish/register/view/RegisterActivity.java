@@ -164,4 +164,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             }
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (registerPresenter != null) {
+            registerPresenter.unsubscribe();
+        }
+    }
 }
