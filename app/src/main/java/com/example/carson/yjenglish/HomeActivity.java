@@ -13,7 +13,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 
+import com.example.carson.yjenglish.customviews.MyVideoView;
 import com.example.carson.yjenglish.discover.DiscoverFragment;
 import com.example.carson.yjenglish.home.view.HomeFragment;
 import com.example.carson.yjenglish.home.view.WordListAty;
@@ -67,17 +69,13 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
             public void onTabReselected(TabLayout.Tab tab) {
             }
         });
-
-
     }
-
     private void setDefaultFragment() {
         fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         ft.add(R.id.home_container, HomeFragment.newInstance());
         ft.commit();
     }
-
     private void setContainerView(TabLayout.Tab tab) {
         fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();

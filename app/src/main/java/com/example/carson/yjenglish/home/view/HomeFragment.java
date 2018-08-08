@@ -2,25 +2,32 @@ package com.example.carson.yjenglish.home.view;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
+import com.example.carson.yjenglish.FullScreenVideo;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.HomeListAdapter;
 import com.example.carson.yjenglish.customviews.MyVideoView;
 import com.example.carson.yjenglish.home.model.HomeItem;
 import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.home.model.PicHeader;
+import com.example.carson.yjenglish.utils.ScreenUtils;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
@@ -36,7 +43,6 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     private final String TAG = "HomeFragment";
 
     private RecyclerView recyclerView;
-    private FrameLayout mFullScreenFl;
     private MyVideoView mVideoView;
 
     private int mHeaderStyle;
@@ -48,9 +54,12 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     private HomeListAdapter mAdapter;
 
     private OnHomeInteractListener mListener;
+    private OnFullScreenListener fullScreenListener;
     private PicHeader mPicData;
     private LoadHeader mLoadData;
     private List<HomeItem> mListData;
+
+    private boolean isFullClick = false;
 
     public HomeFragment() {
 
@@ -102,8 +111,15 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         mVideoView.setFullScreenListener(new MyVideoView.IFullScreenListener() {
             @Override
             public void onClickFull(boolean isFull) {
-                //TODO 跳转到新的Activity播放
                 //if isPlaying 则把progress传过去
+                //需要横屏
+                isFullClick = true;
+                int progress = mVideoView.getPosition();
+                Intent toFullScreen = new Intent(getContext(), FullScreenVideo.class);
+                toFullScreen.putExtra("progress", progress);
+                toFullScreen.putExtra("path", path);
+                startActivityForResult(toFullScreen, 1);
+                getActivity().overridePendingTransition(R.anim.anim_top_rotate_get_into, R.anim.anim_top_rotate_sign_out);
             }
         });
 
@@ -120,12 +136,6 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     }
 
 
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.e(TAG, "onSaveInstance");
-    }
-
     private void removeVideoView() {
         View v;
         if (lastView != null) {
@@ -140,12 +150,16 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         }
     }
 
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.e(TAG, "onSaveInstance");
+    }
+
     private void initViews(View view) {
         recyclerView = view.findViewById(R.id.rv_container);
         mLayoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(mLayoutManager);
-
-        mFullScreenFl = view.findViewById(R.id.fl_full_screen);
 
         mListData = new ArrayList<>();
         mPicData = new PicHeader();
@@ -227,6 +241,25 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if (resultCode == FullScreenVideo.RESULT_VIDEO_COMPLETE) {
+                isFullClick = false;
+                if (mVideoView != null) {
+                    mVideoView.stop();
+                }
+            } else if (resultCode == FullScreenVideo.RESULT_VIDEO_NOT_FINISH) {
+                if (mVideoView != null) {
+                    mVideoView.seekTo(data.getIntExtra("progress", 0));
+                    mVideoView.start();
+                }
+                isFullClick = false;
+            }
+        }
+    }
+
+    @Override
     public void onHiddenChanged(boolean hidden) {
         super.onHiddenChanged(hidden);
         if (hidden) {
@@ -239,16 +272,27 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     @Override
     public void onStop() {
         super.onStop();
+        Log.e(TAG, "isFullClick = " + isFullClick);
+        Log.e(TAG, "onStop");
         if (mVideoView != null) {
-            mVideoView.stop();
+            if (isFullClick) {
+                mVideoView.pause();
+            } else {
+                mVideoView.stop();
+            }
         }
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        Log.e(TAG, "isFullClick = " + isFullClick);
         if (mVideoView != null) {
-            mVideoView.stop();
+            if (isFullClick) {
+                mVideoView.pause();
+            } else {
+                mVideoView.stop();
+            }
         }
     }
 
@@ -279,6 +323,10 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         void onMusicPressed(View view);
         void onItemClick(ArrayList item);
         void onProgressClick(View view);
+    }
+
+    public interface OnFullScreenListener {
+        void onFullScreen(String path, int progress);
     }
 
 }

@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -206,6 +208,7 @@ public class MyVideoView extends ConstraintLayout {
         fullScreen.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
+                pause();
                 isFull = !isFull;
                 setFullScreen(isFull);
                 if (listener != null) {
@@ -266,6 +269,25 @@ public class MyVideoView extends ConstraintLayout {
         isPause = false;
         mVideoView.start();
         showControl();
+    }
+
+    /**
+     * 设置播放旋转角度
+     */
+    public void onRotate(boolean isFull) {
+        if (isFull) {
+            mVideoView.setDisplayOrientation(90);
+            playOrPauseView.setRotation(-90);
+            controlView.setRotation(-90);
+        } else {
+            mVideoView.setDisplayOrientation(-90);
+            playOrPauseView.setRotation(90);
+            controlView.setRotation(90);
+        }
+    }
+
+    public void setControlRotate(ConstraintLayout.LayoutParams params) {
+        controlView.setLayoutParams(params);
     }
 
     /**

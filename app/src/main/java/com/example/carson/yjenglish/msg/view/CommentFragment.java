@@ -61,25 +61,25 @@ public class CommentFragment extends Fragment {
 
         mAdapter = new MsgAdapters.CommentAdapter(getContext(), mComments);
         recyclerView.setAdapter(mAdapter);
-        for (int i = 0; i < 10; i++) {
-            CommentMsg comment = new CommentMsg();
-            comment.setUsername("carson");
-            if (i % 2 == 0) {
-                comment.setType("评论了你");
-            } else {
-                comment.setType("回复了你");
-            }
-            comment.setContent("不错不错");
-            comment.setDate("2018/8/6");
-            comment.setOrigin("原创：《大海鱼塘》");
-            comment.setImgUrl("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533311106938&di=a428eb3a3220df77190f2b9b2abef542&imgtype=0&src=http%3A%2F%2Fphotocdn.sohu.com%2F20150907%2Fmp30906533_1441629699374_2.jpeg");
-            mComments.add(comment);
-        }
+//        for (int i = 0; i < 10; i++) {
+//            CommentMsg comment = new CommentMsg();
+//            comment.setUsername("carson");
+//            if (i % 2 == 0) {
+//                comment.setType("评论了你");
+//            } else {
+//                comment.setType("回复了你");
+//            }
+//            comment.setContent("不错不错");
+//            comment.setDate("2018/8/6");
+//            comment.setOrigin("原创：《大海鱼塘》");
+//            comment.setImgUrl("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533311106938&di=a428eb3a3220df77190f2b9b2abef542&imgtype=0&src=http%3A%2F%2Fphotocdn.sohu.com%2F20150907%2Fmp30906533_1441629699374_2.jpeg");
+//            mComments.add(comment);
+//        }
         View emptyView = View.inflate(getContext(), R.layout.layout_error, null);
         TextView errorMsg = emptyView.findViewById(R.id.error_text);
         errorMsg.setText("暂时没有数据噢...");
         ImageView errorImg = emptyView.findViewById(R.id.error_img);
-        errorImg.setImageResource(R.drawable.ic_warning);
+        errorImg.setImageResource(R.drawable.testimg);
         emptyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         recyclerView.setEmptyView(emptyView);

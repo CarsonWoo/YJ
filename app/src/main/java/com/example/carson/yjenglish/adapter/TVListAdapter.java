@@ -1,7 +1,9 @@
 package com.example.carson.yjenglish.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -62,7 +64,7 @@ public class TVListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         }
     }
 
-    private void bindList(TVHolder holder, int position) {
+    private void bindList(final TVHolder holder, int position) {
         holder.item = mItemList.get(position - 1);
         holder.word.setText(holder.item.getWord());
         holder.soundMark.setText(holder.item.getSoundMark());
@@ -72,7 +74,7 @@ public class TVListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             @Override
             public void onClick(View view) {
                 if (itemListener != null) {
-                    itemListener.onVideoClick(view);
+                    itemListener.onVideoClick(holder.itemView, holder.item.getVideoUrl());
                 }
             }
         });
@@ -84,6 +86,7 @@ public class TVListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 }
             }
         });
+        holder.videoBg.setBackgroundColor(Color.parseColor("#eeeeff"));
     }
 
     private void bindHeader(TVHeadHolder holder) {
@@ -148,15 +151,19 @@ public class TVListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
         FrameLayout video;
         ImageView play;
+        ImageView videoBg;
         TextView word;
         SoundMarkTextView soundMark;
         TextView commentNum;
         TextView likeNum;
         TVItem item;
         RelativeLayout mClickView;
+        ConstraintLayout itemView;
 
         public TVHolder(View itemView) {
             super(itemView);
+            this.itemView = (ConstraintLayout) itemView;
+            videoBg = itemView.findViewById(R.id.video_bg);
             video = itemView.findViewById(R.id.video);
             play = itemView.findViewById(R.id.item_video_play);
             word = itemView.findViewById(R.id.word);
@@ -192,7 +199,7 @@ public class TVListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
     public interface OnItemClickListener {
-        void onVideoClick(View view);//点击了直接播放
+        void onVideoClick(View view, String path);//点击了直接播放
         void onItemClick(View view);//点击了跳转
     }
 }

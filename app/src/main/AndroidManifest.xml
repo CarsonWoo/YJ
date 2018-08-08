@@ -64,6 +64,10 @@
             </intent-filter>
         </activity>
         <activity android:name=".home.view.WordListAty" />
+        <activity
+            android:name=".FullScreenVideo"
+            android:screenOrientation="landscape" />
+        <activity android:name=".home.view.WordActivity"></activity>
     </application>
 
 </manifest>

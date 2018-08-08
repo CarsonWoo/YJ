@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportHeight="20"
+    android:viewportWidth="20">
+
+    <path
+        android:strokeWidth="0.8"
+        android:strokeColor="@color/colorAccent"
+        android:fillColor="@color/colorAccent"
+        android:strokeLineJoin="round"
+        android:strokeLineCap="round"
+        android:pathData="M 6 8.5 L 6 11.5 L 7.5 11.5 L 10.5 15 L 10.5 5 L 7.5 8.5 Z" />
+
+    <path
+        android:name="sound_level_1"
+        android:strokeWidth="0.8"
+        android:strokeColor="@color/colorAccent"
+        android:strokeLineCap="round"
+        android:pathData="M 12.5 8 Q 14.5 10 12.5 12" />
+
+    <path
+        android:name="sound_level_2"
+        android:strokeWidth="0.8"
+        android:strokeColor="@color/colorAccent"
+        android:strokeLineCap="round"
+        android:pathData="M 13.5 6 Q 17.5 10 13.5 14" />
+
+
+</vector>
