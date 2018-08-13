@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.androidkun.PullToRefreshRecyclerView;
 import com.androidkun.callback.PullToRefreshListener;
+import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.MsgAdapters;
 import com.example.carson.yjenglish.msg.model.CommentMsg;
@@ -79,7 +80,7 @@ public class CommentFragment extends Fragment {
         TextView errorMsg = emptyView.findViewById(R.id.error_text);
         errorMsg.setText("暂时没有数据噢...");
         ImageView errorImg = emptyView.findViewById(R.id.error_img);
-        errorImg.setImageResource(R.drawable.testimg);
+        Glide.with(getContext()).load(R.drawable.testimg).thumbnail(0.5f).into(errorImg);
         emptyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         recyclerView.setEmptyView(emptyView);

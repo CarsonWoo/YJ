@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:id="@+id/root_send_code"
-    android:background="@drawable/round_rect_edit"
+    android:background="@drawable/baseline_edit_gray"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
@@ -13,13 +13,15 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:background="@null"
+        android:paddingBottom="40dp"
         android:textColor="@color/colorText"
         android:textColorHint="@color/colorTextHint"
-        android:drawablePadding="10dp"
-        android:textSize="16sp"
+        android:drawablePadding="20dp"
+        android:textSize="15sp"
         android:inputType="textPassword"
-        android:drawableStart="@drawable/ic_password"
+        android:drawableStart="@drawable/ic_password_20dp"
         android:hint="@string/edit_password"
+        android:maxLength="16"
         android:layout_toLeftOf="@id/btn_show_password"
         />
 
@@ -27,6 +29,7 @@
         android:id="@+id/btn_show_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingBottom="40dp"
         android:src="@drawable/ic_cover"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <com.example.carson.yjenglish.customviews.CorrectOrWrongTextView
+        android:id="@+id/trans_1"
+        android:layout_width="match_parent"
+        android:layout_height="65dp" />
+
+    <com.example.carson.yjenglish.customviews.CorrectOrWrongTextView
+        android:id="@+id/trans_2"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_marginTop="1dp"
+        app:layout_constraintTop_toBottomOf="@id/trans_1"/>
+
+    <com.example.carson.yjenglish.customviews.CorrectOrWrongTextView
+        android:id="@+id/trans_3"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_marginTop="1dp"
+        app:layout_constraintTop_toBottomOf="@id/trans_2"/>
+
+    <com.example.carson.yjenglish.customviews.CorrectOrWrongTextView
+        android:id="@+id/trans_4"
+        android:layout_width="match_parent"
+        android:layout_height="65dp"
+        android:layout_marginTop="1dp"
+        app:layout_constraintTop_toBottomOf="@id/trans_3"/>
+
+</android.support.constraint.ConstraintLayout>

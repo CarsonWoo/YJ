@@ -1,6 +1,9 @@
 package com.example.carson.yjenglish.zone;
 
 
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -30,6 +33,7 @@ public class ZoneFragment extends Fragment {
     private TextView download;
     private TextView comment;
     private TextView setting;
+    private ImageView bgImg;
 
     public ZoneFragment() {
         // Required empty public constructor
@@ -59,10 +63,16 @@ public class ZoneFragment extends Fragment {
         download = view.findViewById(R.id.my_download);
         comment = view.findViewById(R.id.my_comment);
         setting = view.findViewById(R.id.my_setting);
+        bgImg = view.findViewById(R.id.zone_bg_img);
 
         Glide.with(getContext()).load(R.mipmap.ic_launcher_round).asBitmap().into(portrait);
         username.setText("单词小霸王");
         signature.setText("一位背单词萌新");
+
+        Glide.with(this).load(R.drawable.zone_bg).thumbnail(0.6f).into(bgImg);
+//        BitmapDrawable bd = (BitmapDrawable) bgImg.getDrawable();
+//        bgImg.setImageBitmap(Bitmap.createBitmap(bd.getBitmap(), 0, 0, bd.getBitmap().getWidth(),
+//                bd.getBitmap().getHeight() - 1500));
     }
 
 }

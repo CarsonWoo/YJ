@@ -24,18 +24,13 @@ public class LoginTask implements NetTask<LoginModule> {
     private static final String HOST = "";
     private Retrofit retrofit;
 
-    private static final int TYPE_PASSWORD = 0;
-    private static final int TYPE_CODE = 1;
-    private int type;
-
-    private LoginTask(int type) {
-        this.type = type;
+    private LoginTask() {
         createRetrofit();
     }
 
-    public static LoginTask getInstance(int type) {
+    public static LoginTask getInstance() {
         if (INSTANCE == null) {
-            INSTANCE = new LoginTask(type);
+            INSTANCE = new LoginTask();
         }
         return INSTANCE;
     }
@@ -53,11 +48,7 @@ public class LoginTask implements NetTask<LoginModule> {
         LoginService loginService = retrofit.create(LoginService.class);
         Observable<LoginInfo> mObservable;
         Subscription subscription;
-        if (type == TYPE_CODE) {
-            mObservable = loginService.getLoginResponse(module.getUsername(), module.getCode());
-        } else {
-            mObservable = loginService.getLoginResponse(module.getUsername(), module.getPassword());
-        }
+        mObservable = loginService.getLoginResponse(module.getUsername(), module.getPassword());
         subscription = mObservable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<LoginInfo>() {
                     @Override

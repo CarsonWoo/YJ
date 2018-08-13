@@ -43,7 +43,7 @@ public class RememberListAdapter extends RecyclerView.Adapter<RememberListAdapte
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
         holder.trans.setText(holder.item.getTrans());
-        holder.btnTrans.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (listener != null) {
@@ -74,15 +74,15 @@ public class RememberListAdapter extends RecyclerView.Adapter<RememberListAdapte
 
         TextView word;
         TextView trans;
-        Button btnTrans;
         Button pass;
         RememberWord item;
+        View itemView;
 
         public ListViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             word = itemView.findViewById(R.id.tv_word);
             trans = itemView.findViewById(R.id.tv_trans);
-            btnTrans = itemView.findViewById(R.id.btn_meaning);
             pass = itemView.findViewById(R.id.btn_pass);
         }
     }

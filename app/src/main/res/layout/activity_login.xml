@@ -5,34 +5,32 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#f2fffd"
+    android:background="#f9fffe"
     android:fitsSystemWindows="true"
     android:clipToPadding="true"
     tools:context="com.example.carson.yjenglish.login.view.LoginActivity">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/login_bg"
-        android:gravity="center_horizontal"
-        app:layout_constraintTop_toTopOf="parent"
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:text="语\n境"
+        android:textColor="@color/colorAccent"
+        android:textSize="39sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
-        <TextView
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:layout_marginTop="50dp"
-            android:background="@drawable/round_rect_edit"
-            android:textColor="@color/colorAccent"
-            android:textSize="25sp"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:text="语境"
-            />
-
-    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_rect_edit"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
+        app:layout_constraintTop_toBottomOf="@id/tv1" />
 
     <TextView
         android:id="@+id/test_use"
@@ -50,147 +48,98 @@
         android:id="@+id/edit_phone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="160dp"
-        android:background="@drawable/round_rect_edit"
+        android:layout_marginTop="80dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginEnd="55dp"
+        android:background="@drawable/baseline_edit_gray"
         android:hint="@string/edit_phone"
-        android:drawableStart="@drawable/ic_phone"
+        android:drawableStart="@drawable/ic_phone_20dp"
         android:textColor="@color/colorText"
         android:textColorHint="@color/colorTextHint"
-        android:drawablePadding="10dp"
-        android:paddingStart="15dp"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
-        android:paddingEnd="10dp"
-        android:textSize="16sp"
+        android:maxLength="16"
+        android:drawablePadding="25dp"
+        android:paddingBottom="40dp"
+        android:textSize="15sp"
         android:inputType="phone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/tv1" />
 
     <com.example.carson.yjenglish.customviews.PasswordEditText
         android:id="@+id/edit_password"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="0.1dp"
-        android:background="@drawable/round_rect_edit"
+        android:layout_marginStart="55dp"
+        android:layout_marginEnd="55dp"
         android:textColor="@color/colorText"
         android:textColorHint="@color/colorTextHint"
-        android:paddingStart="15dp"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
-        android:paddingEnd="10dp"
-        android:drawableStart="@drawable/ic_password"
+        android:drawableStart="@drawable/ic_password_20dp"
         android:hint="@string/edit_password"
         app:layout_constraintTop_toBottomOf="@id/edit_phone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <TextView
-        android:id="@+id/tv_code_login"
+        android:id="@+id/btn_register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/code_login"
+        android:text="@string/click2register"
         android:textColor="@color/colorText"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
+        android:textSize="13sp"
         app:layout_constraintTop_toBottomOf="@id/btn_login"
-        app:layout_constraintStart_toStartOf="@id/btn_login"
+        app:layout_constraintEnd_toEndOf="@id/btn_login"
         />
 
     <TextView
         android:id="@+id/tv_forget_password"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/forget_password"
+        android:text="@string/find_password"
         android:textColor="@color/colorText"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
+        android:textSize="13sp"
         app:layout_constraintTop_toBottomOf="@id/btn_login"
-        app:layout_constraintEnd_toEndOf="@id/btn_login"
+        app:layout_constraintStart_toStartOf="@id/btn_login"
         />
 
     <Button
         android:id="@+id/btn_login"
         android:layout_width="0dp"
-        android:layout_height="50dp"
-        android:background="@drawable/round_rect_btn_main"
+        android:layout_height="40dp"
+        android:background="@drawable/solid_half_circle_btn"
         android:textColor="#beffffff"
         android:textStyle="bold"
         android:text="@string/confirm"
         android:textSize="18sp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginStart="55dp"
+        android:layout_marginEnd="55dp"
         app:layout_constraintTop_toBottomOf="@id/edit_password"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_rect_btn_gray"
-        android:layout_marginTop="25dp"
-        android:layout_marginStart="5dp"
-        android:paddingStart="15dp"
-        android:paddingTop="7dp"
-        android:paddingEnd="15dp"
-        android:paddingBottom="7dp"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="@id/btn_login"
-        app:layout_constraintEnd_toEndOf="@id/btn_login"
-        app:layout_constraintTop_toBottomOf="@id/tv_code_login">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="#f9f9f9"
-            android:text="还没有账号，"
-            android:layout_gravity="center_vertical"/>
-
-        <com.example.carson.yjenglish.customviews.BaselineTextView
-            android:id="@+id/btn_register"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/click2register"
-            app:baseline_color="#f9f9f9"
-            android:textColor="#f9f9f9"/>
-
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/tv1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="—————— OR ——————"
-        android:textSize="16sp"
-        android:textColor="#f9f9f9"
-        android:layout_marginTop="100dp"
-        app:layout_constraintStart_toStartOf="@id/btn_login"
-        app:layout_constraintEnd_toEndOf="@id/btn_login"
-        app:layout_constraintTop_toBottomOf="@id/tv_code_login"/>
-
     <ImageButton
         android:id="@+id/btn_qq"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:background="@drawable/round_btn"
         android:src="@drawable/ic_home_unsel"
-        android:layout_marginStart="5dp"
-        android:layout_marginTop="3dp"
-        app:layout_constraintTop_toBottomOf="@id/tv1"
-        app:layout_constraintStart_toStartOf="@id/tv1"
+        android:layout_marginTop="65dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_forget_password"
+        app:layout_constraintStart_toEndOf="@id/tv_forget_password"
         />
 
     <ImageButton
         android:id="@+id/btn_wechat"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:background="@drawable/round_btn"
         android:src="@drawable/ic_home_unsel"
-        android:layout_marginEnd="5dp"
-        android:layout_marginTop="3dp"
-        app:layout_constraintTop_toBottomOf="@id/tv1"
-        app:layout_constraintEnd_toEndOf="@id/tv1"
+        android:layout_marginTop="65dp"
+        app:layout_constraintTop_toBottomOf="@id/tv_forget_password"
+        app:layout_constraintEnd_toStartOf="@id/btn_register"
         />
 
     <TextView

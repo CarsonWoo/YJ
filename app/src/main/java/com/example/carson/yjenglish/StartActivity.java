@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.example.carson.yjenglish.login.view.LoginActivity;
+import com.example.carson.yjenglish.register.view.RegisterActivity;
 import com.example.carson.yjenglish.utils.UserConfig;
 
 public class StartActivity extends AppCompatActivity {
@@ -41,8 +42,13 @@ public class StartActivity extends AppCompatActivity {
                     startActivity(new Intent(StartActivity.this, HomeActivity.class));
                     overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                 } else {
-                    startActivity(new Intent(StartActivity.this, LoginActivity.class));
-                    overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    if (UserConfig.isIsFirstTimeUser()) {
+                        startActivity(new Intent(StartActivity.this, RegisterActivity.class));
+                        overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    } else {
+                        startActivity(new Intent(StartActivity.this, LoginActivity.class));
+                        overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    }
                 }
                 finish();
             }

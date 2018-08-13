@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 public class UserConfig {
 
     private static String APP_ID = "YJEnglish";
+    private static boolean isFirstTimeUser = true;
 
     public static void cacheToken(Context context, String token) {
         SharedPreferences sp = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE);
@@ -29,4 +30,11 @@ public class UserConfig {
         editor.clear();
     }
 
+    public static boolean isIsFirstTimeUser() {
+        return isFirstTimeUser;
+    }
+
+    public static void setIsFirstTimeUser(boolean isFirstTimeUser) {
+        UserConfig.isFirstTimeUser = isFirstTimeUser;
+    }
 }

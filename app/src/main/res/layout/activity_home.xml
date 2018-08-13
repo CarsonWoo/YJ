@@ -19,6 +19,7 @@
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="53dp"
+        android:background="@android:color/white"
         android:textAlignment="center"
         app:tabIndicatorHeight="0dp"
         app:tabGravity="fill"

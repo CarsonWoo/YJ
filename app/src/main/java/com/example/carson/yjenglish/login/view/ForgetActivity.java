@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.carson.yjenglish.R;
@@ -27,14 +28,17 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
         ForgetContract.View {
 
     //判断从哪里跳转来
-    private final int INTENT_FROM_CODE = 1;
+    private final int INTENT_FROM_CODE_FORGET = 1;
     private final int INTENT_FROM_LOGIN = 0;
+    private final int INTENT_FROM_CODE_REGISTER = 2;
 
     private final int RESULT_FORGET_OK = 102;
 
     private ImageView back;
     private PasswordEditText phone;
     private Button confirm;
+
+    private TextView toolbarTitle;
 
     private String phoneStr;
     private int code;
@@ -62,12 +66,18 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
         back = findViewById(R.id.forget_back);
         phone = findViewById(R.id.edit_phone);
         confirm = findViewById(R.id.btn_confirm);
+        toolbarTitle = findViewById(R.id.toolbar_title);
 
         confirm.setOnClickListener(this);
         back.setOnClickListener(this);
 
         mIntentType = getIntent().getIntExtra("type", INTENT_FROM_LOGIN);
-        if (mIntentType == INTENT_FROM_CODE) {
+        if (mIntentType == INTENT_FROM_CODE_REGISTER) {
+            toolbarTitle.setText("设置密码");
+        } else {
+            toolbarTitle.setText(R.string.find_password);
+        }
+        if (mIntentType == INTENT_FROM_CODE_FORGET || mIntentType == INTENT_FROM_CODE_REGISTER) {
             initPasswordView();
         } else {
             initPhoneView();
@@ -78,8 +88,8 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
     private void initPhoneView() {
         mClickCount = 0;
         phone.setInputType(InputType.TYPE_CLASS_PHONE);
-        phone.getText().setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
-        phone.setStartDrawable(getResources().getDrawable(R.drawable.ic_phone));
+        phone.getText().setFilters(new InputFilter[]{new InputFilter.LengthFilter(16)});
+        phone.setStartDrawable(getResources().getDrawable(R.drawable.ic_phone_20dp));
         phone.setHint("请输入手机号码");
         phone.setShowVisible(false);
     }
@@ -92,8 +102,8 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
 
         phone.setInputType(InputType.TYPE_CLASS_TEXT
                 | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        phone.getText().setFilters(new InputFilter[]{new InputFilter.LengthFilter(15)});
-        phone.setStartDrawable(getResources().getDrawable(R.drawable.ic_password));
+        phone.getText().setFilters(new InputFilter[]{new InputFilter.LengthFilter(16)});
+        phone.setStartDrawable(getResources().getDrawable(R.drawable.ic_password_20dp));
         phone.setHint("请输入密码");
         phone.setShowVisible(true);
         phone.setShowClickListener(new View.OnClickListener() {
@@ -125,9 +135,20 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
                     } else {
                         Toast.makeText(getApplicationContext(), "请检查手机号码是否填写正确", Toast.LENGTH_SHORT).show();
                     }
-                } else {
+                } else if (mIntentType == INTENT_FROM_CODE_FORGET) {
                     if (checkEnable()) {
                         executeTask();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "请先填写密码", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    if (checkEnable()) {
+                        Intent backIntent = new Intent();
+                        //密码
+                        backIntent.putExtra("password", phone.getText().toString());
+                        backIntent.putExtra("code", code);
+                        setResult(RESULT_OK, backIntent);
+                        onBackPressed();
                     } else {
                         Toast.makeText(getApplicationContext(), "请先填写密码", Toast.LENGTH_SHORT).show();
                     }
@@ -152,7 +173,7 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
         } else {
             if (mIntentType == INTENT_FROM_LOGIN && phone.getText().toString().length() == 11) {
                 return true;
-            } else if (mIntentType == INTENT_FROM_CODE) {
+            } else if (mIntentType == INTENT_FROM_CODE_FORGET || mIntentType == INTENT_FROM_CODE_REGISTER) {
                 return true;
             }
             return false;

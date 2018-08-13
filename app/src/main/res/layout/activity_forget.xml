@@ -26,6 +26,7 @@
             android:src="@drawable/ic_arrow_left"/>
 
         <TextView
+            android:id="@+id/toolbar_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/find_password"
@@ -36,35 +37,19 @@
 
     </RelativeLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:layout_marginBottom="1dp"
-        android:background="#11d3d3d3"
-        app:layout_constraintBottom_toTopOf="@id/edit_phone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#58d3d3d3"
-        app:layout_constraintBottom_toTopOf="@id/edit_phone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
     <com.example.carson.yjenglish.customviews.PasswordEditText
         android:id="@+id/edit_phone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginStart="15dp"
+        android:layout_marginEnd="15dp"
         android:background="@drawable/round_rect_edit"
         android:maxLength="11"
         android:inputType="phone"
         android:textSize="16sp"
-        android:paddingTop="15dp"
-        android:paddingBottom="15dp"
-        android:paddingStart="15dp"
-        android:paddingEnd="10dp"
+        android:paddingTop="25dp"
+        android:paddingStart="40dp"
+        android:paddingEnd="40dp"
         app:edit_hint="@string/edit_phone"
         android:drawablePadding="8dp"
         app:drawableStart="@drawable/ic_phone"
@@ -74,32 +59,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="0.5dp"
-        android:background="#61d3d3d3"
-        app:layout_constraintTop_toBottomOf="@id/edit_phone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="5dp"
-        android:layout_marginTop="1dp"
-        android:background="#11d3d3d3"
-        app:layout_constraintTop_toBottomOf="@id/edit_phone"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
-
     <Button
         android:id="@+id/btn_confirm"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:background="@drawable/round_rect_btn_main"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="50dp"
+        android:layout_height="40dp"
+        android:background="@drawable/solid_half_circle_btn"
+        android:layout_marginStart="55dp"
+        android:layout_marginEnd="55dp"
+        android:layout_marginTop="20dp"
         android:text="@string/confirm"
         android:textColor="#e3ffffff"
         android:textStyle="bold"

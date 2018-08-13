@@ -1,79 +1,57 @@
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.carson.yjenglish.discover.DiscoverFragment">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:clipChildren="false">
 
-        <ImageView
-            android:id="@+id/daily_sentence_img"
+        <com.example.carson.yjenglish.customviews.CanotSlidingViewPager
+            android:id="@+id/vp"
             android:layout_width="match_parent"
-            android:layout_height="450dp"
-            android:src="#cfaed1f1"
-            />
-
-        <ImageView
-            android:id="@+id/like_sentence"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_like_white_stroke"
+            android:layout_height="395dp"
             android:layout_marginTop="10dp"
-            android:layout_marginEnd="30dp"
-            app:layout_constraintTop_toTopOf="@id/daily_sentence_img"
-            app:layout_constraintEnd_toStartOf="@id/download_sentence"
-            />
-
-        <ImageView
-            android:id="@+id/download_sentence"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_comment_gray"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="30dp"
-            app:layout_constraintTop_toTopOf="@id/daily_sentence_img"
-            app:layout_constraintEnd_toStartOf="@id/share_sentence"
-            />
-
-        <ImageView
-            android:id="@+id/share_sentence"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_comment_gray"
-            android:layout_marginEnd="15dp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintTop_toTopOf="@id/daily_sentence_img"
-            app:layout_constraintEnd_toEndOf="@id/daily_sentence_img"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:clipChildren="false"
+            android:background="@android:color/transparent"
+            app:layout_constraintTop_toTopOf="parent"
             />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="13sp"
             android:text="福利社"
-            android:padding="10dp"
-            app:layout_constraintTop_toBottomOf="@id/daily_sentence_img"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/vp"
+            app:layout_constraintBottom_toTopOf="@id/rv_aty"
             />
 
         <com.androidkun.PullToRefreshRecyclerView
             android:id="@+id/rv_aty"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:layout_marginTop="35dp"
-            app:layout_constraintTop_toBottomOf="@id/daily_sentence_img"
-            />
+            android:layout_marginTop="50dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            app:layout_constraintTop_toBottomOf="@id/vp"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textSize="13sp"
             android:text="过关斩将"
-            android:padding="10dp"
+            android:layout_marginStart="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/rv_game"
             app:layout_constraintTop_toBottomOf="@id/rv_aty"
             />
 
@@ -81,15 +59,14 @@
             android:id="@+id/rv_game"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="10dp"
-            android:paddingEnd="10dp"
-            android:paddingTop="5dp"
-            android:paddingBottom="5dp"
-            android:layout_marginTop="35dp"
-            app:layout_constraintTop_toBottomOf="@id/rv_aty"
-            />
+            android:paddingBottom="20dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="50dp"
+            app:layout_constraintTop_toBottomOf="@id/rv_aty"/>
 
     </android.support.constraint.ConstraintLayout>
+
 
 
 

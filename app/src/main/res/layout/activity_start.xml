@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:clipToPadding="true"
-    android:background="@drawable/start_pic"
+    android:background="@drawable/start_img"
     tools:context="com.example.carson.yjenglish.StartActivity">
 
 </android.support.constraint.ConstraintLayout>

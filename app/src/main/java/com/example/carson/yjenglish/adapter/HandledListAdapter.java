@@ -41,7 +41,7 @@ public class HandledListAdapter extends RecyclerView.Adapter<HandledListAdapter.
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
         holder.trans.setText(holder.item.getTrans());
-        holder.btnTrans.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (listener != null) {
@@ -73,15 +73,15 @@ public class HandledListAdapter extends RecyclerView.Adapter<HandledListAdapter.
 
         TextView word;
         TextView trans;
-        Button btnTrans;
         Button recover;
         HandledWord item;
+        View itemView;
 
         public ListViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             word = itemView.findViewById(R.id.tv_word);
             trans = itemView.findViewById(R.id.tv_trans);
-            btnTrans = itemView.findViewById(R.id.btn_meaning);
             recover = itemView.findViewById(R.id.btn_recover);
         }
     }

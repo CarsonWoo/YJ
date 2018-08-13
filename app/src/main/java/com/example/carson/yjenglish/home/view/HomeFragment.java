@@ -201,7 +201,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                 mLoadData.setWordsCount(2000);
                 mLoadData.save();
             }
-            Log.e(TAG, mLoadData.isSaved() + "");
+//            Log.e(TAG, mLoadData.isSaved() + "");
             mAdapter.setLoadItem(mLoadData);
             initAdapterListener(3);
         }
@@ -223,7 +223,11 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             mAdapter.setStartListener(new HomeListAdapter.OnStartListener() {
                 @Override
                 public void onStartClick(View view) {
-                    Log.i(TAG, "Load Start Click");
+                    Intent toWord = new Intent(getContext(), WordActivity.class);
+                    startActivity(toWord);
+                    if (getActivity() != null) {
+                        getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    }
                 }
             });
             mAdapter.setLoadListener(new HomeListAdapter.OnLoadHeaderListener() {

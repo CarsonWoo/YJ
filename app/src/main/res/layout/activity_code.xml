@@ -22,7 +22,7 @@
         />
 
     <TextView
-        android:id="@+id/tv1"
+        android:id="@+id/tv2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -43,8 +43,8 @@
         android:textSize="15sp"
         android:textColor="@color/colorUnselected"
         android:layout_marginTop="5dp"
-        app:layout_constraintStart_toStartOf="@id/tv1"
-        app:layout_constraintTop_toBottomOf="@id/tv1"
+        app:layout_constraintStart_toStartOf="@id/tv2"
+        app:layout_constraintTop_toBottomOf="@id/tv2"
         />
 
     <TextView
@@ -54,8 +54,8 @@
         android:textSize="15sp"
         android:textColor="@color/colorUnselected"
         android:layout_marginTop="28dp"
-        app:layout_constraintStart_toStartOf="@id/tv1"
-        app:layout_constraintTop_toBottomOf="@id/tv1"
+        app:layout_constraintStart_toStartOf="@id/tv2"
+        app:layout_constraintTop_toBottomOf="@id/tv2"
         />
 
     <com.example.carson.yjenglish.customviews.CodeView
@@ -71,6 +71,7 @@
         />
 
     <TextView
+        android:id="@+id/tv1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="若未收到验证码，请点击"
@@ -93,6 +94,17 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="205dp"
         app:layout_constraintTop_toBottomOf="@id/code_view"
+        />
+
+    <TextView
+        android:id="@+id/count_down_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15sp"
+        android:textColor="@color/colorText"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/code_view"
+        app:layout_constraintEnd_toEndOf="@id/reload_code"
         />
 
 </android.support.constraint.ConstraintLayout>

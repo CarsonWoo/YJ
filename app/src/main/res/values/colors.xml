@@ -6,10 +6,12 @@
     <color name="colorSelected">#dc64ffd0</color>
     <color name="colorUnselected">#e6dbdada</color>
     <color name="colorPink">#ffabbc</color>
+    <color name="colorRed">#f1ff817a</color>
     <color name="colorText">#656565</color>
     <color name="colorTextHint">#97919191</color>
     <color name="test1">#f862a99b</color>
     <color name="test2">#c6d5fff5</color>
     <color name="colorTextWord">#eb000000</color>
     <color name="colorYellow">#f2bf27</color>
+    <color name="colorPinkAlpha">#aae8918d</color>
 </resources>

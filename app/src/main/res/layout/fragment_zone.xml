@@ -2,18 +2,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#26d6e1de"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.example.carson.yjenglish.zone.ZoneFragment">
 
-    <com.example.carson.yjenglish.customviews.RoundRectImageView
+    <ImageView
         android:id="@+id/zone_bg_img"
         android:layout_width="match_parent"
-        android:layout_height="190dp"
-        android:src="@color/colorPrimary"
-        app:radius="20"
-        android:layout_marginStart="15dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginTop="8dp"
+        android:layout_height="268dp"
+        android:src="@drawable/zone_bg"
+        android:scaleType="centerCrop"
         app:layout_constraintTop_toTopOf="parent"
         />
 
@@ -24,7 +22,7 @@
         android:src="#bfffffff"
         app:civ_border_color="#2effffff"
         app:civ_border_width="2dp"
-        android:layout_marginTop="18dp"
+        android:layout_marginTop="20dp"
         app:layout_constraintStart_toStartOf="@id/zone_bg_img"
         app:layout_constraintEnd_toEndOf="@id/zone_bg_img"
         app:layout_constraintTop_toTopOf="@id/zone_bg_img"
@@ -34,9 +32,10 @@
         android:id="@+id/username"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
-        android:textColor="@color/colorTextWord"
+        android:textSize="15.5sp"
+        android:textColor="@android:color/white"
         android:layout_marginTop="18dp"
+        android:text="浅川青叶"
         app:layout_constraintStart_toStartOf="@id/zone_bg_img"
         app:layout_constraintEnd_toEndOf="@id/zone_bg_img"
         app:layout_constraintTop_toBottomOf="@id/portrait"
@@ -46,10 +45,11 @@
         android:id="@+id/signature"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="一缕清风，一缕青烟"
         android:textSize="10sp"
         android:singleLine="true"
         android:maxLength="25"
-        android:textColor="@color/colorText"
+        android:textColor="@android:color/white"
         android:layout_marginTop="5dp"
         app:layout_constraintTop_toBottomOf="@id/username"
         app:layout_constraintStart_toStartOf="@id/zone_bg_img"
@@ -60,8 +60,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        app:layout_constraintTop_toBottomOf="@id/zone_bg_img"
+        android:layout_marginBottom="15dp"
+        app:layout_constraintBottom_toBottomOf="@id/zone_bg_img"
         >
 
         <LinearLayout
@@ -75,6 +75,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
+                android:textColor="@android:color/white"
                 android:text="2"
                 android:textSize="20sp"
                 />
@@ -83,6 +84,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
+                android:textColor="@android:color/white"
                 android:text="打卡天数"
                 android:textSize="13sp"
                 />
@@ -106,6 +108,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
+                android:textColor="@android:color/white"
                 android:text="46"
                 android:textSize="20sp"
                 />
@@ -114,6 +117,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
+                android:textColor="@android:color/white"
                 android:text="已背单词"
                 android:textSize="13sp"
                 />
@@ -137,6 +141,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
+                android:textColor="@android:color/white"
                 android:text="2146"
                 android:textSize="20sp"
                 />
@@ -145,6 +150,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textAlignment="center"
+                android:textColor="@android:color/white"
                 android:text="剩余词数"
                 android:textSize="13sp"
                 />
@@ -157,10 +163,11 @@
         android:id="@+id/my_plan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         android:drawableStart="@drawable/ic_msg_sel_20dp"
         android:drawableEnd="@drawable/ic_arrow_right_20dp"
         android:drawablePadding="15dp"
-        android:paddingStart="10dp"
+        android:paddingStart="25dp"
         android:paddingEnd="10dp"
         android:paddingTop="13dp"
         android:paddingBottom="13dp"
@@ -168,8 +175,6 @@
         android:textSize="13sp"
         android:textColor="@color/colorTextWord"
         android:gravity="center_vertical"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="75dp"
         app:layout_constraintTop_toBottomOf="@id/zone_bg_img"
         />
 
@@ -177,10 +182,11 @@
         android:id="@+id/my_like"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         android:drawableStart="@drawable/ic_like_main_stroke_20dp"
         android:drawableEnd="@drawable/ic_arrow_right_20dp"
         android:drawablePadding="15dp"
-        android:paddingStart="10dp"
+        android:paddingStart="25dp"
         android:paddingEnd="10dp"
         android:paddingTop="13dp"
         android:paddingBottom="13dp"
@@ -188,7 +194,7 @@
         android:textSize="13sp"
         android:textColor="@color/colorTextWord"
         android:gravity="center_vertical"
-        android:layout_marginStart="15dp"
+        android:layout_marginTop="0.5dp"
         app:layout_constraintTop_toBottomOf="@id/my_plan"
         />
 
@@ -196,10 +202,11 @@
         android:id="@+id/my_download"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         android:drawableStart="@drawable/ic_msg_sel_20dp"
         android:drawableEnd="@drawable/ic_arrow_right_20dp"
         android:drawablePadding="15dp"
-        android:paddingStart="10dp"
+        android:paddingStart="25dp"
         android:paddingEnd="10dp"
         android:paddingTop="13dp"
         android:paddingBottom="13dp"
@@ -207,7 +214,7 @@
         android:textSize="13sp"
         android:textColor="@color/colorTextWord"
         android:gravity="center_vertical"
-        android:layout_marginStart="15dp"
+        android:layout_marginTop="0.5dp"
         app:layout_constraintTop_toBottomOf="@id/my_like"
         />
 
@@ -215,10 +222,11 @@
         android:id="@+id/my_comment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         android:drawableStart="@drawable/ic_comment_main_stroke_20dp"
         android:drawableEnd="@drawable/ic_arrow_right_20dp"
         android:drawablePadding="15dp"
-        android:paddingStart="10dp"
+        android:paddingStart="25dp"
         android:paddingEnd="10dp"
         android:paddingTop="13dp"
         android:paddingBottom="13dp"
@@ -226,7 +234,7 @@
         android:textSize="13sp"
         android:textColor="@color/colorTextWord"
         android:gravity="center_vertical"
-        android:layout_marginStart="15dp"
+        android:layout_marginTop="0.5dp"
         app:layout_constraintTop_toBottomOf="@id/my_download"
         />
 
@@ -234,10 +242,11 @@
         android:id="@+id/my_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         android:drawableStart="@drawable/ic_msg_sel_20dp"
         android:drawableEnd="@drawable/ic_arrow_right_20dp"
         android:drawablePadding="15dp"
-        android:paddingStart="10dp"
+        android:paddingStart="25dp"
         android:paddingEnd="10dp"
         android:paddingTop="13dp"
         android:paddingBottom="13dp"
@@ -245,7 +254,7 @@
         android:textSize="13sp"
         android:textColor="@color/colorTextWord"
         android:gravity="center_vertical"
-        android:layout_marginStart="15dp"
+        android:layout_marginTop="0.5dp"
         app:layout_constraintTop_toBottomOf="@id/my_comment"
         />
 

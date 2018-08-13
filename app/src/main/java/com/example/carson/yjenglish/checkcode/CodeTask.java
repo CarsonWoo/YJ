@@ -19,7 +19,7 @@ import rx.schedulers.Schedulers;
 public class CodeTask implements NetTask<String> {
 
     private final int TYPE_REGISTER = 1;
-    private final int TYPE_LOGIN = 0;
+    private final int TYPE_FORGET = 0;
 
     private static CodeTask INSTANCE = null;
 
@@ -52,7 +52,7 @@ public class CodeTask implements NetTask<String> {
         CodeService codeService = retrofit.create(CodeService.class);
         Observable<Integer> mObservable;
         Subscription subscription;
-        if (type == TYPE_LOGIN) {
+        if (type == TYPE_FORGET) {
             mObservable = codeService.getLoginCode(data);
         } else {
             mObservable = codeService.getRegisterCode(data);

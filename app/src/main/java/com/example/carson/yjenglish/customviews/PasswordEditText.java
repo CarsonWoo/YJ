@@ -39,6 +39,7 @@ public class PasswordEditText extends RelativeLayout {
         textHint = a.getString(R.styleable.PasswordEditText_edit_hint);
         visible = a.getBoolean(R.styleable.PasswordEditText_btn_visible, true);
         drawableRes = a.getResourceId(R.styleable.PasswordEditText_drawableStart, R.drawable.ic_password);
+        a.recycle();
         initView(context);
     }
 
