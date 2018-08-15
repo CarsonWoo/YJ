@@ -8,6 +8,7 @@
 
     <declare-styleable name="BaselineTextView">
         <attr name="baseline_color" format="color" />
+        <attr name="baseline_height" format="dimension" />
     </declare-styleable>
 
     <declare-styleable name="CodeView">
@@ -20,5 +21,16 @@
 
     <declare-styleable name="RoundRectImageView">
         <attr name="radius" format="float" />
+    </declare-styleable>
+
+    <declare-styleable name="MyCalendarView">
+        <attr name="mTextSizeMonth" format="dimension" />        <!--标题字体大小-->
+        <attr name="mTextSizeWeek" format="dimension" />         <!--星期字体大小-->
+        <attr name="mTextSizeDay" format="dimension" />          <!--日期字体大小-->
+
+        <attr name="mTextColorMonth" format="color" />           <!--标题字体颜色-->
+        <attr name="mTextColorDay" format="color" />             <!--日期字体颜色-->
+        <attr name="mTextColorWeek" format="color" />            <!--星期字体颜色-->
+        <attr name="mTextColorSelected" format="color" />        <!--当天日期颜色-->
     </declare-styleable>
 </resources>

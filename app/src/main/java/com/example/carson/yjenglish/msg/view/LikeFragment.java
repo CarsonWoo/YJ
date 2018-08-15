@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.androidkun.PullToRefreshRecyclerView;
 import com.androidkun.callback.PullToRefreshListener;
+import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.MsgAdapters;
 import com.example.carson.yjenglish.msg.model.LikeMsg;
@@ -70,9 +71,9 @@ public class LikeFragment extends Fragment {
 
         View emptyView = View.inflate(getContext(), R.layout.layout_error, null);
         TextView errorMsg = emptyView.findViewById(R.id.error_text);
-        errorMsg.setText("暂时没有数据噢...");
+        errorMsg.setText("暂时没有人点赞噢...");
         ImageView errorImg = emptyView.findViewById(R.id.error_img);
-        errorImg.setImageResource(R.drawable.ic_warning);
+        Glide.with(getContext()).load(R.mipmap.bg_like_box).thumbnail(0.8f).into(errorImg);
         emptyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         recyclerView.setEmptyView(emptyView);

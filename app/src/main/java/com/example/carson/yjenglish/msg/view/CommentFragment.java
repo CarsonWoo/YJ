@@ -78,9 +78,9 @@ public class CommentFragment extends Fragment {
 //        }
         View emptyView = View.inflate(getContext(), R.layout.layout_error, null);
         TextView errorMsg = emptyView.findViewById(R.id.error_text);
-        errorMsg.setText("暂时没有数据噢...");
+        errorMsg.setText("暂时没有评论噢...");
         ImageView errorImg = emptyView.findViewById(R.id.error_img);
-        Glide.with(getContext()).load(R.drawable.testimg).thumbnail(0.5f).into(errorImg);
+        Glide.with(getContext()).load(R.mipmap.bg_comment_box).thumbnail(0.8f).into(errorImg);
         emptyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         recyclerView.setEmptyView(emptyView);

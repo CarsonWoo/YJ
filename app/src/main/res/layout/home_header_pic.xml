@@ -18,7 +18,8 @@
             android:id="@+id/pic_bg"
             android:layout_width="match_parent"
             android:layout_height="241dp"
-            android:background="#bbf3ffff" />
+            android:scaleType="centerCrop"
+            android:src="@mipmap/home_header_img" />
 
         <TextView
             android:id="@+id/learner_num"
@@ -49,7 +50,7 @@
             android:id="@+id/btn_start"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@drawable/solid_half_circle_btn"
+            android:background="@drawable/solid_half_circle_btn_main"
             android:textColor="@android:color/white"
             android:textSize="18sp"
             android:text="@string/start_remember"
@@ -82,7 +83,7 @@
             app:layout_constraintEnd_toEndOf="parent">
             
             <ImageView
-                android:src="@drawable/ic_home_unsel"
+                android:background="@mipmap/ic_music"
                 android:layout_width="48dp"
                 android:layout_height="48dp" />
 

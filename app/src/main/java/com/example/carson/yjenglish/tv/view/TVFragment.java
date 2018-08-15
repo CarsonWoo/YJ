@@ -60,6 +60,7 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e(TAG, "onCreate");
 //        if (getArguments() != null) {
 //            mParam1 = getArguments().getString(ARG_PARAM1);
 //            mParam2 = getArguments().getString(ARG_PARAM2);
@@ -69,6 +70,7 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.e(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.fragment_tv, container, false);
         initViews(view);
         return view;

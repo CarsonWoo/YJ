@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.TabItem;
 import android.support.design.widget.TabLayout;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,15 +12,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
-import android.widget.FrameLayout;
 
-import com.example.carson.yjenglish.customviews.MyVideoView;
 import com.example.carson.yjenglish.discover.DiscoverFragment;
 import com.example.carson.yjenglish.home.view.HomeFragment;
 import com.example.carson.yjenglish.home.view.WordListAty;
 import com.example.carson.yjenglish.msg.MsgFragment;
 import com.example.carson.yjenglish.tv.view.TVFragment;
-import com.example.carson.yjenglish.zone.ZoneFragment;
+import com.example.carson.yjenglish.utils.UserConfig;
+import com.example.carson.yjenglish.zone.view.ZoneFragment;
 
 import java.util.ArrayList;
 
@@ -223,6 +221,7 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        UserConfig.cacheLastDate(this);
     }
 
     @Override

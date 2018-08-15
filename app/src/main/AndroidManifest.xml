@@ -64,9 +64,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".home.view.WordListAty"
+        <activity
+            android:name=".home.view.WordListAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".FullScreenVideo"
             android:screenOrientation="landscape" />
@@ -78,6 +79,10 @@
             android:name=".home.view.WordDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
+        <activity android:name=".home.view.EditAty" />
+        <activity android:name=".home.view.SignInAty" />
+        <activity android:name=".home.view.SignAty" />
+        <activity android:name=".zone.view.PlanActivity"></activity>
     </application>
 
 </manifest>

@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish.home.view;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -28,11 +29,14 @@ import com.example.carson.yjenglish.home.model.HomeItem;
 import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.home.model.PicHeader;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.UserConfig;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,6 +45,12 @@ import java.util.List;
 public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoListener {
 
     private final String TAG = "HomeFragment";
+
+    public static final int REQUEST_WORD_CODE = 101;
+    public static final int REQUEST_SIGN_CODE = 102;
+    public static final int REQUEST_MORE_CODE = 103;
+    public static final int RESULT_WORD_OK = 201;
+    public static final int RESULT_SIGN_OK = 202;
 
     private RecyclerView recyclerView;
     private MyVideoView mVideoView;
@@ -61,6 +71,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 
     private boolean isFullClick = false;
 
+    private String mCurDate;
+
     public HomeFragment() {
 
     }
@@ -75,12 +87,14 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //作UI请求
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        mCurDate = UserConfig.getLastDate(getContext());
         initViews(view);
         initEvents();
         return view;
@@ -179,13 +193,15 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             mListData.add(data);
         }
 //        prepareVideo();
-
         mHeaderStyle = 3;
         if (mHeaderStyle == 2) {
             mAdapter = new HomeListAdapter(getContext(), mListData, mListener, 2, this);
             initAdapterListener(2);
             mAdapter.setPicItem(mPicData);
         } else {
+            Date mDate = new Date();
+            @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");
+            String dateStr = df.format(mDate);
             mAdapter = new HomeListAdapter(getContext(), mListData, mListener, 3, this);
             LitePal.getDatabase();
             //以下这些都要放在联网后再设置
@@ -199,6 +215,14 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                 mLoadData.setTodayFinish(false);
                 mLoadData.setProgress(10);
                 mLoadData.setWordsCount(2000);
+                mLoadData.setSignClick(false);
+                mLoadData.save();
+            }
+            Log.e(TAG, "mCurDate = " + mCurDate);
+            Log.e(TAG, "dateStr = " + dateStr);
+            if (!dateStr.equals(mCurDate)) {
+                mLoadData.setSignClick(false);
+                mLoadData.setTodayFinish(false);
                 mLoadData.save();
             }
 //            Log.e(TAG, mLoadData.isSaved() + "");
@@ -224,7 +248,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                 @Override
                 public void onStartClick(View view) {
                     Intent toWord = new Intent(getContext(), WordActivity.class);
-                    startActivity(toWord);
+                    toWord.putExtra("type", REQUEST_WORD_CODE);
+                    startActivityForResult(toWord, REQUEST_WORD_CODE);
                     if (getActivity() != null) {
                         getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                     }
@@ -233,12 +258,22 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             mAdapter.setLoadListener(new HomeListAdapter.OnLoadHeaderListener() {
                 @Override
                 public void onSignClick(View view) {
-                    Log.i(TAG, "sign click");
+                    Intent toSignIn = new Intent(getContext(), SignInAty.class);
+                    startActivityForResult(toSignIn, REQUEST_SIGN_CODE);
+                    startActivity(new Intent(getContext(), SignAty.class));
+                    if (getActivity() != null) {
+                        getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    }
                 }
 
                 @Override
                 public void onMoreClick(View view) {
-                    Log.i(TAG, "more click");
+                    Intent toWord = new Intent(getContext(), WordActivity.class);
+                    toWord.putExtra("type", REQUEST_MORE_CODE);
+                    startActivityForResult(toWord, REQUEST_MORE_CODE);
+                    if (getActivity() != null) {
+                        getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    }
                 }
             });
         }
@@ -260,6 +295,16 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                 }
                 isFullClick = false;
             }
+        } else if (requestCode == REQUEST_WORD_CODE && resultCode == RESULT_WORD_OK) {
+            mLoadData.setTodayFinish(true);
+            mLoadData.save();
+            mAdapter.notifyItemChanged(0);
+        } else if (requestCode == REQUEST_SIGN_CODE && resultCode == RESULT_SIGN_OK) {
+//            mLoadData.setSignClick(true);
+//            mLoadData.save();
+//            mAdapter.notifyItemChanged(0);
+        } else if (requestCode == REQUEST_MORE_CODE && resultCode == getActivity().RESULT_OK) {
+            Log.e(TAG, "progress finish");
         }
     }
 

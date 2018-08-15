@@ -125,7 +125,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
             picHolder.learnerNum.setText(picItem.getNumber());
         }
         if (picItem.getImgUrl() != null) {
-            Glide.with(mCtx).load(picItem.getImgUrl()).into(picHolder.bg);
+            Glide.with(mCtx).load(picItem.getImgUrl()).thumbnail(0.8f).into(picHolder.bg);
         }
         picHolder.start.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -161,7 +161,11 @@ public class HomeListAdapter extends RecyclerView.Adapter {
             //今天完成了背单词
             loadHolder.start.setVisibility(View.GONE);
             loadHolder.sign.setVisibility(View.VISIBLE);
-            loadHolder.more.setVisibility(View.VISIBLE);
+            loadHolder.more.setVisibility(View.INVISIBLE);
+            if (loadItem.isSignClick()) {
+                loadHolder.sign.setVisibility(View.INVISIBLE);
+                loadHolder.more.setVisibility(View.VISIBLE);
+            }
         } else {
             loadHolder.start.setVisibility(View.VISIBLE);
             loadHolder.sign.setVisibility(View.GONE);
@@ -237,7 +241,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
             homeHolder.video.setVisibility(View.GONE);
             homeHolder.play.setVisibility(View.GONE);
             homeHolder.img.setVisibility(View.VISIBLE);
-            Glide.with(mCtx).load(homeHolder.item.getImgUrl()).asBitmap().error(R.drawable.ic_warning).into(homeHolder.img);
+            Glide.with(mCtx).load(homeHolder.item.getImgUrl()).thumbnail(0.8f).error(R.drawable.ic_warning).into(homeHolder.img);
             homeHolder.img.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

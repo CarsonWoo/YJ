@@ -8,6 +8,7 @@ import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.app.AlertDialog;
@@ -44,6 +45,8 @@ public class WordActivity extends AppCompatActivity {
 
     public static final int REQUEST_TO_DETAIL = 1000;
 
+    private int type;//判断是再来20个 还是开始背单词的类型
+
     private final int TYPE_GRAPH = 0x1011;//图册选择
     private final int TYPE_MEAN = 0x1012;//释义选择
 
@@ -58,6 +61,8 @@ public class WordActivity extends AppCompatActivity {
     private TextView word;
     private TextView soundMark;
     private TextSwitcher mTextSwitcher;
+    private FrameLayout mLoadingView;
+
     private CorrectOrWrongImageView pic1, pic2, pic3, pic4;//分别对应于四张图片
     private CorrectOrWrongTextView tran1, tran2, tran3, tran4;
 
@@ -74,10 +79,14 @@ public class WordActivity extends AppCompatActivity {
     private int mWordType = TYPE_GRAPH;
     private int mLastType;
 
+    private boolean isOnBackPressed = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_word);
+        Intent fromIntent = getIntent();
+        type = fromIntent.getIntExtra("type", HomeFragment.REQUEST_WORD_CODE);
         initViews();
     }
 
@@ -93,6 +102,10 @@ public class WordActivity extends AppCompatActivity {
         soundMark = findViewById(R.id.soundmark);
         mTextSwitcher = findViewById(R.id.text_switcher);
         mWordContainer = findViewById(R.id.word_container);
+        mLoadingView = findViewById(R.id.loading_view);
+        mLoadingView.setVisibility(View.VISIBLE);
+
+        initLoadingView();
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,8 +134,7 @@ public class WordActivity extends AppCompatActivity {
                 }
             }
         });
-        loadJsonData();
-        loadDatas();
+
 
         pass.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -142,6 +154,56 @@ public class WordActivity extends AppCompatActivity {
                 mDialog.getWindow().setAttributes(params);
             }
         });
+    }
+
+    private void initLoadingView() {
+        //加载页
+        mLoadingView.removeAllViews();
+        View loadingView = LayoutInflater.from(this).inflate(R.layout.loading_view, null, false);
+        ImageView bg = loadingView.findViewById(R.id.img);
+        ImageView loadingBack = loadingView.findViewById(R.id.back);
+        Glide.with(this).load(R.mipmap.word_loading_img).thumbnail(0.5f).into(bg);
+        final ProgressBar loadingProgress = loadingView.findViewById(R.id.progress_bar);
+        mLoadingView.addView(loadingView);
+
+        final CountDownTimer timer = new CountDownTimer(3000, 100) {
+            @Override
+            public void onTick(long l) {
+                Log.e(TAG, l + "");
+                loadingProgress.setProgress((int) (((float) (3000 - l) / 3000) * 100), true);
+
+            }
+
+            @Override
+            public void onFinish() {
+                Log.e(TAG, "onFinish");
+            }
+        }.start();
+        loadingBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                isOnBackPressed = true;
+                onBackPressed();
+            }
+        });
+        mLoadingView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (!isOnBackPressed) {
+                    mLoadingView.removeAllViews();
+                    mLoadingView.setVisibility(View.GONE);
+                    timer.cancel();
+                    loadJsonData();
+                    loadDatas();
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    back.setVisibility(View.VISIBLE);
+                    pass.setVisibility(View.VISIBLE);
+                    sound.setVisibility(View.VISIBLE);
+                }
+
+            }
+        }, 2500);
+
     }
 
     private void loadJsonData() {
@@ -245,7 +307,7 @@ public class WordActivity extends AppCompatActivity {
     private void initTextViews() {
         word.setText(mWords.get(mCurPos - 1).getWord());
         soundMark.setText(mWords.get(mCurPos - 1).getSoundMark());
-        mProgressBar.setProgress((int) (((float) mTotalProgress / (mWords.size() * 2)) * 100));
+        mProgressBar.setProgress((int) (((float) mTotalProgress / (mWords.size() * 2)) * 100), true);
         String sentence = mWords.get(mCurPos - 1).getSentence();
         String[] sentencePieces = sentence.split(mWords.get(mCurPos - 1).getWord());
         setmSentence(sentencePieces);
@@ -267,7 +329,12 @@ public class WordActivity extends AppCompatActivity {
                 initList();
             } else {
                 //如果是释义复习题也答完了
-                Log.e(TAG, "到头了");
+                if (type == HomeFragment.REQUEST_WORD_CODE) {
+                    setResult(HomeFragment.RESULT_WORD_OK);
+                } else if (type == HomeFragment.REQUEST_MORE_CODE) {
+                    setResult(RESULT_OK);
+                }
+                onBackPressed();
             }
         } else {
             wrongCount = 0;
@@ -293,7 +360,7 @@ public class WordActivity extends AppCompatActivity {
                 mTextSwitcher.setText(mWords.get(mCurPos - 1).getTrans());
                 break;
             default:
-                //TODO 需要跳转到单词卡片
+                resetCheckImg();
                 Intent toDetail = new Intent(WordActivity.this, WordDetailActivity.class);
                 toDetail.putExtra("tag", mWords.get(mCurPos - 1).getWord());
                 toDetail.putExtra("soundMark", mWords.get(mCurPos - 1).getSoundMark());
@@ -313,7 +380,16 @@ public class WordActivity extends AppCompatActivity {
                 mTextSwitcher.setText(mWords.get(mCurPos - 1).getParaphrase());
                 break;
             default:
-                //TODO 需要跳转到单词卡片
+                resetTextImg();
+                Intent toDetail = new Intent(WordActivity.this, WordDetailActivity.class);
+                toDetail.putExtra("tag", mWords.get(mCurPos - 1).getWord());
+                toDetail.putExtra("soundMark", mWords.get(mCurPos - 1).getSoundMark());
+                toDetail.putExtra("trans", mWords.get(mCurPos - 1).getTrans());
+                toDetail.putExtra("paraphrase", mWords.get(mCurPos - 1).getParaphrase());
+                toDetail.putExtra("sentence", mWords.get(mCurPos - 1).getSentence());
+                toDetail.putExtra("sentenceTrans", mWords.get(mCurPos - 1).getSentenceTrans());
+                toDetail.putExtra("imgUrl", mWords.get(mCurPos - 1).getWordUrl());
+                startActivityForResult(toDetail, REQUEST_TO_DETAIL);
                 break;
         }
     }
@@ -344,7 +420,7 @@ public class WordActivity extends AppCompatActivity {
 
         for (int i = 1; mTrans.size() < 4;) {
             Random r = new Random();
-            int rNum = Math.abs(r.nextInt() % mWords.size());//index:0-3
+            int rNum = Math.abs(r.nextInt() % mWords.size());//index:0 ~ mWords.size() - 1
             boolean isAdded = false;
             if (mTrans.size() == 3 && !isCorrectInList) {
                 mTrans.add(mWords.get(mCurPos - 1).getTrans());
@@ -442,7 +518,7 @@ public class WordActivity extends AppCompatActivity {
 
         for (int i = 1; imgUrls.size() < 4;) {
             Random r = new Random();
-            int rNum = Math.abs(r.nextInt() % mWords.size());//index:0-3
+            int rNum = Math.abs(r.nextInt() % mWords.size());//index:0 ~ mWords.size() - 1
             boolean isAdded = false;
             if (imgUrls.size() == 3 && !isCorrectInList) {
                 //如果正确答案在size = 3时还没有加进来过

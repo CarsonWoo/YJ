@@ -16,6 +16,13 @@
     </style>
 
     <style name="HorizontalProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:progressDrawable">@drawable/progress_horizontal_word</item>
+        <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
+        <item name="android:minHeight">7dp</item>
+        <item name="android:maxHeight">10dp</item>
+    </style>
+
+    <style name="HorizontalProgressBarColorAccent" parent="Widget.AppCompat.ProgressBar.Horizontal">
         <item name="android:progressDrawable">@drawable/progress_horizontal_main</item>
         <item name="android:indeterminateDrawable">@android:drawable/progress_indeterminate_horizontal</item>
         <item name="android:minHeight">7dp</item>

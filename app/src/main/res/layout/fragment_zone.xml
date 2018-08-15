@@ -4,13 +4,13 @@
     android:layout_height="match_parent"
     android:background="#26d6e1de"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context="com.example.carson.yjenglish.zone.ZoneFragment">
+    tools:context="com.example.carson.yjenglish.zone.view.ZoneFragment">
 
     <ImageView
         android:id="@+id/zone_bg_img"
         android:layout_width="match_parent"
-        android:layout_height="268dp"
-        android:src="@drawable/zone_bg"
+        android:layout_height="308dp"
+        android:src="@mipmap/zone_bg_img"
         android:scaleType="centerCrop"
         app:layout_constraintTop_toTopOf="parent"
         />
@@ -22,7 +22,7 @@
         android:src="#bfffffff"
         app:civ_border_color="#2effffff"
         app:civ_border_width="2dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         app:layout_constraintStart_toStartOf="@id/zone_bg_img"
         app:layout_constraintEnd_toEndOf="@id/zone_bg_img"
         app:layout_constraintTop_toTopOf="@id/zone_bg_img"

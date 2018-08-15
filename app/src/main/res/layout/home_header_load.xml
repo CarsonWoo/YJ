@@ -24,6 +24,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
+        <!--设置一个自定义样式的progressbar 可动态更换图片 可设置样式-->
 
         <LinearLayout
             android:id="@+id/download_control"
@@ -41,7 +42,7 @@
                 android:id="@+id/iv_down_load"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_pause"
+                android:src="@mipmap/ic_download"
                 />
 
             <!--设置最大长度 -->
@@ -49,6 +50,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="11M/26M"
+                android:layout_marginTop="5dp"
                 android:maxLength="7"
                 android:textColor="@color/colorTextHint"
                 android:textSize="12sp"/>
@@ -118,7 +120,7 @@
             android:id="@+id/btn_start"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="@drawable/solid_half_circle_btn"
+            android:background="@drawable/solid_half_circle_btn_main"
             android:textColor="@android:color/white"
             android:textSize="18sp"
             android:text="@string/start_remember"
@@ -132,29 +134,36 @@
 
         <Button
             android:id="@+id/btn_sign_in"
-            android:layout_width="140dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:visibility="gone"
-            android:background="@drawable/stroke_half_circle_btn_pink"
-            android:textColor="@color/colorPink"
+            android:background="@drawable/solid_half_circle_btn_shade"
+            android:textColor="@android:color/white"
             android:textSize="18sp"
+            android:drawablePadding="8dp"
+            android:textAlignment="viewStart"
+            android:paddingStart="115dp"
+            android:drawableStart="@drawable/ic_sign_in"
             android:text="@string/sign_in_daily"
+            android:visibility="gone"
             android:layout_marginTop="15dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             app:layout_constraintTop_toBottomOf="@id/tv_target_words"
             app:layout_constraintStart_toStartOf="@id/btn_start"
             />
 
         <Button
             android:id="@+id/btn_more_remember"
-            android:layout_width="140dp"
+            android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:visibility="gone"
-            android:background="@drawable/stroke_half_circle_btn_main"
-            android:textColor="@color/colorAccent"
+            android:background="@drawable/solid_half_circle_btn_main"
+            android:textColor="@android:color/white"
             android:textSize="18sp"
+            android:visibility="gone"
             android:text="@string/more_20"
             android:layout_marginTop="15dp"
-
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             app:layout_constraintTop_toBottomOf="@id/tv_target_words"
             app:layout_constraintEnd_toEndOf="@id/btn_start"
             />
@@ -180,7 +189,7 @@
             app:layout_constraintEnd_toEndOf="parent">
 
             <ImageView
-                android:src="@drawable/ic_home_unsel"
+                android:background="@mipmap/ic_music"
                 android:layout_width="48dp"
                 android:layout_height="48dp" />
 

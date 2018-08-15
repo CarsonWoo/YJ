@@ -5,9 +5,12 @@ package com.example.carson.yjenglish.home.model.forviewbinder;
  */
 
 public class Text {
+
     private String text;
-    public Text(String text) {
+    public boolean hasDrawable;
+    public Text(String text, boolean hasDrawable) {
         this.text = text;
+        this.hasDrawable = hasDrawable;
     }
 
     public String getText() {

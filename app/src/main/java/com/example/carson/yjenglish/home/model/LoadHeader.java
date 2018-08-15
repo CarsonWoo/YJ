@@ -19,6 +19,8 @@ public class LoadHeader extends DataSupport {
     private int insistCount;
     @Column(defaultValue = "false")
     private boolean isTodayFinish;
+    @Column(defaultValue = "false")
+    private boolean isSignClick;
     private float progress;
 
     public int getWordsCount() {
@@ -67,5 +69,13 @@ public class LoadHeader extends DataSupport {
 
     public void setProgress(float progress) {
         this.progress = progress;
+    }
+
+    public boolean isSignClick() {
+        return isSignClick;
+    }
+
+    public void setSignClick(boolean signClick) {
+        isSignClick = signClick;
     }
 }

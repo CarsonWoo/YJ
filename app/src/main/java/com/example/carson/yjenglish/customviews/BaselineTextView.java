@@ -18,6 +18,7 @@ public class BaselineTextView extends android.support.v7.widget.AppCompatTextVie
 
     private Paint mLinePaint;
 
+    private float mLineHeight;
     private int mLineColor = Color.BLACK;
 
     public BaselineTextView(Context context) {
@@ -29,6 +30,7 @@ public class BaselineTextView extends android.support.v7.widget.AppCompatTextVie
         super(context, attrs);
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.BaselineTextView);
         mLineColor = a.getColor(R.styleable.BaselineTextView_baseline_color, mLineColor);
+        mLineHeight = a.getDimension(R.styleable.BaselineTextView_baseline_height, 2f);
         a.recycle();
         initViews();
     }
@@ -40,7 +42,7 @@ public class BaselineTextView extends android.support.v7.widget.AppCompatTextVie
 
     private void initViews() {
         mLinePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-        mLinePaint.setStrokeWidth(2f);
+        mLinePaint.setStrokeWidth(mLineHeight);
         mLinePaint.setColor(mLineColor);
     }
 
@@ -52,5 +54,13 @@ public class BaselineTextView extends android.support.v7.widget.AppCompatTextVie
         float height = getHeight() - offset;
 
         canvas.drawLine(0, height, width, height, mLinePaint);
+    }
+
+    public void setLineColor(int color) {
+        this.mLineColor = color;
+    }
+
+    public void setLineColorRes(int colorRes) {
+        this.mLineColor = getResources().getColor(colorRes);
     }
 }

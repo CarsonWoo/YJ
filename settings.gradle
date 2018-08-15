@@ -1,1 +1,1 @@
-include ':app', ':pulltorefreshlibrary'
+include ':app', ':pulltorefreshlibrary', ':library:Common', ':library:WheelPicker'

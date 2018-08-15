@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.carson.yjenglish.home.view.SignAty">
+
+    <ImageView
+        android:id="@+id/img_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_left"
+        android:layout_marginTop="30dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:text="打卡到"
+        android:layout_marginBottom="25dp"
+        app:layout_constraintBottom_toTopOf="@id/btn_qq"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
+    <View
+        android:layout_width="80dp"
+        android:layout_height="0.5dp"
+        android:background="@android:color/white"
+        android:layout_marginBottom="35dp"
+        android:layout_marginStart="55dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_qq" />
+
+    <View
+        android:layout_width="80dp"
+        android:layout_height="0.5dp"
+        android:background="@android:color/white"
+        android:layout_marginBottom="35dp"
+        android:layout_marginEnd="55dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btn_qq" />
+
+    <ImageButton
+        android:id="@+id/btn_wechat_friend"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:background="@drawable/round_btn"
+        android:src="@drawable/ic_home_unsel"
+        android:layout_marginBottom="45dp"
+        android:layout_marginStart="34dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <ImageButton
+        android:id="@+id/btn_wechat"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:background="@mipmap/ic_wechat"
+        android:layout_marginBottom="45dp"
+        android:layout_marginStart="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_wechat_friend"
+        />
+
+    <ImageButton
+        android:id="@+id/btn_qq"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:background="@mipmap/ic_qq"
+        android:layout_marginBottom="45dp"
+        android:layout_marginStart="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_wechat"
+        />
+
+    <ImageButton
+        android:id="@+id/btn_qq_zone"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:background="@drawable/round_btn"
+        android:src="@drawable/ic_home_unsel"
+        android:layout_marginBottom="45dp"
+        android:layout_marginStart="25dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/btn_qq"
+        />
+
+</android.support.constraint.ConstraintLayout>

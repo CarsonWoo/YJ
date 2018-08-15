@@ -1,9 +1,7 @@
-package com.example.carson.yjenglish.zone;
+package com.example.carson.yjenglish.zone.view;
 
 
-import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -69,10 +67,26 @@ public class ZoneFragment extends Fragment {
         username.setText("单词小霸王");
         signature.setText("一位背单词萌新");
 
-        Glide.with(this).load(R.drawable.zone_bg).thumbnail(0.6f).into(bgImg);
+        Glide.with(this).load(R.mipmap.zone_bg_img).thumbnail(0.5f).into(bgImg);
 //        BitmapDrawable bd = (BitmapDrawable) bgImg.getDrawable();
 //        bgImg.setImageBitmap(Bitmap.createBitmap(bd.getBitmap(), 0, 0, bd.getBitmap().getWidth(),
 //                bd.getBitmap().getHeight() - 1500));
+
+        initPlan();
+
+    }
+
+    private void initPlan() {
+        plan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent toPlan = new Intent(getContext(), PlanActivity.class);
+                startActivity(toPlan);
+                if (getActivity() != null) {
+                    getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                }
+            }
+        });
     }
 
 }
