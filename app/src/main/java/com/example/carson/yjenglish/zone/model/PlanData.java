@@ -8,6 +8,7 @@ public class PlanData {
     private String tag;
     private String wordCount;
     private boolean isLearning;
+    private boolean isEditing;
     private int progress;
 
     public String getTag() {
@@ -40,5 +41,13 @@ public class PlanData {
 
     public void setProgress(int progress) {
         this.progress = progress;
+    }
+
+    public boolean isEditing() {
+        return isEditing;
+    }
+
+    public void setEditing(boolean editing) {
+        isEditing = editing;
     }
 }

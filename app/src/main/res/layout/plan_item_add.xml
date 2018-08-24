@@ -15,7 +15,7 @@
         android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         android:background="@android:color/transparent"
-        app:cardBackgroundColor="#a5eaf0f7"
+        app:cardBackgroundColor="#a5f8feff"
         app:cardCornerRadius="12dp">
 
         <ImageView

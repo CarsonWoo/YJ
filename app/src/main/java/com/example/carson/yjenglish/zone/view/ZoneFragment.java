@@ -3,10 +3,14 @@ package com.example.carson.yjenglish.zone.view;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.TranslateAnimation;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,6 +23,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * A simple {@link Fragment} subclass.
  */
 public class ZoneFragment extends Fragment {
+
+    private final int REQUEST_INFO_CODE = 1000;
 
     private CircleImageView portrait;
     private TextView username;
@@ -33,6 +39,9 @@ public class ZoneFragment extends Fragment {
     private TextView setting;
     private ImageView bgImg;
 
+    private String imgUrl;
+
+
     public ZoneFragment() {
         // Required empty public constructor
     }
@@ -45,6 +54,7 @@ public class ZoneFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_zone, container, false);
+        imgUrl = "http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg";
         initViews(view);
         return view;
     }
@@ -63,17 +73,32 @@ public class ZoneFragment extends Fragment {
         setting = view.findViewById(R.id.my_setting);
         bgImg = view.findViewById(R.id.zone_bg_img);
 
-        Glide.with(getContext()).load(R.mipmap.ic_launcher_round).asBitmap().into(portrait);
+        Glide.with(getContext()).load(imgUrl).asBitmap().into(portrait);
         username.setText("单词小霸王");
         signature.setText("一位背单词萌新");
 
         Glide.with(this).load(R.mipmap.zone_bg_img).thumbnail(0.5f).into(bgImg);
-//        BitmapDrawable bd = (BitmapDrawable) bgImg.getDrawable();
-//        bgImg.setImageBitmap(Bitmap.createBitmap(bd.getBitmap(), 0, 0, bd.getBitmap().getWidth(),
-//                bd.getBitmap().getHeight() - 1500));
 
         initPlan();
+        initInfo();
 
+    }
+
+    private void initInfo() {
+        portrait.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent toInfo = new Intent(getContext(), InfoAty.class);
+                toInfo.putExtra("img_url", imgUrl);
+                toInfo.putExtra("name", username.getText().toString());
+                toInfo.putExtra("sign", signature.getText().toString());
+                startActivityForResult(toInfo, REQUEST_INFO_CODE);
+                if (getActivity() != null) {
+                    getActivity().overridePendingTransition(R.anim.translate_dialog_in, R.anim.translate_dialog_out);
+                }
+            }
+
+        });
     }
 
     private void initPlan() {
@@ -89,4 +114,11 @@ public class ZoneFragment extends Fragment {
         });
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_INFO_CODE && resultCode == getActivity().RESULT_OK) {
+
+        }
+    }
 }

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    android:orientation="vertical"
+    android:background="@android:color/white"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/take_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="拍照"
+        android:textSize="16sp"
+        android:textAlignment="center"
+        android:textColor="@color/colorTextWord"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/colorTextHint" />
+
+    <TextView
+        android:id="@+id/pick_photo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="选取照片"
+        android:textSize="16sp"
+        android:textAlignment="center"
+        android:textColor="@color/colorTextWord"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        />
+
+</LinearLayout>

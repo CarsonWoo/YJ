@@ -84,8 +84,8 @@ public class DiscoverFragment extends Fragment {
         rvAty.setHasFixedSize(true);
         rvGame.setHasFixedSize(true);
 
-        initRecycler(rvGame, "暂时还没运营噢...", R.drawable.testimg);
-        initRecycler(rvAty, "暂时没有更多活动噢\n小语正在努力筹划~", R.drawable.testimg);
+        initRecycler(rvGame, "暂时还没运营噢...", R.mipmap.bg_plan_box);
+        initRecycler(rvAty, "暂时没有更多活动噢\n小语正在努力筹划~", R.mipmap.bg_plan_box);
 
     }
 

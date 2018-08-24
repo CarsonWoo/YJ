@@ -12,6 +12,7 @@ public class HomeItem {
     private int commentNum;
     private int likeNum;
     private String imgUrl;
+    private String portraitUrl;
 
     public String getTitle() {
         return title;
@@ -59,5 +60,13 @@ public class HomeItem {
 
     public void setImgUrl(String imgUrl) {
         this.imgUrl = imgUrl;
+    }
+
+    public String getPortraitUrl() {
+        return portraitUrl;
+    }
+
+    public void setPortraitUrl(String portraitUrl) {
+        this.portraitUrl = portraitUrl;
     }
 }

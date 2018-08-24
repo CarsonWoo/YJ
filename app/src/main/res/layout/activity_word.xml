@@ -55,6 +55,14 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
+    <ImageView
+        android:layout_width="290dp"
+        android:layout_height="300dp"
+        android:src="@mipmap/bg_word"
+        app:layout_constraintTop_toBottomOf="@id/progress_bar"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -87,9 +95,11 @@
     </LinearLayout>
 
     <View
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="0.1dp"
         android:background="#b2dbdbdb"
+        android:visibility="invisible"
         android:layout_marginTop="80dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"

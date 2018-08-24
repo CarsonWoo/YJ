@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">YJEnglish</string>
+    <string name="app_name">语境背单词</string>
     <string name="edit_phone">请输入手机号</string>
     <string name="edit_password">请输入密码</string>
     <string name="code_login">验证码登录</string>
@@ -31,4 +31,11 @@
     <string name="tips">提示</string>
     <string name="next">Next</string>
     <string name="my_plan">我的计划</string>
+    <string name="tag_else">其它</string>
+    <string name="tag_foreign">出国</string>
+    <string name="tag_college">大学</string>
+    <string name="tag_senior">高中</string>
+    <string name="tag_junior">初中</string>
+    <string name="tag_primary">小学</string>
+    <string name="tag_hit">最热</string>
 </resources>

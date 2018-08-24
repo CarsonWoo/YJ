@@ -29,4 +29,18 @@
         <item name="android:maxHeight">10dp</item>
     </style>
 
+    <style name="MyTabText" parent="TextAppearance.Design.Tab">
+        <item name="android:textSize">11sp</item>
+    </style>
+
+    <style name="BottomDialog.Animation" parent="Animation.AppCompat.Dialog">
+        <item name="android:windowEnterAnimation">@anim/translate_dialog_in</item>
+        <item name="android:windowExitAnimation">@anim/translate_dialog_out</item>
+    </style>
+
+    <style name="popup_window_photo_utils_animation">
+        <item name="android:windowEnterAnimation">@anim/ani_bottom_enter</item>
+        <item name="android:windowExitAnimation">@anim/ani_bottom_exit</item>
+    </style>
+
 </resources>

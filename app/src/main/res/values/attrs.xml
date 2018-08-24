@@ -33,4 +33,10 @@
         <attr name="mTextColorWeek" format="color" />            <!--星期字体颜色-->
         <attr name="mTextColorSelected" format="color" />        <!--当天日期颜色-->
     </declare-styleable>
+
+    <declare-styleable name="LrcView">
+        <attr name="highLineColor" format="color" />
+        <attr name="lrcColor" format="color" />
+        <attr name="lrcMode" format="integer" />
+    </declare-styleable>
 </resources>

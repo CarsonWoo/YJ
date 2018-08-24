@@ -151,6 +151,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
     }
 
     private void doRegisterTask() {
+        //加多一个 确认验证码的url
 
         Intent toSetPwd = new Intent(this, ForgetActivity.class);
         toSetPwd.putExtra("type", 2);

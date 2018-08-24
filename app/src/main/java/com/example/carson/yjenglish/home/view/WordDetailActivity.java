@@ -20,15 +20,15 @@ import com.example.carson.yjenglish.home.model.forviewbinder.Text;
 import com.example.carson.yjenglish.home.model.forviewbinder.Video;
 import com.example.carson.yjenglish.home.model.forviewbinder.VideoList;
 import com.example.carson.yjenglish.home.model.forviewbinder.WordSituation;
-import com.example.carson.yjenglish.home.viewbinder.FieldTitleViewBinder;
-import com.example.carson.yjenglish.home.viewbinder.HeaderViewBinder;
-import com.example.carson.yjenglish.home.viewbinder.HorizontalViewBinder;
-import com.example.carson.yjenglish.home.viewbinder.MiniSizeTextViewBinder;
-import com.example.carson.yjenglish.home.viewbinder.SentenceSoundViewBinder;
-import com.example.carson.yjenglish.home.viewbinder.SentenceViewBinder;
-import com.example.carson.yjenglish.home.viewbinder.SituationViewBinder;
-import com.example.carson.yjenglish.home.viewbinder.TextDrawableViewBinder;
-import com.example.carson.yjenglish.home.viewbinder.TextViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.FieldTitleViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.HeaderViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.HorizontalViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.MiniSizeTextViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.SentenceSoundViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.SentenceViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.SituationViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.TextDrawableViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.TextViewBinder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,6 @@ import java.util.List;
 import me.drakeet.multitype.ClassLinker;
 import me.drakeet.multitype.ItemViewBinder;
 import me.drakeet.multitype.Items;
-import me.drakeet.multitype.Linker;
 import me.drakeet.multitype.MultiTypeAdapter;
 
 public class WordDetailActivity extends AppCompatActivity implements View.OnClickListener,

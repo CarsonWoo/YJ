@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+
+        <LinearLayout
+            android:id="@+id/tab_remember"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/tab_remember_img"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@mipmap/ic_music_word"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                />
+            <TextView
+                android:id="@+id/tab_remember_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="已背单词"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                android:layout_marginTop="5dp"
+                />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="0.1dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"/>
+
+        <LinearLayout
+            android:id="@+id/tab_like"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/tab_like_img"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/selector_music_like_list"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                />
+            <TextView
+                android:id="@+id/tab_like_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="我喜欢的"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                android:layout_marginTop="5dp"
+                />
+
+        </LinearLayout>
+        <View
+            android:layout_width="0.1dp"
+            android:layout_height="match_parent"
+            android:background="@android:color/darker_gray"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"/>
+
+        <LinearLayout
+            android:id="@+id/tab_download"
+            android:layout_width="0dp"
+            android:layout_weight="5"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/tab_download_img"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:src="@drawable/selector_music_download_list"
+                android:layout_gravity="center"
+                android:layout_marginTop="5dp"
+                />
+            <TextView
+                android:id="@+id/tab_download_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="我的下载"
+                android:textSize="15sp"
+                android:textAlignment="center"
+                android:layout_marginTop="5dp"
+                />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/music_view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        />
+
+</LinearLayout>

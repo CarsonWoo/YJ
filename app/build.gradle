@@ -45,4 +45,6 @@ dependencies {
     compile project(path: ':library:Common')
     compile project(path: ':library:WheelPicker')
     compile 'me.drakeet.multitype:multitype:3.3.0'
+    compile 'jp.wasabeef:glide-transformations:2.0.2'
+    implementation 'me.wcy:lrcview:2.0.1'
 }

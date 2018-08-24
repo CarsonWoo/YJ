@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#26d6e1de"
+    tools:context="com.example.carson.yjenglish.home.view.AuthorAty">
+
+    <ImageView
+        android:id="@+id/zone_bg_img"
+        android:layout_width="match_parent"
+        android:layout_height="290dp"
+        android:src="@mipmap/zone_bg_img"
+        android:scaleType="centerCrop"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/portrait"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:src="#bfffffff"
+        app:civ_border_color="#2effffff"
+        app:civ_border_width="2dp"
+        android:layout_marginTop="50dp"
+        app:layout_constraintStart_toStartOf="@id/zone_bg_img"
+        app:layout_constraintEnd_toEndOf="@id/zone_bg_img"
+        app:layout_constraintTop_toTopOf="@id/zone_bg_img"
+        />
+
+    <TextView
+        android:id="@+id/username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="15.5sp"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="18dp"
+        android:text="浅川青叶"
+        app:layout_constraintStart_toStartOf="@id/zone_bg_img"
+        app:layout_constraintEnd_toEndOf="@id/zone_bg_img"
+        app:layout_constraintTop_toBottomOf="@id/portrait"
+        />
+
+    <TextView
+        android:id="@+id/signature"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="一缕清风，一缕青烟"
+        android:textSize="10sp"
+        android:singleLine="true"
+        android:maxLength="25"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@id/username"
+        app:layout_constraintStart_toStartOf="@id/zone_bg_img"
+        app:layout_constraintEnd_toEndOf="@id/zone_bg_img"
+        />
+
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_left_white"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="30dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/zone_bg_img"
+        />
+
+</android.support.constraint.ConstraintLayout>

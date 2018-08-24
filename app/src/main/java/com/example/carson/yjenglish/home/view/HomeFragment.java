@@ -113,6 +113,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         mVideoView.stop();
         v = view.findViewById(R.id.item_video_play);
         if (v != null) v.setVisibility(View.INVISIBLE);
+        v = view.findViewById(R.id.img_content);
+        if (v != null) v.setVisibility(View.INVISIBLE);
         v = view.findViewById(R.id.video);
         if (v != null) {
             v.setVisibility(View.VISIBLE);
@@ -155,6 +157,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         if (lastView != null) {
             v = lastView.findViewById(R.id.item_video_play);
             if (v != null) v.setVisibility(View.VISIBLE);
+            v = lastView.findViewById(R.id.img_content);
+            if (v != null) v.setVisibility(View.VISIBLE);
             v = lastView.findViewById(R.id.video);
             if (v != null) {
                 FrameLayout fl = (FrameLayout) v;
@@ -187,8 +191,11 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             data.setUsername("Carson");
             if (i == 0 || i == 1) {
                 data.setVideoUrl("http://dn-chunyu.qbox.me/fwb/static/images/home/video/video_aboutCY_A.mp4");
+                data.setImgUrl("http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg");
+                data.setPortraitUrl("http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg");
             } else {
                 data.setImgUrl("http://pic.qiantucdn.com/58pic/19/57/12/47B58PICxdD_1024.jpg");
+                data.setPortraitUrl("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533311106938&di=a428eb3a3220df77190f2b9b2abef542&imgtype=0&src=http%3A%2F%2Fphotocdn.sohu.com%2F20150907%2Fmp30906533_1441629699374_2.jpeg");
             }
             mListData.add(data);
         }
@@ -370,7 +377,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 
     public interface OnHomeInteractListener {
         void onMusicPressed(View view);
-        void onItemClick(ArrayList item);
+        void onItemClick(ArrayList item, boolean requestComment);
         void onProgressClick(View view);
     }
 

@@ -1,9 +1,11 @@
 package com.example.carson.yjenglish;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.TabLayout;
 import android.os.Bundle;
@@ -13,17 +15,24 @@ import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 
+import com.example.carson.yjenglish.broadcastreceiver.NetworkReceiver;
 import com.example.carson.yjenglish.discover.DiscoverFragment;
+import com.example.carson.yjenglish.home.model.HomeItem;
 import com.example.carson.yjenglish.home.view.HomeFragment;
+import com.example.carson.yjenglish.home.view.HomeItemAty;
+import com.example.carson.yjenglish.music.view.MusicActivity;
 import com.example.carson.yjenglish.home.view.WordListAty;
 import com.example.carson.yjenglish.msg.MsgFragment;
 import com.example.carson.yjenglish.tv.view.TVFragment;
+import com.example.carson.yjenglish.utils.DialogUtils;
+import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.view.ZoneFragment;
 
 import java.util.ArrayList;
 
-public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInteractListener {
+public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInteractListener,
+        NetUtils.NetEvent {
 
     private final String TAG = "HomeActivity";
 
@@ -39,6 +48,9 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
 
     //设置一个广播 监听message数据列表的更新
     private MsgBroadCastReceiver mMsgReceiver;
+
+    //设置广播 监听网络数据变化
+    private NetworkReceiver mNetworkReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,6 +162,21 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
         return R.layout.activity_home;
     }
 
+    @Override
+    public void onNetworkChange(int netMobile) {
+        switch (netMobile) {
+            case -1://无网络
+                DialogUtils dialogUtils = DialogUtils.getInstance(HomeActivity.this);
+                AlertDialog mDialog = dialogUtils.newCommonDialog("无网络连接", R.mipmap.ic_no_network);
+                dialogUtils.show(mDialog);
+                break;
+            case 0://移动网络
+                break;
+            case 1://WIFI网络
+                break;
+        }
+    }
+
     public class MsgBroadCastReceiver extends BroadcastReceiver {
 
         @Override
@@ -182,16 +209,28 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
      */
     @Override
     public void onMusicPressed(View view) {
-
+        Intent toMusic = new Intent(this, MusicActivity.class);
+        startActivity(toMusic);
+        overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
     }
 
     /**
      * 点击item的回调
      * @param item
+     * @param requestComment 是否一进入就跳转到评论区
      */
     @Override
-    public void onItemClick(ArrayList item) {
-
+    public void onItemClick(ArrayList item, boolean requestComment) {
+        HomeItem mItem = (HomeItem) item.get(0);
+        Intent toDetail = new Intent(this, HomeItemAty.class);
+        toDetail.putExtra("video_url", mItem.getVideoUrl());
+        toDetail.putExtra("img_url", mItem.getImgUrl());
+        toDetail.putExtra("username", mItem.getUsername());
+        toDetail.putExtra("title", mItem.getTitle());
+        toDetail.putExtra("portrait_url", mItem.getPortraitUrl());
+        toDetail.putExtra("like_num", mItem.getLikeNum());
+        toDetail.putExtra("request_comment", requestComment);
+        startActivity(toDetail);
     }
 
     @Override
@@ -199,6 +238,19 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
         Intent toWordList = new Intent(HomeActivity.this, WordListAty.class);
         startActivity(toWordList);
         overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        //注册广播
+        if (mNetworkReceiver == null) {
+            mNetworkReceiver = new NetworkReceiver();
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            registerReceiver(mNetworkReceiver, filter);
+            mNetworkReceiver.setNetEvent(this);
+        }
     }
 
     @Override
@@ -216,6 +268,10 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
     @Override
     protected void onStop() {
         super.onStop();
+        if (mNetworkReceiver != null) {
+            unregisterReceiver(mNetworkReceiver);
+            mNetworkReceiver = null;
+        }
     }
 
     @Override

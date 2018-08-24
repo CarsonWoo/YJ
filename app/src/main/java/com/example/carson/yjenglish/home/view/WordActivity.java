@@ -62,6 +62,7 @@ public class WordActivity extends AppCompatActivity {
     private TextView soundMark;
     private TextSwitcher mTextSwitcher;
     private FrameLayout mLoadingView;
+    private View divider;
 
     private CorrectOrWrongImageView pic1, pic2, pic3, pic4;//分别对应于四张图片
     private CorrectOrWrongTextView tran1, tran2, tran3, tran4;
@@ -104,6 +105,7 @@ public class WordActivity extends AppCompatActivity {
         mWordContainer = findViewById(R.id.word_container);
         mLoadingView = findViewById(R.id.loading_view);
         mLoadingView.setVisibility(View.VISIBLE);
+        divider = findViewById(R.id.divider);
 
         initLoadingView();
 
@@ -199,6 +201,7 @@ public class WordActivity extends AppCompatActivity {
                     back.setVisibility(View.VISIBLE);
                     pass.setVisibility(View.VISIBLE);
                     sound.setVisibility(View.VISIBLE);
+                    divider.setVisibility(View.VISIBLE);
                 }
 
             }

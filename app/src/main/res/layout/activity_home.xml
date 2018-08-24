@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    android:clipChildren="false"
     tools:context="com.example.carson.yjenglish.HomeActivity">
 
     <android.support.constraint.ConstraintLayout
@@ -17,11 +17,12 @@
     <android.support.design.widget.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="53dp"
+        android:layout_height="60dp"
         android:background="@android:color/white"
         android:textAlignment="center"
         app:tabIndicatorHeight="0dp"
         app:tabGravity="fill"
+        app:tabTextAppearance="@style/MyTabText"
         app:tabTextColor="#808080"
         app:tabSelectedTextColor="@color/colorSelected"
         android:layout_alignParentBottom="true">
@@ -35,7 +36,6 @@
         <android.support.design.widget.TabItem
             android:icon="@drawable/selector_tv"
             android:text="语境"
-            android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

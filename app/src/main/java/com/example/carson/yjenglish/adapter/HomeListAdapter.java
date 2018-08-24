@@ -28,6 +28,8 @@ import com.example.carson.yjenglish.home.view.HomeFragment;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by 84594 on 2018/8/1.
  */
@@ -39,6 +41,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
 
     private final int HEADER_STYLE_PIC = 2;
     private final int HEADER_STYLE_LOAD = 3;
+    private final int HEADER_EMPTY = -1;
 
     private Context mCtx;
     private List<HomeItem> mList;
@@ -50,11 +53,19 @@ public class HomeListAdapter extends RecyclerView.Adapter {
     private OnVideoListener videoListener;
     private OnStartListener startListener;
     private OnLoadHeaderListener loadListener;
+    private OnItemClickListener itemListener;
 
     private int headerStyle;
 
     public HomeListAdapter() {
 
+    }
+
+    public HomeListAdapter(Context ctx, List<HomeItem> list, int headerStyle, OnVideoListener listener) {
+        this.mCtx = ctx;
+        this.mList = list;
+        this.videoListener = listener;
+        this.headerStyle = headerStyle;
     }
 
     public HomeListAdapter(Context context, List<HomeItem> list, HomeFragment.OnHomeInteractListener listener,
@@ -91,9 +102,13 @@ public class HomeListAdapter extends RecyclerView.Adapter {
             if (headerStyle == HEADER_STYLE_PIC) {
                 return new PicHolder(LayoutInflater.from(mCtx).inflate
                         (R.layout.home_header_pic, parent, false));
-            } else {
+            } else if (headerStyle == HEADER_STYLE_LOAD) {
                 return new LoadHolder(LayoutInflater.from(mCtx).inflate
                         (R.layout.home_header_load, parent, false));
+            } else {
+                //无头部时
+                return new EmptyHeader(LayoutInflater.from(mCtx).inflate
+                        (R.layout.word_detail_text, parent, false));
             }
         } else if (viewType == TYPE_LIST) {
             return new HomeViewHolder(LayoutInflater.from(mCtx).inflate
@@ -109,11 +124,10 @@ public class HomeListAdapter extends RecyclerView.Adapter {
             if (headerStyle == HEADER_STYLE_LOAD) {
                 LoadHolder loadHolder = (LoadHolder) holder;
                 bindLoadHolder(loadHolder);
-            } else {
+            } else if (headerStyle == HEADER_STYLE_PIC) {
                 PicHolder picHolder = (PicHolder) holder;
                 bindPicHolder(picHolder);
             }
-
         } else {
             final HomeViewHolder homeHolder = (HomeViewHolder) holder;
             bindListHolder(homeHolder, position);
@@ -224,9 +238,8 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         if (homeHolder.item.getUsername() != null) {
             homeHolder.name.setText(homeHolder.item.getUsername());
         }
-        if (homeHolder.item.getVideoUrl() != null) {
-            homeHolder.img.setVisibility(View.GONE);
-            homeHolder.img.setBackgroundColor(Color.parseColor("#f9feff"));
+        if (homeHolder.item.getVideoUrl() != null && !homeHolder.item.getVideoUrl().isEmpty()) {
+            Glide.with(mCtx).load(homeHolder.item.getImgUrl()).thumbnail(0.6f).into(homeHolder.img);
             homeHolder.video.setVisibility(View.VISIBLE);
             homeHolder.play.setVisibility(View.VISIBLE);
             homeHolder.play.setOnClickListener(new View.OnClickListener() {
@@ -240,26 +253,42 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         } else {
             homeHolder.video.setVisibility(View.GONE);
             homeHolder.play.setVisibility(View.GONE);
-            homeHolder.img.setVisibility(View.VISIBLE);
-            Glide.with(mCtx).load(homeHolder.item.getImgUrl()).thumbnail(0.8f).error(R.drawable.ic_warning).into(homeHolder.img);
-            homeHolder.img.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (mListener != null) {
-                        itemSelected.clear();
-                        itemSelected.add(homeHolder.item);
-                        mListener.onItemClick(itemSelected);
-                    }
-                }
-            });
+            Glide.with(mCtx).load(homeHolder.item.getImgUrl()).thumbnail(0.8f).into(homeHolder.img);
         }
-        homeHolder.container.setOnClickListener(new View.OnClickListener() {
+        if (homeHolder.item.getPortraitUrl() != null && !homeHolder.item.getPortraitUrl().isEmpty()) {
+            Glide.with(mCtx).load(homeHolder.item.getPortraitUrl()).thumbnail(0.8f).into(homeHolder.portrait);
+        } else {
+            Glide.with(mCtx).load(R.mipmap.ic_launcher_round).into(homeHolder.portrait);
+        }
+        homeHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
                     itemSelected.clear();
                     itemSelected.add(homeHolder.item);
-                    mListener.onItemClick(itemSelected);
+                    mListener.onItemClick(itemSelected, false);
+                } else {
+                    if (itemListener != null) {
+                        itemSelected.clear();
+                        itemSelected.add(homeHolder.item);
+                        itemListener.onClick(itemSelected, false);
+                    }
+                }
+            }
+        });
+        homeHolder.commentNum.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mListener != null) {
+                    itemSelected.clear();
+                    itemSelected.add(homeHolder.item);
+                    mListener.onItemClick(itemSelected, true);
+                } else {
+                    if (itemListener != null) {
+                        itemSelected.clear();
+                        itemSelected.add(homeHolder.item);
+                        itemListener.onClick(itemSelected, true);
+                    }
                 }
             }
         });
@@ -278,6 +307,10 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         this.loadListener = loadListener;
     }
 
+    public void setItemListener(OnItemClickListener itemListener) {
+        this.itemListener = itemListener;
+    }
+
     public class HomeViewHolder extends BaseViewHolder {
 
         TextView title;
@@ -290,9 +323,12 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         HomeItem item;
         ConstraintLayout container;
         CardView mCardView;
+        CircleImageView portrait;
+        View itemView;
 
         public HomeViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             mCardView = (CardView) itemView;
             title = itemView.findViewById(R.id.content_title);
             name = itemView.findViewById(R.id.username);
@@ -301,8 +337,8 @@ public class HomeListAdapter extends RecyclerView.Adapter {
             video = itemView.findViewById(R.id.video);
             container = itemView.findViewById(R.id.item_card);
             img = itemView.findViewById(R.id.img_content);
-
             play = itemView.findViewById(R.id.item_video_play);
+            portrait = itemView.findViewById(R.id.portrait);
         }
     }
 
@@ -349,6 +385,12 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         }
     }
 
+    public class EmptyHeader extends BaseViewHolder {
+        public EmptyHeader(View itemView) {
+            super(itemView);
+        }
+    }
+
     public interface OnVideoListener {
         void onVideoClick(View view, String url);
     }
@@ -360,5 +402,9 @@ public class HomeListAdapter extends RecyclerView.Adapter {
     public interface OnLoadHeaderListener {
         void onSignClick(View view);
         void onMoreClick(View view);
+    }
+
+    public interface OnItemClickListener {
+        void onClick(ArrayList item, boolean requestComment);
     }
 }

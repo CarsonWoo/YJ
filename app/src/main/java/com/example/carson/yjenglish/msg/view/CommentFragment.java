@@ -98,7 +98,7 @@ public class CommentFragment extends Fragment {
                     public void run() {
                         recyclerView.setRefreshComplete();
                     }
-                }, 2000);
+                }, 1000);
             }
 
             @Override
@@ -107,28 +107,28 @@ public class CommentFragment extends Fragment {
             }
         });
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                CommentMsg newComment = new CommentMsg();
-                newComment.setImgUrl(null);
-                newComment.setUsername("帅哥");
-                newComment.setOrigin("原创：嘻嘻");
-                newComment.setContent("不错嘛小子");
-                newComment.setDate("2018/9/9");
-                newComment.setType("评论了你");
-                mComments.add(newComment);
-//                mAdapter.notifyDataSetChanged();
-                Intent itemIntent = new Intent("NEW_MSG_ITEM_ADD");
-                itemIntent.putExtra("tabPos", 0);
-                itemIntent.putExtra("isRefresh", false);
-                Intent msgIntent = new Intent("MSG_LIST_CHANGE");
-                if (getActivity() != null) {
-                    getActivity().sendBroadcast(itemIntent);
-                    getActivity().sendBroadcast(msgIntent);
-                }
-            }
-        }, 5000);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                CommentMsg newComment = new CommentMsg();
+//                newComment.setImgUrl(null);
+//                newComment.setUsername("帅哥");
+//                newComment.setOrigin("原创：嘻嘻");
+//                newComment.setContent("不错嘛小子");
+//                newComment.setDate("2018/9/9");
+//                newComment.setType("评论了你");
+//                mComments.add(newComment);
+////                mAdapter.notifyDataSetChanged();
+//                Intent itemIntent = new Intent("NEW_MSG_ITEM_ADD");
+//                itemIntent.putExtra("tabPos", 0);
+//                itemIntent.putExtra("isRefresh", false);
+//                Intent msgIntent = new Intent("MSG_LIST_CHANGE");
+//                if (getActivity() != null) {
+//                    getActivity().sendBroadcast(itemIntent);
+//                    getActivity().sendBroadcast(msgIntent);
+//                }
+//            }
+//        }, 5000);
     }
 
 }

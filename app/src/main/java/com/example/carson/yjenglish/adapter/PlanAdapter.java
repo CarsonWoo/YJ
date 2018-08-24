@@ -31,11 +31,13 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
     private List<PlanData> mPlans;
     private Context ctx;
-    private OnItemChangeListener mChangeListner;
+    private OnItemChangeListener mChangeListener;
 
     private int mLastPos = -1;//由于recyclerview的复用item的问题 需要记录上一次选择的item的position
 
     private Map<Integer, Boolean> mCardSelected = new HashMap<>();
+
+    private int resType = 1001;//1001代表reset 1002代表delete
 
     public PlanAdapter(Context ctx, List<PlanData> mPlans) {
         this.ctx = ctx;
@@ -60,11 +62,13 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     @Override
     public void onBindViewHolder(@NonNull BaseViewHolder holder, final int position) {
         if (position == mPlans.size()) {//底部布局
-            FooterViewHolder mFooter = (FooterViewHolder) holder;
+            final FooterViewHolder mFooter = (FooterViewHolder) holder;
             mFooter.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Log.e("PlanAdapter", "onAddClick");
+                    if (mChangeListener != null) {
+                        mChangeListener.onAddClick(mFooter.itemView);
+                    }
                 }
             });
         } else {
@@ -76,16 +80,24 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 mHolder.isLearning.setVisibility(View.VISIBLE);
                 mHolder.seekBar.setVisibility(View.VISIBLE);
                 mHolder.seekBar.setProgress(mHolder.item.getProgress());
+                mHolder.resetOrDelete.setImageResource(R.mipmap.ic_reset_plan);
+                resType = 1001;
             } else {
                 mHolder.isLearning.setVisibility(View.INVISIBLE);
                 mHolder.seekBar.setVisibility(View.INVISIBLE);
+                mHolder.resetOrDelete.setImageResource(R.mipmap.ic_delete_gray);
+                resType = 1002;
             }
             if (mCardSelected.get(position)) {
                 mHolder.mCard.setSelected(true);
                 mHolder.border.setVisibility(View.VISIBLE);
             } else {
                 mHolder.mCard.setSelected(false);
-                mHolder.border.setVisibility(View.INVISIBLE);
+                mHolder.border.setVisibility(View.GONE);
+            }
+            if (mLastPos < 0 && position == 0) {
+                mHolder.mCard.setSelected(true);
+                mHolder.border.setVisibility(View.VISIBLE);
             }
             if (mLastPos == position) {
                 mHolder.mCard.setSelected(true);
@@ -98,12 +110,31 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                         if (position == i) {
                             mCardSelected.put(position, true);
                             mLastPos = position;
-
                             continue;
                         }
                         mCardSelected.put(i, false);
                     }
+                    if (mChangeListener != null) {
+                        mChangeListener.onCardClick(view, mHolder.item.getTag());
+                    }
                     notifyDataSetChanged();
+                }
+            });
+            if (mHolder.item.isEditing()) {
+                mHolder.resetOrDelete.setVisibility(View.VISIBLE);
+            } else {
+                mHolder.resetOrDelete.setVisibility(View.GONE);
+            }
+            mHolder.resetOrDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mChangeListener != null) {
+                        if (resType == 1001) {
+                            mChangeListener.onDeleteClick(view, position);
+                        } else {
+                            mChangeListener.onResetClick(view, position);
+                        }
+                    }
                 }
             });
         }
@@ -123,8 +154,8 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         return mPlans.size() + 1;
     }
 
-    public void setChangeListner(OnItemChangeListener mChangeListner) {
-        this.mChangeListner = mChangeListner;
+    public void setChangeListener(OnItemChangeListener mChangeListener) {
+        this.mChangeListener = mChangeListener;
     }
 
     public class ViewHolder extends BaseViewHolder {
@@ -158,6 +189,9 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
     public interface OnItemChangeListener {
-        void onItemChange(View target, ImageView border, int targetPos);
+        void onCardClick(View view, String tag);
+        void onAddClick(View view);
+        void onResetClick(View view, int pos);
+        void onDeleteClick(View view, int pos);
     }
 }
