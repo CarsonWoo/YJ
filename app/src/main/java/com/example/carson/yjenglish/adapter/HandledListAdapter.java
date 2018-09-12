@@ -10,7 +10,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.home.model.HandledWord;
+import com.example.carson.yjenglish.home.model.HandledWordInfo;
+
 import java.util.List;
 
 /**
@@ -20,12 +21,12 @@ import java.util.List;
 public class HandledListAdapter extends RecyclerView.Adapter<HandledListAdapter.ListViewHolder> {
 
     private Context context;
-    private List<HandledWord> mList;
+    private List<HandledWordInfo.HandleWord> mList;
 
     private onButtonClickListener listener;
 
     public HandledListAdapter(){}
-    public HandledListAdapter(Context ctx, List<HandledWord> list) {
+    public HandledListAdapter(Context ctx, List<HandledWordInfo.HandleWord> list) {
         this.context = ctx;
         this.mList = list;
     }
@@ -40,7 +41,7 @@ public class HandledListAdapter extends RecyclerView.Adapter<HandledListAdapter.
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
-        holder.trans.setText(holder.item.getTrans());
+        holder.trans.setText(holder.item.getMeaning());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,7 +75,7 @@ public class HandledListAdapter extends RecyclerView.Adapter<HandledListAdapter.
         TextView word;
         TextView trans;
         Button recover;
-        HandledWord item;
+        HandledWordInfo.HandleWord item;
         View itemView;
 
         public ListViewHolder(View itemView) {

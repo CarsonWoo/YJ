@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.home.model.RememberWord;
+import com.example.carson.yjenglish.home.model.RememberWordInfo;
 
 import java.util.List;
 
@@ -20,14 +20,14 @@ import java.util.List;
 
 public class RememberListAdapter extends RecyclerView.Adapter<RememberListAdapter.ListViewHolder> {
 
-    private List<RememberWord> mList;
+    private List<RememberWordInfo.RememberWord> mList;
     private Context ctx;
 
     private OnButtonClickListener listener;
 
     public RememberListAdapter(){}
 
-    public RememberListAdapter(Context ctx, List<RememberWord> mList) {
+    public RememberListAdapter(Context ctx, List<RememberWordInfo.RememberWord> mList) {
         this.ctx = ctx;
         this.mList = mList;
     }
@@ -42,7 +42,7 @@ public class RememberListAdapter extends RecyclerView.Adapter<RememberListAdapte
     public void onBindViewHolder(@NonNull ListViewHolder holder, final int position) {
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
-        holder.trans.setText(holder.item.getTrans());
+        holder.trans.setText(holder.item.getMeaning());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -75,7 +75,7 @@ public class RememberListAdapter extends RecyclerView.Adapter<RememberListAdapte
         TextView word;
         TextView trans;
         Button pass;
-        RememberWord item;
+        RememberWordInfo.RememberWord item;
         View itemView;
 
         public ListViewHolder(View itemView) {

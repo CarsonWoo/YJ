@@ -37,9 +37,7 @@ public class DialogUtils {
     private OnSortListener sortListener;
 
     public static DialogUtils getInstance(Context ctx) {
-        if (INSTANCE == null) {
-            INSTANCE = new DialogUtils(ctx);
-        }
+        INSTANCE = new DialogUtils(ctx);
         return INSTANCE;
     }
 
@@ -109,7 +107,7 @@ public class DialogUtils {
     /**
      * bottom picker dialog
      */
-    public Dialog newPickerDialog(String wordTag) {
+    public Dialog newPickerDialog(String wordTag, int count) {
         Dialog mDialog = new Dialog(ctx);
         mDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         View dialogView = LayoutInflater.from(ctx).inflate(R.layout.layout_double_picker_dialog, null, false);
@@ -123,11 +121,11 @@ public class DialogUtils {
         mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mDialog.getWindow().setWindowAnimations(R.style.BottomDialog_Animation);
 
-        initPickerViews(dialogView, wordTag);
+        initPickerViews(dialogView, wordTag, count);
         return mDialog;
     }
 
-    private void initPickerViews(View view, String tag) {
+    private void initPickerViews(View view, String tag, final int count) {
         TextView wordTag = view.findViewById(R.id.word_tag);
         final TextView planDate = view.findViewById(R.id.plan_date);
         TextView confirm = view.findViewById(R.id.btn_confirm);
@@ -136,12 +134,12 @@ public class DialogUtils {
         final TextView planStr = view.findViewById(R.id.plan_string);
 
         /** 先设置data */
-        List<String> days = new ArrayList<>();
-        List<String> words = new ArrayList<>();
+        final List<String> days = new ArrayList<>();
+        final List<String> words = new ArrayList<>();
 
-        for (int i = 1; i <= 10; i++) {
-            days.add((i * 3) + "天");
-            words.add((i * 20) + "单词");
+        for (int i = 10; i <= 60; i += 5) {
+            days.add((count / i) + "天");
+            words.add(i + "单词");
         }
 
         dayPicker.setData(days);
@@ -159,19 +157,27 @@ public class DialogUtils {
         dayPicker.setOnSelectListener(new PickerView.onSelectListener() {
             @Override
             public void onSelect(String text, int pos) {
+                int i = count / Integer.parseInt(text.replace("天", ""));
+                if (i % 5 != 0) {
+                    i = (i / 5) * 5;
+                }
+                String str = i + "单词";
+                wordPicker.setSelected(str);
                 String s = "每天" + wordPicker.getText() + "，计划" + text + "完成";
                 planStr.setText(s);
                 Date afterDate = CalculateUtils.getDateAfter(new Date(), Integer.
                         parseInt(dayPicker.getText().replace("天", "")));
                 String dateStr = date2Str(afterDate);
                 planDate.setText(dateStr);
-
             }
         });
 
         wordPicker.setOnSelectListener(new PickerView.onSelectListener() {
             @Override
             public void onSelect(String text, int pos) {
+                String str = (count / Integer.parseInt(text.replace("单词", ""))) + "天";
+                Log.e("DayPick", str);
+                dayPicker.setSelected(str);
                 String s = "每天" + text + "，计划" + dayPicker.getText() + "完成";
                 planStr.setText(s);
                 Date afterDate = CalculateUtils.getDateAfter(new Date(), Integer.

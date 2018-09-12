@@ -23,18 +23,6 @@ public class StartActivity extends AppCompatActivity {
 
         mLayout = findViewById(R.id.start_layout);
 
-//        ObjectAnimator animator = ObjectAnimator.ofFloat(mLayout, "rotationY", 0, 90).setDuration(500);
-//        ObjectAnimator animator1 = ObjectAnimator.ofFloat(mLayout, "rotationY", 270, 360).setDuration(500);
-//        final AnimatorSet set = new AnimatorSet();
-//        set.play(animator).before(animator1);
-//        mLayout.postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                set.start();
-//            }
-//        }, 1000);
-
-
         mLayout.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -42,7 +30,7 @@ public class StartActivity extends AppCompatActivity {
                     startActivity(new Intent(StartActivity.this, HomeActivity.class));
                     overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                 } else {
-                    if (UserConfig.isIsFirstTimeUser()) {
+                    if (UserConfig.getIsFirstTimeUser(MyApplication.getContext())) {
                         startActivity(new Intent(StartActivity.this, RegisterActivity.class));
                         overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                     } else {

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">语境背单词</string>
+    <string name="slogan">透过语境记住你</string>
     <string name="edit_phone">请输入手机号</string>
     <string name="edit_password">请输入密码</string>
     <string name="code_login">验证码登录</string>
@@ -38,4 +39,6 @@
     <string name="tag_junior">初中</string>
     <string name="tag_primary">小学</string>
     <string name="tag_hit">最热</string>
+    <string name="setup_password">设置密码</string>
+    <string name="home_header_pic_text">个小伙伴正在背单词\n快来加入吧！</string>
 </resources>

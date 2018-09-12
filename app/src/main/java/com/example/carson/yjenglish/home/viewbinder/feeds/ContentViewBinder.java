@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.BaseViewHolder;
 import com.example.carson.yjenglish.home.model.forviewbinder.Content;
-import com.example.carson.yjenglish.home.view.AuthorAty;
+import com.example.carson.yjenglish.home.view.feeds.AuthorAty;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.drakeet.multitype.ItemViewBinder;
@@ -41,12 +41,12 @@ public class ContentViewBinder extends ItemViewBinder<Content, ContentViewBinder
         holder.title.setText(item.getTitle());
         holder.username.setText(item.getUsername());
         holder.text.setText(item.getText());
-        holder.likeNum.setText(item.getLikeNum() + "");
+        holder.likeNum.setText(item.getLikeNum());
         Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).thumbnail(0.8f).into(holder.portrait);
         holder.fabLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holder.likeNum.setText(item.getLikeNum() + 1);
+                holder.likeNum.setText(Integer.parseInt(item.getLikeNum())+ 1 + "");
                 if (mListener != null) {
                     mListener.onLikeClick();
                 }

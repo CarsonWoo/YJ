@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/portrait_1"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@android:color/darker_gray"
+        app:civ_border_color="@color/colorAccent"
+        app:civ_border_width="1dp"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/portrait_2"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@android:color/darker_gray"
+        app:civ_border_color="@color/colorAccent"
+        app:civ_border_width="1dp"
+        android:layout_marginStart="13dp"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/portrait_3"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@android:color/darker_gray"
+        app:civ_border_color="@color/colorAccent"
+        app:civ_border_width="1dp"
+        android:layout_marginStart="26dp"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/portrait_4"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@android:color/darker_gray"
+        app:civ_border_color="@color/colorAccent"
+        app:civ_border_width="1dp"
+        android:layout_marginStart="39dp"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/portrait_5"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@android:color/darker_gray"
+        app:civ_border_color="@color/colorAccent"
+        app:civ_border_width="1dp"
+        android:layout_marginStart="52dp"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/portrait_6"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@android:color/darker_gray"
+        app:civ_border_color="@color/colorAccent"
+        app:civ_border_width="1dp"
+        android:layout_marginStart="65dp"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/portrait_7"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@android:color/darker_gray"
+        app:civ_border_color="@color/colorAccent"
+        app:civ_border_width="1dp"
+        android:layout_marginStart="78dp"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/portrait_load_more"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@drawable/ic_menu_more_white"
+        app:civ_circle_background_color="@color/colorAccent"
+        app:civ_border_color="@color/colorAccent"
+        app:civ_border_width="1dp"
+        android:layout_marginStart="91dp"
+        />
+
+</FrameLayout>

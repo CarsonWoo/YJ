@@ -19,7 +19,6 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.home.model.forviewbinder.Comment;
-import com.example.carson.yjenglish.home.view.CommentAty;
 import com.example.carson.yjenglish.utils.ScreenUtils;
 
 import java.util.List;

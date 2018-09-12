@@ -9,6 +9,8 @@ import org.litepal.crud.DataSupport;
 
 public class LoadHeader extends DataSupport {
 
+    @Column(defaultValue = "1")
+    private int header_id;
     @Column(defaultValue = "0")
     private int wordsCount;
     @Column(defaultValue = "0")
@@ -77,5 +79,13 @@ public class LoadHeader extends DataSupport {
 
     public void setSignClick(boolean signClick) {
         isSignClick = signClick;
+    }
+
+    public int getHeader_id() {
+        return header_id;
+    }
+
+    public void setHeader_id(int header_id) {
+        this.header_id = header_id;
     }
 }

@@ -12,27 +12,33 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 
 import com.example.carson.yjenglish.broadcastreceiver.NetworkReceiver;
 import com.example.carson.yjenglish.discover.DiscoverFragment;
+import com.example.carson.yjenglish.home.HomeInfoTask;
+import com.example.carson.yjenglish.home.model.HomeInfo;
 import com.example.carson.yjenglish.home.model.HomeItem;
+import com.example.carson.yjenglish.home.presenter.HomeInfoPresenter;
 import com.example.carson.yjenglish.home.view.HomeFragment;
-import com.example.carson.yjenglish.home.view.HomeItemAty;
+import com.example.carson.yjenglish.home.view.feeds.HomeItemAty;
+import com.example.carson.yjenglish.login.view.LoginActivity;
 import com.example.carson.yjenglish.music.view.MusicActivity;
-import com.example.carson.yjenglish.home.view.WordListAty;
+import com.example.carson.yjenglish.home.view.word.WordListAty;
 import com.example.carson.yjenglish.msg.MsgFragment;
 import com.example.carson.yjenglish.tv.view.TVFragment;
 import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
+import com.example.carson.yjenglish.zone.view.setting.SettingAty;
 import com.example.carson.yjenglish.zone.view.ZoneFragment;
 
 import java.util.ArrayList;
 
 public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInteractListener,
-        NetUtils.NetEvent {
+        NetUtils.NetEvent, ZoneFragment.OnZoneEventListener {
 
     private final String TAG = "HomeActivity";
 
@@ -83,9 +89,18 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
     private void setDefaultFragment() {
         fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
-        ft.add(R.id.home_container, HomeFragment.newInstance());
+        homeFragment = HomeFragment.newInstance();
+        executeHomeTask();
+        ft.add(R.id.home_container, homeFragment);
         ft.commit();
     }
+
+    private void executeHomeTask() {
+        HomeInfoTask homeTask = HomeInfoTask.getInstance();
+        HomeInfoPresenter homePresenter = new HomeInfoPresenter(homeTask, homeFragment);
+        homeFragment.setPresenter(homePresenter);
+    }
+
     private void setContainerView(TabLayout.Tab tab) {
         fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
@@ -93,12 +108,7 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
         hideAllFragments(transaction);
         switch (tab.getPosition()) {
             case 0:
-                if (homeFragment == null) {
-                    homeFragment = HomeFragment.newInstance();
-                    transaction.add(R.id.home_container, homeFragment);
-                } else {
-                    transaction.show(homeFragment);
-                }
+                transaction.show(homeFragment);
                 break;
             case 1:
                 if (tvFragment == null) {
@@ -173,8 +183,25 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
             case 0://移动网络
                 break;
             case 1://WIFI网络
+//                executeHomeTask();
+//                FragmentTransaction transaction = fm.beginTransaction();
+//                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+//                if (tabLayout.getSelectedTabPosition() == 0) {
+//                    transaction.remove(homeFragment);
+//                    homeFragment = HomeFragment.newInstance();
+//                    executeHomeTask();
+//                    transaction.add(R.id.home_container, homeFragment);
+//                    transaction.commit();
+//                }
                 break;
         }
+    }
+
+    @Override
+    public void onSetting() {
+        Intent toSetting = new Intent(this, SettingAty.class);
+        startActivityForResult(toSetting, 100);
+        overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
     }
 
     public class MsgBroadCastReceiver extends BroadcastReceiver {
@@ -221,15 +248,16 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
      */
     @Override
     public void onItemClick(ArrayList item, boolean requestComment) {
-        HomeItem mItem = (HomeItem) item.get(0);
+        HomeInfo.Data.Feed mItem = (HomeInfo.Data.Feed) item.get(0);
         Intent toDetail = new Intent(this, HomeItemAty.class);
-        toDetail.putExtra("video_url", mItem.getVideoUrl());
-        toDetail.putExtra("img_url", mItem.getImgUrl());
-        toDetail.putExtra("username", mItem.getUsername());
+        toDetail.putExtra("video_url", mItem.getVideo());
+        toDetail.putExtra("img_url", mItem.getPic());
+        toDetail.putExtra("username", mItem.getAuthor_username());
         toDetail.putExtra("title", mItem.getTitle());
-        toDetail.putExtra("portrait_url", mItem.getPortraitUrl());
-        toDetail.putExtra("like_num", mItem.getLikeNum());
+        toDetail.putExtra("portrait_url", mItem.getAuthor_portrait());
+        toDetail.putExtra("like_num", mItem.getLikes());
         toDetail.putExtra("request_comment", requestComment);
+        toDetail.putExtra("is_like", mItem.getIsLike().equals("1"));
         startActivity(toDetail);
     }
 
@@ -277,7 +305,10 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        UserConfig.cacheLastDate(this);
+        if (!TextUtils.isEmpty(UserConfig.getToken(this))) {
+            UserConfig.cacheLastDate(this);
+        }
+        Log.e(TAG, "onDestroy");
     }
 
     @Override
@@ -294,6 +325,22 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
             msgFragment = (MsgFragment) fragment;
         } else if (zoneFragment == null && fragment instanceof ZoneFragment) {
             zoneFragment = (ZoneFragment) fragment;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 100 && resultCode == 1001) {
+            Intent toLogin = new Intent(this, LoginActivity.class);
+            startActivity(toLogin);
+            overridePendingTransition(R.anim.ani_left_get_into, R.anim.ani_right_sign_out);
+            Log.e(TAG, "onFinish");
+            finishAfterTransition();
+            if (MusicActivity.INSTANCE != null) {
+                Log.e(TAG, "finish");
+                MusicActivity.INSTANCE.finishAffinity();
+            }
         }
     }
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android" android:drawable="@drawable/ic_arrow_double_up">
+
+    <target
+        android:animation="@animator/arrow_fade_in_1200"
+        android:name="arrow_1" />
+
+    <target
+        android:animation="@animator/arrow_fade_in_800"
+        android:name="arrow_2" />
+
+</animated-vector>

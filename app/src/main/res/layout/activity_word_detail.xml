@@ -8,7 +8,7 @@
     android:clipToPadding="true"
     android:focusableInTouchMode="true"
     android:focusable="true"
-    tools:context="com.example.carson.yjenglish.home.view.WordDetailActivity">
+    tools:context="com.example.carson.yjenglish.home.view.word.WordDetailActivity">
 
     <ImageView
         android:id="@+id/back"

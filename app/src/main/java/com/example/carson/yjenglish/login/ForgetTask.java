@@ -4,7 +4,10 @@ import com.example.carson.yjenglish.login.model.ForgetModel;
 import com.example.carson.yjenglish.net.LoadTasksCallback;
 import com.example.carson.yjenglish.net.NetTask;
 import com.example.carson.yjenglish.utils.CommonInfo;
+import com.example.carson.yjenglish.utils.NetUtils;
+import com.example.carson.yjenglish.utils.UserConfig;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -20,7 +23,7 @@ import rx.schedulers.Schedulers;
 public class ForgetTask implements NetTask<ForgetModel> {
 
     private static ForgetTask INSTANCE = null;
-    private static final String HOST = "";
+    private static final String HOST = UserConfig.HOST;
     private Retrofit retrofit;
 
     private ForgetTask() {
@@ -37,6 +40,7 @@ public class ForgetTask implements NetTask<ForgetModel> {
     private void createRetrofit() {
         retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
+                .client(NetUtils.getInstance().getClientInstance())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
@@ -45,8 +49,9 @@ public class ForgetTask implements NetTask<ForgetModel> {
     @Override
     public Subscription execute(ForgetModel data, final LoadTasksCallback callback) {
         ForgetService forgetService = retrofit.create(ForgetService.class);
-        Subscription subscription = forgetService.getResponse(data).subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<CommonInfo>() {
+        Subscription subscription = forgetService.getResponse(data.getForget_password_token(), data.getPassword())
+                .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Subscriber<CommonInfo>() {
                     @Override
                     public void onStart() {
                         callback.onStart();

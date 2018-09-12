@@ -13,7 +13,9 @@
     <ImageView
         android:id="@+id/img"
         android:layout_width="match_parent"
-        android:layout_height="220dp" />
+        android:layout_height="220dp"
+        android:scaleType="centerCrop"
+        />
 
     <ImageView
         android:id="@+id/item_video_play"

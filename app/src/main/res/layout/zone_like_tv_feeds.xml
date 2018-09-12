@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/my_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="95dp"
+        app:cardBackgroundColor="#f4f1f4"
+        app:cardCornerRadius="4dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.example.carson.yjenglish.customviews.RoundRectImageView
+                android:id="@+id/cover_img"
+                android:layout_width="130dp"
+                android:layout_height="80dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="10dp"
+                android:src="@color/colorAccent"
+                app:radius="20"
+                />
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_play_white_solid"
+                android:layout_marginStart="15dp"
+                android:layout_marginBottom="10dp"
+                android:layout_alignParentBottom="true"
+                />
+
+            <TextView
+                android:id="@+id/view_num"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="35.6w"
+                android:textColor="@android:color/white"
+                android:textSize="12sp"
+                android:layout_marginBottom="12dp"
+                android:layout_marginStart="35dp"
+                android:layout_alignParentBottom="true"
+                />
+
+            <TextView
+                android:id="@+id/word_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="travel"
+                android:textSize="21sp"
+                android:textColor="@color/colorTextWord"
+                android:layout_marginStart="35dp"
+                android:layout_marginTop="20dp"
+                android:layout_toEndOf="@id/cover_img"
+                />
+
+            <TextView
+                android:id="@+id/soundmark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="/trae:vl/"
+                android:textSize="14sp"
+                android:layout_toEndOf="@id/cover_img"
+                android:layout_below="@id/word_tag"
+                android:layout_marginStart="35dp"
+                />
+
+        </RelativeLayout>
+    </android.support.v7.widget.CardView>
+
+    <TextView
+        android:id="@+id/like_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorTextHint"
+        android:text="18:50"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintTop_toBottomOf="@id/my_card_view"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@mipmap/ic_delete_item_gray"
+        android:visibility="gone"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:background="#dadada"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@id/like_time"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</android.support.constraint.ConstraintLayout>

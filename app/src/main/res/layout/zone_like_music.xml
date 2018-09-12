@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp">
+
+    <com.example.carson.yjenglish.customviews.RoundRectImageView
+        android:id="@+id/my_card_view"
+        android:layout_width="match_parent"
+        android:layout_height="95dp"
+        android:src="#f4f1f4"
+        app:radius="18"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp">
+    </com.example.carson.yjenglish.customviews.RoundRectImageView>
+
+    <ImageView
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:src="@mipmap/ic_music"
+        android:layout_marginStart="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/my_card_view"
+        app:layout_constraintBottom_toBottomOf="@id/my_card_view"
+        />
+
+    <TextView
+        android:id="@+id/word_tag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="travel"
+        android:textSize="21sp"
+        android:textColor="@color/colorTextWord"
+        android:layout_marginStart="120dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/meaning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="n. 旅行；进行"
+        android:textSize="15sp"
+        android:layout_marginStart="120dp"
+        app:layout_constraintTop_toBottomOf="@id/word_tag"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/like_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="18:50"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/colorTextHint"
+        app:layout_constraintTop_toBottomOf="@id/my_card_view"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@mipmap/ic_delete_item_gray"
+        android:visibility="gone"
+        android:layout_marginBottom="5dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:background="#dadada"
+        android:layout_marginTop="5dp"
+        app:layout_constraintTop_toBottomOf="@id/like_time"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</android.support.constraint.ConstraintLayout>

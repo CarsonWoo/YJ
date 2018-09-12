@@ -6,12 +6,10 @@ package com.example.carson.yjenglish.register.model;
 
 public class RegisterModel {
     private String phone;
-    private String password;
-    private int code;
-    public RegisterModel(String phone, String password, int code) {
-        this.password = password;
+    private String token;//填sendCode
+    public RegisterModel(String token, String phone) {
+        this.token = token;
         this.phone = phone;
-        this.code = code;
     }
 
     public String getPhone() {
@@ -22,19 +20,11 @@ public class RegisterModel {
         this.phone = phone;
     }
 
-    public String getPassword() {
-        return password;
+    public String getToken() {
+        return token;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public void setCode(int code) {
-        this.code = code;
+    public void setToken(String token) {
+        this.token = token;
     }
 }

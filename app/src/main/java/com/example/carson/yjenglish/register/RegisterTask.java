@@ -1,10 +1,21 @@
 package com.example.carson.yjenglish.register;
 
+import android.util.Log;
+
 import com.example.carson.yjenglish.net.LoadTasksCallback;
 import com.example.carson.yjenglish.net.NetTask;
+import com.example.carson.yjenglish.net.NullOnEmptyConverterFactory;
 import com.example.carson.yjenglish.register.model.RegisterInfo;
 import com.example.carson.yjenglish.register.model.RegisterModel;
+import com.example.carson.yjenglish.utils.AddCookiesInterceptor;
+import com.example.carson.yjenglish.utils.NetUtils;
+import com.example.carson.yjenglish.utils.SaveCookiesInterceptor;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -21,15 +32,35 @@ public class RegisterTask implements NetTask<RegisterModel> {
 
     private static RegisterTask INSTANCE = null;
     private Retrofit retrofit;
-    private static final String HOST = "";
+    private static final String HOST = "http://123.207.85.37:8080/";
 
     private RegisterTask() {
         createRetrofit();
     }
 
     private void createRetrofit() {
+        OkHttpClient.Builder builder = new OkHttpClient().newBuilder();
+        HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+            @Override
+            public void log(String message) {
+                String text;
+                try {
+                    text = URLDecoder.decode(message, "utf-8");
+                    Log.e("======", text);
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    Log.e("======", e.getMessage());
+                }
+            }
+        });
+        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        builder.addInterceptor(interceptor);
+        builder.addInterceptor(new SaveCookiesInterceptor());
+//        builder.addInterceptor(new AddCookiesInterceptor());
         retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
+                .client(builder.build())
+                .addConverterFactory(new NullOnEmptyConverterFactory())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
@@ -45,7 +76,7 @@ public class RegisterTask implements NetTask<RegisterModel> {
     @Override
     public Subscription execute(RegisterModel model, final LoadTasksCallback callback) {
         RegisterService registerService = retrofit.create(RegisterService.class);
-        Subscription subscription = registerService.getResponse(model)
+        Subscription subscription = registerService.getResponse(model.getToken(), model.getPhone())
                 .subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<RegisterInfo>() {
                     @Override

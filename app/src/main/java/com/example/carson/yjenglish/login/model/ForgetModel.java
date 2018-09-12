@@ -5,23 +5,12 @@ package com.example.carson.yjenglish.login.model;
  */
 
 public class ForgetModel {
-    private String phone;
+    private String forget_password_token;
     private String password;
-    private int code;
-    public ForgetModel(String phone, String password, int code) {
+    public ForgetModel(String forget_password_token, String password) {
         this.password = password;
-        this.phone = phone;
-        this.code = code;
+        this.forget_password_token = forget_password_token;
     }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     public String getPassword() {
         return password;
     }
@@ -30,11 +19,11 @@ public class ForgetModel {
         this.password = password;
     }
 
-    public int getCode() {
-        return code;
+    public String getForget_password_token() {
+        return forget_password_token;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setForget_password_token(String forget_password_token) {
+        this.forget_password_token = forget_password_token;
     }
 }

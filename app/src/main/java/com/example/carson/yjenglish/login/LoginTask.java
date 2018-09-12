@@ -4,7 +4,17 @@ import com.example.carson.yjenglish.login.model.LoginInfo;
 import com.example.carson.yjenglish.login.model.LoginModule;
 import com.example.carson.yjenglish.net.LoadTasksCallback;
 import com.example.carson.yjenglish.net.NetTask;
+import com.example.carson.yjenglish.net.NullOnEmptyConverterFactory;
+import com.example.carson.yjenglish.utils.NetUtils;
+import com.example.carson.yjenglish.utils.SaveCookiesInterceptor;
+import com.example.carson.yjenglish.utils.UserConfig;
 
+import java.io.IOException;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -20,8 +30,8 @@ import rx.schedulers.Schedulers;
 
 public class LoginTask implements NetTask<LoginModule> {
     private static LoginTask INSTANCE = null;
-    //TODO 要将HOST替换
-    private static final String HOST = "";
+
+    private static final String HOST = UserConfig.HOST;
     private Retrofit retrofit;
 
     private LoginTask() {
@@ -38,6 +48,8 @@ public class LoginTask implements NetTask<LoginModule> {
     private void createRetrofit() {
         retrofit = new Retrofit.Builder()
                 .baseUrl(HOST)
+                .client(NetUtils.getInstance().getClientInstance())
+                .addConverterFactory(new NullOnEmptyConverterFactory())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();

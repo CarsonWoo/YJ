@@ -3,46 +3,38 @@ package com.example.carson.yjenglish.music.view;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.media.MediaPlayer;
-import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.transition.AutoTransition;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.CycleInterpolator;
-import android.view.animation.Interpolator;
 import android.view.animation.LinearInterpolator;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.Switch;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 import android.widget.ViewSwitcher;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.music.model.MusicEvent;
+import com.example.carson.yjenglish.service.MusicService;
 
-import java.io.IOException;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import jp.wasabeef.glide.transformations.BlurTransformation;
@@ -53,6 +45,7 @@ public class MusicActivity extends AppCompatActivity implements RememberTab.OnMu
 
     private ImageView back;
     private ImageSwitcher imgBg;
+    private TextSwitcher title;
     private CircleImageView photo;
     private ImageView play;
     private ImageView control;
@@ -76,6 +69,13 @@ public class MusicActivity extends AppCompatActivity implements RememberTab.OnMu
     private String curTimeStr;
 
     private static final int UPDATE = 0;
+
+    private MusicConn conn;
+    private MusicService.MusicBinder musicControl;
+
+    private Intent musicService;
+
+    public static MusicActivity INSTANCE;
 
 
     private String lrcTest = "[ti:Rap God]\n" +
@@ -271,9 +271,9 @@ public class MusicActivity extends AppCompatActivity implements RememberTab.OnMu
             switch (msg.what) {
                 case UPDATE:
                     try {
-                        mSeekBar.setProgress(mPlayer.getCurrentPosition());
-                        curTime.setText(parseDuration2Time(mPlayer.getCurrentPosition()));
-                        mLrcView.updateTime((mPlayer.getCurrentPosition()));
+                        mSeekBar.setProgress(musicControl.getCurrentPosition());
+                        curTime.setText(parseDuration2Time(musicControl.getCurrentPosition()));
+                        mLrcView.updateTime((musicControl.getCurrentPosition()));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -290,6 +290,8 @@ public class MusicActivity extends AppCompatActivity implements RememberTab.OnMu
         Log.e("Music", "onCreate()");
         imgUrl = "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2859719634,4239030051&fm=27&gp=0.jpg";
         initViews();
+        EventBus.getDefault().register(this);
+        INSTANCE = this;
     }
 
     private void initViews() {
@@ -306,17 +308,16 @@ public class MusicActivity extends AppCompatActivity implements RememberTab.OnMu
         latterPlay = findViewById(R.id.music_play_latter);
         formerPlay = findViewById(R.id.music_play_former);
         musicList = findViewById(R.id.music_play_list);
+        title = findViewById(R.id.music_title);
 
         curTime.setText("00:00");
         curTimeStr = "00:00";
-        if (mPlayer == null) {
-            mPlayer = new MediaPlayer();
-            Log.e("Music", "player = null");
-        } else {
-            Log.e("Music", "player != null");
-        }
-
-
+//        if (mPlayer == null) {
+//            mPlayer = new MediaPlayer();
+//            Log.e("Music", "player = null");
+//        } else {
+//            Log.e("Music", "player != null");
+//        }
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -345,8 +346,27 @@ public class MusicActivity extends AppCompatActivity implements RememberTab.OnMu
             }
         });
 
+        musicService = new Intent(this, MusicService.class);
+        conn = new MusicConn();
+        startService(musicService);
+        bindService(musicService, conn, BIND_AUTO_CREATE);
         initBgPhoto();
+        initTitle();
         initPlayAction();
+    }
+
+    private void initTitle() {
+        title.setFactory(new ViewSwitcher.ViewFactory() {
+            @Override
+            public View makeView() {
+                TextView tv = new TextView(MusicActivity.this);
+                tv.setTextSize(16);
+                tv.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+                tv.setTextColor(Color.WHITE);
+                return tv;
+            }
+        });
+        title.setText("Rap God");
     }
 
     private void initMusicList() {
@@ -355,12 +375,18 @@ public class MusicActivity extends AppCompatActivity implements RememberTab.OnMu
     }
 
     private void onBefore() {
-        mPlayer.reset();
+        isPlaying = true;
+        mHandler.removeMessages(UPDATE);
+        musicControl.setDataSource(R.raw.rap_god);
+        musicControl.onNext();
+        resetControl();
+        imgUrl = "https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2859719634,4239030051&fm=27&gp=0.jpg";
         Glide.with(this).load(imgUrl).thumbnail(0.8f)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .bitmapTransform(new BlurTransformation(this, 10, 10))
                 .crossFade().into((ImageView) imgBg.getCurrentView());
         Glide.with(this).load(imgUrl).thumbnail(0.8f).crossFade().into(photo);
+        title.setText("Rap God");
         initPlayAction();
     }
 
@@ -385,89 +411,63 @@ public class MusicActivity extends AppCompatActivity implements RememberTab.OnMu
     }
 
     private void initPlayAction() {
-        try {
-            mPlayer.setDataSource(getResources().openRawResourceFd(R.raw.rap_god));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mPlayer.prepareAsync();
-
-        mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mediaPlayer) {
-                mSeekBar.setMax(mediaPlayer.getDuration());
-                mSeekBar.setProgress(mediaPlayer.getCurrentPosition());
-                mSeekBar.setEnabled(true);
-                mHandler.sendEmptyMessage(UPDATE);
-                totalTime.setText(parseDuration2Time(mediaPlayer.getDuration()));
-//                Log.e("Music", "" + mediaPlayer.getDuration());
-                mPlayer.start();
-                play.setImageResource(R.drawable.ic_music_play_pause);
-                setRotateAnimation(true);
-            }
-        });
-        mPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                mSeekBar.setProgress(0);
-                mLrcView.updateTime(0);
-                mediaPlayer.stop();
-//                mediaPlayer.release();
-                curTime.setText("00:00");
-                mHandler.removeMessages(UPDATE);
-                isPlaying = false;
-                setRotateAnimation(false);
-                onNext();
-            }
-        });
+        EventBus.getDefault().removeStickyEvent(MusicEvent.class);
         play.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 isPlaying = !isPlaying;
+                //控制动画效果
                 setRotateAnimation(isPlaying);
+                //控制播放暂停
                 if (isPlaying) {
-                    mPlayer.start();
+                    musicControl.play();
                     if (!mHandler.hasMessages(UPDATE)) {
                         mHandler.sendEmptyMessage(UPDATE);
                     }
                     play.setImageResource(R.drawable.ic_music_play_pause);
                 } else {
-                    mPlayer.pause();
+                    musicControl.play();
                     mHandler.removeMessages(UPDATE);
                     play.setImageResource(R.mipmap.ic_music_play_large);
                 }
             }
         });
+        //设置进度条
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
             }
-
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
             }
-
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 int pos = seekBar.getProgress();
-                mPlayer.seekTo(pos);
+                musicControl.seekTo(pos);
                 mLrcView.updateTime(seekBar.getProgress());
-
             }
         });
+        //设置滚动歌词
         mLrcView.loadLrc(lrcTest);
-
+        //与其他页面交互
+        EventBus.getDefault().postSticky(new MusicEvent(imgUrl, "Rap God", lrcTest, isPlaying));
     }
 
     private void onNext() {
-        mPlayer.reset();
-        Glide.with(this).load("http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg").thumbnail(0.8f)
+//        mPlayer.reset();
+        isPlaying = true;
+        mHandler.removeMessages(UPDATE);
+        musicControl.setDataSource(R.raw.rap_god);
+        musicControl.onNext();
+        resetControl();
+//        unbindService(conn);
+        imgUrl = "http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg";
+        Glide.with(this).load(imgUrl).thumbnail(0.8f)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 .bitmapTransform(new BlurTransformation(this, 10, 10))
                 .crossFade().into((ImageView) imgBg.getCurrentView());
-        Glide.with(this).load("http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg").thumbnail(0.8f).crossFade().into(photo);
+        Glide.with(this).load(imgUrl).thumbnail(0.8f).crossFade().into(photo);
+        title.setText("Rap God");
         initPlayAction();
     }
 
@@ -533,4 +533,93 @@ public class MusicActivity extends AppCompatActivity implements RememberTab.OnMu
     public void onMusicSelect(String path) {
         Log.e("Music", "music click");
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (musicControl != null) {
+            mHandler.sendEmptyMessage(UPDATE);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(conn);
+        stopService(musicService);
+        EventBus.getDefault().unregister(this);
+        Log.e("Music", "onDestroy");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mHandler.removeCallbacksAndMessages(null);
+    }
+
+    private class MusicConn implements ServiceConnection {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            //获得service中的IBinder
+            musicControl = (MusicService.MusicBinder) iBinder;
+            resetControl();
+            musicControl.setCompleteListner(new MusicService.OnCompleteListener() {
+                @Override
+                public void onComplete() {
+                    onNext();
+                }
+            });
+            Log.e("MusicActivity", "onServiceConnect");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+        }
+    }
+
+    private void resetControl() {
+        //设置进度条最大值
+        mSeekBar.setMax(musicControl.getDuration());
+        //设置进度条进度
+        mSeekBar.setProgress(0);
+        mSeekBar.setEnabled(true);
+        curTimeStr = "00:00";
+        curTime.setText(curTimeStr);
+        totalTime.setText(parseDuration2Time(musicControl.getDuration()));
+        setRotateAnimation(true);
+        play.setImageResource(R.drawable.ic_music_play_pause);
+        if (!mHandler.hasMessages(UPDATE)) {
+            mHandler.sendEmptyMessage(UPDATE);
+        }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMoonEvent(String msg) {
+        switch (msg) {
+            case "play_former":
+                onBefore();
+                break;
+            case "play":
+                isPlaying = !isPlaying;
+                setRotateAnimation(isPlaying);
+                if (isPlaying) {
+                    musicControl.play();
+                    if (!mHandler.hasMessages(UPDATE)) {
+                        mHandler.sendEmptyMessage(UPDATE);
+                    }
+                    play.setImageResource(R.drawable.ic_music_play_pause);
+                } else {
+                    musicControl.play();
+                    mHandler.removeMessages(UPDATE);
+                    play.setImageResource(R.mipmap.ic_music_play_large);
+                }
+                break;
+            case "play_latter":
+                onNext();
+                break;
+            case "speed_change":
+                break;
+        }
+    }
+
 }

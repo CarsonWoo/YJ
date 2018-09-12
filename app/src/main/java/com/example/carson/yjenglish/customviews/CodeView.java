@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.example.carson.yjenglish.R;
 
@@ -24,7 +25,7 @@ import java.util.List;
  * Created by 84594 on 2018/7/30.
  */
 
-public class CodeView extends LinearLayout implements View.OnFocusChangeListener {
+public class CodeView extends RelativeLayout implements View.OnFocusChangeListener {
 
     private EditText first, second, third, fourth;
 

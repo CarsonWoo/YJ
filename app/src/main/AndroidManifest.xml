@@ -14,13 +14,14 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
 
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@mipmap/ic_yj_launcher"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@mipmap/ic_yj_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <provider
@@ -46,6 +47,24 @@
             <!-- <category android:name="android.intent.category.LAUNCHER" /> -->
             <!-- </intent-filter> -->
         </activity>
+        <!-- 注册SDKActivity -->
+        <activity
+            android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="tencent1107820868" /> <!-- 开放平台获取的APPID -->
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.tencent.connect.common.AssistActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".login.view.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -78,38 +97,38 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".home.view.WordListAty"
+            android:name=".home.view.word.WordListAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
             android:name=".FullScreenVideo"
             android:screenOrientation="landscape" />
         <activity
-            android:name=".home.view.WordActivity"
+            android:name=".home.view.word.WordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".home.view.WordDetailActivity"
+            android:name=".home.view.word.WordDetailActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".home.view.EditAty"
+            android:name=".home.view.word.EditAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".home.view.SignInAty"
+            android:name=".home.view.word.SignInAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".home.view.SignAty"
+            android:name=".home.view.word.SignAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".zone.view.PlanActivity"
+            android:name=".zone.view.plan.PlanActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".zone.PlanAddAty"
+            android:name=".zone.view.plan.PlanAddAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
@@ -117,21 +136,67 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".home.view.HomeItemAty"
+            android:name=".home.view.feeds.HomeItemAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
-            android:name=".home.view.CommentAty"
+            android:name=".home.view.feeds.CommentAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden" />
-        <activity android:name=".home.view.AuthorAty" />
+        <activity android:name=".home.view.feeds.AuthorAty" />
         <activity
             android:name=".music.view.MusicActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name=".service.MusicService"
+            android:exported="false" />
+
+        <activity
+            android:name=".music.LockScreenAty"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:noHistory="true"
             android:screenOrientation="portrait"
-            android:launchMode="singleInstance" />
+            android:taskAffinity="com.example.carson.yjenglish.lockscreen"
+            android:theme="@style/LockScreenTheme" />
+        <activity
+            android:name=".zone.view.setting.SettingAty"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".register.view.SetupPasswordActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".zone.view.setting.RememSettingAty"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".zone.view.setting.AdviceAty"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".zone.view.setting.AboutAty"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".zone.view.setting.ManageAty"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".zone.view.like.MyLikeAty"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait" />
+        <activity android:name=".zone.view.users.UserInfoAty"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait">
+        </activity>
     </application>
 
 </manifest>

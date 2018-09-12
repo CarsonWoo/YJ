@@ -1,8 +1,10 @@
 package com.example.carson.yjenglish.checkcode.presenter;
 
 import com.example.carson.yjenglish.checkcode.CodeContract;
+import com.example.carson.yjenglish.checkcode.model.RegisterCodeBean;
 import com.example.carson.yjenglish.net.LoadTasksCallback;
 import com.example.carson.yjenglish.net.NetTask;
+import com.example.carson.yjenglish.utils.CommonInfo;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -11,7 +13,7 @@ import rx.subscriptions.CompositeSubscription;
  * Created by 84594 on 2018/7/31.
  */
 
-public class CodePresenter implements CodeContract.Presenter, LoadTasksCallback<Integer> {
+public class CodePresenter implements CodeContract.Presenter, LoadTasksCallback<CommonInfo> {
 
     private NetTask netTask;
     private CodeContract.View addTaskView;
@@ -39,14 +41,8 @@ public class CodePresenter implements CodeContract.Presenter, LoadTasksCallback<
     }
 
     @Override
-    public void getResponse(String phone) {
-        subscription = netTask.execute(phone, this);
-        subscribe();
-    }
-
-    @Override
-    public void onSuccess(Integer integer) {
-        addTaskView.getCode(integer);
+    public void onSuccess(CommonInfo info) {
+        addTaskView.getCode(info);
     }
 
     @Override
@@ -63,5 +59,11 @@ public class CodePresenter implements CodeContract.Presenter, LoadTasksCallback<
     @Override
     public void onFinish() {
         addTaskView.hideCodeLoading();
+    }
+
+    @Override
+    public void getResponse(RegisterCodeBean bean) {
+        subscription = netTask.execute(bean, this);
+        subscribe();
     }
 }

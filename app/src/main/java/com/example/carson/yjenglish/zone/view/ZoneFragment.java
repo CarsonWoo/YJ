@@ -1,21 +1,20 @@
 package com.example.carson.yjenglish.zone.view;
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.view.animation.TranslateAnimation;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.zone.view.like.MyLikeAty;
+import com.example.carson.yjenglish.zone.view.plan.PlanActivity;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -25,6 +24,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class ZoneFragment extends Fragment {
 
     private final int REQUEST_INFO_CODE = 1000;
+
+    private OnZoneEventListener listener;
 
     private CircleImageView portrait;
     private TextView username;
@@ -79,9 +80,36 @@ public class ZoneFragment extends Fragment {
 
         Glide.with(this).load(R.mipmap.zone_bg_img).thumbnail(0.5f).into(bgImg);
 
-        initPlan();
         initInfo();
+        initPlan();
+        initLike();
+        initSetting();
 
+
+    }
+
+    private void initLike() {
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toLike = new Intent(getContext(), MyLikeAty.class);
+                startActivity(toLike);
+                if (getActivity() != null) {
+                    getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                }
+            }
+        });
+    }
+
+    private void initSetting() {
+        setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onSetting();
+                }
+            }
+        });
     }
 
     private void initInfo() {
@@ -120,5 +148,20 @@ public class ZoneFragment extends Fragment {
         if (requestCode == REQUEST_INFO_CODE && resultCode == getActivity().RESULT_OK) {
 
         }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnZoneEventListener) {
+            listener = (OnZoneEventListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnZoneEventListener");
+        }
+    }
+
+    public interface OnZoneEventListener {
+        void onSetting();
     }
 }

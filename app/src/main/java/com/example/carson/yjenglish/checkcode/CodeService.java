@@ -1,5 +1,7 @@
 package com.example.carson.yjenglish.checkcode;
 
+import com.example.carson.yjenglish.utils.CommonInfo;
+
 import retrofit2.http.Field;
 import rx.Observable;
 
@@ -13,10 +15,7 @@ import retrofit2.http.POST;
 //登录或忘记密码时发送验证码的url
 public interface CodeService {
     @FormUrlEncoded
-    @POST("")
-    Observable<Integer> getLoginCode(@Field("phone") String phone);
-
-    @FormUrlEncoded
-    @POST("")
-    Observable<Integer> getRegisterCode(@Field("phone") String phone);
+    @POST("user/register_b.do")
+    Observable<CommonInfo> getRegisterCode(@Field("register_token") String register_token,
+                                           @Field("phone_code") String phone_code);
 }

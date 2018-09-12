@@ -13,7 +13,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.zone.model.PlanData;
+import com.example.carson.yjenglish.zone.model.MyLearningPlanInfo;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +29,7 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private int TYPE_FOOTER = -1;
     private int TYPE_LIST = 0;
 
-    private List<PlanData> mPlans;
+    private List<MyLearningPlanInfo.Data.WordInfo> mPlans;
     private Context ctx;
     private OnItemChangeListener mChangeListener;
 
@@ -39,7 +39,7 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
 
     private int resType = 1001;//1001代表reset 1002代表delete
 
-    public PlanAdapter(Context ctx, List<PlanData> mPlans) {
+    public PlanAdapter(Context ctx, List<MyLearningPlanInfo.Data.WordInfo> mPlans) {
         this.ctx = ctx;
         this.mPlans = mPlans;
     }
@@ -74,8 +74,8 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         } else {
             final ViewHolder mHolder = (ViewHolder) holder;
             mHolder.item = mPlans.get(position);
-            mHolder.tag.setText(mHolder.item.getTag());
-            mHolder.wordCount.setText(mHolder.item.getWordCount());
+            mHolder.tag.setText(mHolder.item.getPlan());
+            mHolder.wordCount.setText(mHolder.item.getWord_number() + "单词");
             if (mHolder.item.isLearning()) {
                 mHolder.isLearning.setVisibility(View.VISIBLE);
                 mHolder.seekBar.setVisibility(View.VISIBLE);
@@ -115,7 +115,7 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                         mCardSelected.put(i, false);
                     }
                     if (mChangeListener != null) {
-                        mChangeListener.onCardClick(view, mHolder.item.getTag());
+                        mChangeListener.onCardClick(view, mHolder.item.getPlan(), mHolder.item.getWord_number());
                     }
                     notifyDataSetChanged();
                 }
@@ -166,8 +166,7 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         private ImageView resetOrDelete;
         private CardView mCard;
         private ImageView border;
-        private
-        PlanData item;
+        private MyLearningPlanInfo.Data.WordInfo item;
         public ViewHolder(View itemView) {
             super(itemView);
             isLearning = itemView.findViewById(R.id.is_learning);
@@ -189,7 +188,7 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     }
 
     public interface OnItemChangeListener {
-        void onCardClick(View view, String tag);
+        void onCardClick(View view, String tag, String wordCount);
         void onAddClick(View view);
         void onResetClick(View view, int pos);
         void onDeleteClick(View view, int pos);

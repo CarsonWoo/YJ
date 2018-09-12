@@ -1,39 +1,30 @@
 package com.example.carson.yjenglish.register.view;
 
-import android.annotation.SuppressLint;
 import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.Editable;
 import android.text.InputFilter;
-import android.text.InputType;
 import android.text.TextUtils;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.checkcode.view.CodeActivity;
-import com.example.carson.yjenglish.customviews.PasswordEditText;
 import com.example.carson.yjenglish.login.view.LoginActivity;
 import com.example.carson.yjenglish.register.RegisterContract;
 import com.example.carson.yjenglish.register.RegisterTask;
 import com.example.carson.yjenglish.register.model.RegisterInfo;
 import com.example.carson.yjenglish.register.model.RegisterModel;
 import com.example.carson.yjenglish.register.presenter.RegisterPresenter;
-import com.jude.swipbackhelper.SwipeBackHelper;
+import com.example.carson.yjenglish.utils.AES;
 
 import java.util.List;
 
@@ -89,7 +80,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 } else {
                     startActivity(new Intent(RegisterActivity.this, LoginActivity.class));
                     overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
-                    finish();
+                    finishAfterTransition();
                 }
                 break;
             case R.id.btn_confirm:
@@ -97,11 +88,11 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "请先输入您的注册信息", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                Intent toCode = new Intent(RegisterActivity.this, CodeActivity.class);
-                toCode.putExtra("type", 1);
-                toCode.putExtra("phone", phone.getText().toString());
-                startActivityForResult(toCode, 1);
-                overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                RegisterTask task = RegisterTask.getInstance();
+                registerPresenter = new RegisterPresenter(task, this);
+                this.setPresenter(registerPresenter);
+                mPresenter.getRegisterResponse(new RegisterModel("sendCode",
+                        phone.getText().toString()));
                 break;
             default:
                 break;
@@ -144,9 +135,22 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void getResponse(RegisterInfo info) {
         if (info != null) {
+            String status = info.getStatus();
             String msg = info.getMsg();
-            //TODO 进行跳转到首页 还需要缓存Token
-            //onBackPressed();
+            RegisterInfo.Data data = info.getData();
+            if (status.equals("200")) {
+                Intent toCode = new Intent(RegisterActivity.this, CodeActivity.class);
+                toCode.putExtra("type", 1);
+                toCode.putExtra("phone", phone.getText().toString());
+                toCode.putExtra("register_token", data.getRegister_token());
+                Log.e("Register", data.getRegister_token());
+                startActivityForResult(toCode, 1);
+                overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+            } else {
+                Log.e("Register", status);
+                Log.e("Register", msg);
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -162,15 +166,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == RESULT_REGISTER_OK) {
             if (data != null) {
-                Log.e("Register", "phone = " + phone.getText());
-                Log.e("Register", "password = " + data.getStringExtra("password"));
-                Log.e("Register", "code = " + data.getIntExtra("code", 0));
-//                confirm.setEnabled(false);
-//                RegisterTask task = RegisterTask.getInstance();
-//                registerPresenter = new RegisterPresenter(task, RegisterActivity.this);
-//                this.setPresenter(registerPresenter);
-//                mPresenter.getRegisterResponse(new RegisterModel(phone.getText().toString(),
-//                        data.getStringExtra("password"), data.getIntExtra("code", 0)));
+                data.putExtra("phone", phone.getText().toString());
+                if (isExistLoginActivity(LoginActivity.class)) {
+                    setResult(100, data);
+                    onBackPressed();
+                } else {
+                    Intent toLogin = new Intent(RegisterActivity.this, LoginActivity.class);
+                    toLogin.putExtra("phone", phone.getText().toString());
+                    toLogin.putExtra("password", data.getStringExtra("password"));
+                    startActivity(toLogin);
+                    overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    finishAfterTransition();
+                }
             }
         }
     }

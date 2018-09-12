@@ -6,7 +6,6 @@ package com.example.carson.yjenglish.home.model;
 
 public class PicHeader {
     private String number;
-    private String imgUrl;
 
     public String getNumber() {
         return number;
@@ -14,13 +13,5 @@ public class PicHeader {
 
     public void setNumber(String number) {
         this.number = number;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
     }
 }

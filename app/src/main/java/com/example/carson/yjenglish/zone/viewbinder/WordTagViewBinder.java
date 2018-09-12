@@ -32,14 +32,14 @@ public class WordTagViewBinder extends ItemViewBinder<WordTag, WordTagViewBinder
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull final WordTag item) {
+    protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull final WordTag item) {
         holder.wordTag.setText(item.getWordTag());
         holder.wordCount.setText(item.getWordCount());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (onTagClickListener != null) {
-                    onTagClickListener.onTagClick(item.getWordTag());
+                    onTagClickListener.onTagClick(item.getWordTag(), holder.getAdapterPosition());
                 }
             }
         });
@@ -58,6 +58,6 @@ public class WordTagViewBinder extends ItemViewBinder<WordTag, WordTagViewBinder
     }
 
     public interface OnTagClickListener {
-        void onTagClick(String tag);
+        void onTagClick(String tag, int pos);
     }
 }

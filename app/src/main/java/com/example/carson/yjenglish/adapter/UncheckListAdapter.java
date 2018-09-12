@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.home.model.UncheckWord;
+import com.example.carson.yjenglish.home.model.UncheckWordInfo;
 
 import java.util.List;
 
@@ -21,12 +21,12 @@ import java.util.List;
 public class UncheckListAdapter extends RecyclerView.Adapter<UncheckListAdapter.ListViewHolder> {
 
     private Context ctx;
-    private List<UncheckWord> mList;
+    private List<UncheckWordInfo.UncheckWord> mList;
 
     private OnButtonClickListener listener;
 
     public UncheckListAdapter(){}
-    public UncheckListAdapter(Context context, List<UncheckWord> list) {
+    public UncheckListAdapter(Context context, List<UncheckWordInfo.UncheckWord> list) {
         this.ctx = context;
         this.mList = list;
     }
@@ -41,7 +41,7 @@ public class UncheckListAdapter extends RecyclerView.Adapter<UncheckListAdapter.
     public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
-        holder.trans.setText(holder.item.getTrans());
+        holder.trans.setText(holder.item.getMeaning());
         holder.pass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -69,7 +69,7 @@ public class UncheckListAdapter extends RecyclerView.Adapter<UncheckListAdapter.
         TextView word;
         TextView trans;
         Button pass;
-        UncheckWord item;
+        UncheckWordInfo.UncheckWord item;
         View itemView;
         public ListViewHolder(View itemView) {
             super(itemView);

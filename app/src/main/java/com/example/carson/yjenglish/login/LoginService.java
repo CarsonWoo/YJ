@@ -4,6 +4,7 @@ import com.example.carson.yjenglish.login.model.LoginInfo;
 
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import rx.Observable;
 
@@ -12,8 +13,7 @@ import rx.Observable;
  */
 
 public interface LoginService {
-    @FormUrlEncoded
-    @POST("login")
-    Observable<LoginInfo> getLoginResponse(@Field("username") String username,
-                                           @Field("password") String password);
+    @POST("user/login.do")
+    Observable<LoginInfo> getLoginResponse(@Header("username") String username,
+                                           @Header("password") String password);
 }

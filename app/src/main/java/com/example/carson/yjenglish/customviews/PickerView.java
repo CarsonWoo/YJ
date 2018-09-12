@@ -58,6 +58,8 @@ public class PickerView extends View {
     private Handler mHandler = new Handler();
     private onSelectListener mSelectListener;
 
+    private boolean scrollable = true;
+
     public PickerView(Context context) {
         this(context, null);
     }
@@ -203,18 +205,22 @@ public class PickerView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        switch (event.getActionMasked()) {
-            case MotionEvent.ACTION_DOWN:
-                doDown(event);
-                break;
-            case MotionEvent.ACTION_MOVE:
-                doMove(event);
-                break;
-            case MotionEvent.ACTION_UP:
-                doUp(event);
-                break;
+        if (scrollable) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    doDown(event);
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    doMove(event);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    doUp(event);
+                    break;
+            }
+            return true;
         }
-        return true;
+        //控制是否可滑动
+        return false;
     }
 
     private void doDown(MotionEvent event) {
@@ -268,6 +274,18 @@ public class PickerView extends View {
 
     public String getText() {
         return mDataList.get(mCurrentSelected);
+    }
+
+    public void setScrollable(boolean scrollable) {
+        this.scrollable = scrollable;
+        if (scrollable) {
+            mPaint.setColor(getResources().getColor(R.color.colorAccent));
+            mBgPaint.setColor(Color.parseColor("#305ee1c9"));
+        } else {
+            mPaint.setColor(getResources().getColor(R.color.colorText));
+            mBgPaint.setColor(Color.parseColor("#97919191"));
+        }
+        postInvalidate();
     }
 
     private Runnable mRunnable = new Runnable() {

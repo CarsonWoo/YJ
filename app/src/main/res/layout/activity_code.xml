@@ -6,8 +6,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:fitsSystemWindows="true"
-    android:clipToPadding="true"
     tools:context="com.example.carson.yjenglish.checkcode.view.CodeActivity">
 
     <ImageView
@@ -15,10 +13,10 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:src="@drawable/ic_arrow_left"
+        android:layout_marginStart="7dp"
+        android:layout_marginTop="30dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="7dp"
-        android:layout_marginTop="7dp"
         />
 
     <TextView
@@ -83,7 +81,7 @@
         app:layout_constraintStart_toStartOf="@id/code_view"
         />
 
-    <TextView
+        <TextView
         android:id="@+id/reload_code"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

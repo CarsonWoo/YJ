@@ -8,11 +8,11 @@ public class HomeItem {
 
     private String title;
     private String videoUrl;
-    private String username;
-    private int commentNum;
-    private int likeNum;
-    private String imgUrl;
-    private String portraitUrl;
+    private String author_username;
+    private String comments;
+    private String likes;
+    private String cover_page;
+    private String author_portrait;
 
     public String getTitle() {
         return title;
@@ -30,43 +30,43 @@ public class HomeItem {
         this.videoUrl = videoUrl;
     }
 
-    public String getUsername() {
-        return username;
+    public String getAuthor_username() {
+        return author_username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setAuthor_username(String author_username) {
+        this.author_username = author_username;
     }
 
-    public int getCommentNum() {
-        return commentNum;
+    public String getCover_page() {
+        return cover_page;
     }
 
-    public void setCommentNum(int commentNum) {
-        this.commentNum = commentNum;
+    public void setCover_page(String cover_page) {
+        this.cover_page = cover_page;
     }
 
-    public int getLikeNum() {
-        return likeNum;
+    public String getAuthor_portrait() {
+        return author_portrait;
     }
 
-    public void setLikeNum(int likeNum) {
-        this.likeNum = likeNum;
+    public void setAuthor_portrait(String author_portrait) {
+        this.author_portrait = author_portrait;
     }
 
-    public String getImgUrl() {
-        return imgUrl;
+    public String getLikes() {
+        return likes;
     }
 
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
+    public void setLikes(String likes) {
+        this.likes = likes;
     }
 
-    public String getPortraitUrl() {
-        return portraitUrl;
+    public String getComments() {
+        return comments;
     }
 
-    public void setPortraitUrl(String portraitUrl) {
-        this.portraitUrl = portraitUrl;
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 }

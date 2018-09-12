@@ -5,44 +5,31 @@ package com.example.carson.yjenglish.login.model;
  */
 
 public class LoginInfo {
-    private int code;
-    private LoginResponse msg;
+    private String status;
+    private String msg;
+    private String data;
 
-    public int getCode() {
-        return code;
+    public String getStatus() {
+        return status;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public LoginResponse getMsg() {
+    public String getMsg() {
         return msg;
     }
 
-    public void setMsg(LoginResponse msg) {
+    public void setMsg(String msg) {
         this.msg = msg;
     }
 
+    public String getData() {
+        return data;
+    }
 
-    public class LoginResponse {
-        private String token;
-        private String usertype;
-
-        public String getToken() {
-            return token;
-        }
-
-        public void setToken(String token) {
-            this.token = token;
-        }
-
-        public String getUsertype() {
-            return usertype;
-        }
-
-        public void setUsertype(String usertype) {
-            this.usertype = usertype;
-        }
+    public void setData(String data) {
+        this.data = data;
     }
 }

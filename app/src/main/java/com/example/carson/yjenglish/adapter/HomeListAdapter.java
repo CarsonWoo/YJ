@@ -2,11 +2,11 @@ package com.example.carson.yjenglish.adapter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +19,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.customviews.MultiPortraitView;
 import com.example.carson.yjenglish.customviews.MyProgressView;
+import com.example.carson.yjenglish.home.model.HomeInfo;
 import com.example.carson.yjenglish.home.model.HomeItem;
 import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.home.model.PicHeader;
@@ -44,11 +46,13 @@ public class HomeListAdapter extends RecyclerView.Adapter {
     private final int HEADER_EMPTY = -1;
 
     private Context mCtx;
-    private List<HomeItem> mList;
+    private List<HomeInfo.Data.Feed> mList;
     private PicHeader picItem;
     private LoadHeader loadItem;
     private HomeFragment.OnHomeInteractListener mListener;
-    private ArrayList<HomeItem> itemSelected = new ArrayList<>();
+    private ArrayList<HomeInfo.Data.Feed> itemSelected = new ArrayList<>();
+
+    private List<String> mPortraitUrls;
 
     private OnVideoListener videoListener;
     private OnStartListener startListener;
@@ -61,19 +65,18 @@ public class HomeListAdapter extends RecyclerView.Adapter {
 
     }
 
-    public HomeListAdapter(Context ctx, List<HomeItem> list, int headerStyle, OnVideoListener listener) {
+    public HomeListAdapter(Context ctx, List<HomeInfo.Data.Feed> list, int headerStyle, OnVideoListener listener) {
         this.mCtx = ctx;
         this.mList = list;
         this.videoListener = listener;
         this.headerStyle = headerStyle;
     }
 
-    public HomeListAdapter(Context context, List<HomeItem> list, HomeFragment.OnHomeInteractListener listener,
+    public HomeListAdapter(Context context, List<HomeInfo.Data.Feed> list, HomeFragment.OnHomeInteractListener listener,
                            int headerStyle, OnVideoListener videoListener) {
         this.mCtx = context;
         this.mList = list;
         this.mListener = listener;
-//        this.picItem = picHeader;
         this.headerStyle = headerStyle;
         this.videoListener = videoListener;
     }
@@ -138,9 +141,6 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         if (picItem.getNumber() != null) {
             picHolder.learnerNum.setText(picItem.getNumber());
         }
-        if (picItem.getImgUrl() != null) {
-            Glide.with(mCtx).load(picItem.getImgUrl()).thumbnail(0.8f).into(picHolder.bg);
-        }
         picHolder.start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,6 +157,16 @@ public class HomeListAdapter extends RecyclerView.Adapter {
                 }
             }
         });
+        Log.e("adapter", "bind portraits");
+        picHolder.multiPortraitView.removeAllViews();
+        MultiPortraitView mView = new MultiPortraitView(picHolder.multiPortraitView.getContext(), mPortraitUrls);
+        mView.setListener(new MultiPortraitView.LoadMorePortraitListener() {
+            @Override
+            public void loadMorePortraits() {
+                //TODO go to the new tab
+            }
+        });
+        picHolder.multiPortraitView.addView(mView);
     }
 
     private void bindLoadHolder(LoadHolder loadHolder) {
@@ -230,33 +240,33 @@ public class HomeListAdapter extends RecyclerView.Adapter {
 
     private void bindListHolder(final HomeViewHolder homeHolder, int position) {
         homeHolder.item = mList.get(position - 1);
-        homeHolder.commentNum.setText(String.valueOf(homeHolder.item.getCommentNum()));
-        homeHolder.likeNum.setText(String.valueOf(homeHolder.item.getLikeNum()));
+        homeHolder.commentNum.setText(String.valueOf(homeHolder.item.getComments()));
+        homeHolder.likeNum.setText(homeHolder.item.getLikes());
         if (homeHolder.item.getTitle() != null) {
             homeHolder.title.setText(homeHolder.item.getTitle());
         }
-        if (homeHolder.item.getUsername() != null) {
-            homeHolder.name.setText(homeHolder.item.getUsername());
+        if (homeHolder.item.getAuthor_username() != null) {
+            homeHolder.name.setText(homeHolder.item.getAuthor_username());
         }
-        if (homeHolder.item.getVideoUrl() != null && !homeHolder.item.getVideoUrl().isEmpty()) {
-            Glide.with(mCtx).load(homeHolder.item.getImgUrl()).thumbnail(0.6f).into(homeHolder.img);
+        if (homeHolder.item.getVideo() != null && !homeHolder.item.getVideo().isEmpty()) {
+            Glide.with(mCtx).load(homeHolder.item.getPic()).thumbnail(0.6f).into(homeHolder.img);
             homeHolder.video.setVisibility(View.VISIBLE);
             homeHolder.play.setVisibility(View.VISIBLE);
             homeHolder.play.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (videoListener != null) {
-                        videoListener.onVideoClick(homeHolder.mCardView, homeHolder.item.getVideoUrl());
+                        videoListener.onVideoClick(homeHolder.mCardView, homeHolder.item.getVideo());
                     }
                 }
             });
         } else {
             homeHolder.video.setVisibility(View.GONE);
             homeHolder.play.setVisibility(View.GONE);
-            Glide.with(mCtx).load(homeHolder.item.getImgUrl()).thumbnail(0.8f).into(homeHolder.img);
+            Glide.with(mCtx).load(homeHolder.item.getPic()).thumbnail(0.8f).into(homeHolder.img);
         }
-        if (homeHolder.item.getPortraitUrl() != null && !homeHolder.item.getPortraitUrl().isEmpty()) {
-            Glide.with(mCtx).load(homeHolder.item.getPortraitUrl()).thumbnail(0.8f).into(homeHolder.portrait);
+        if (homeHolder.item.getAuthor_portrait() != null && !homeHolder.item.getAuthor_portrait().isEmpty()) {
+            Glide.with(mCtx).load(homeHolder.item.getAuthor_portrait()).thumbnail(0.8f).into(homeHolder.portrait);
         } else {
             Glide.with(mCtx).load(R.mipmap.ic_launcher_round).into(homeHolder.portrait);
         }
@@ -311,6 +321,10 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         this.itemListener = itemListener;
     }
 
+    public void setmPortraitUrls(List<String> mPortraitUrls) {
+        this.mPortraitUrls = mPortraitUrls;
+    }
+
     public class HomeViewHolder extends BaseViewHolder {
 
         TextView title;
@@ -320,7 +334,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         FrameLayout video;
         ImageView img;
         ImageView play;
-        HomeItem item;
+        HomeInfo.Data.Feed item;
         ConstraintLayout container;
         CardView mCardView;
         CircleImageView portrait;
@@ -348,6 +362,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         TextView learnerNum;
         Button start;
         RelativeLayout toMusic;
+       FrameLayout multiPortraitView;
 
         public PicHolder(View itemView) {
             super(itemView);
@@ -355,6 +370,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
             learnerNum = itemView.findViewById(R.id.learner_num);
             start = itemView.findViewById(R.id.btn_start);
             toMusic = itemView.findViewById(R.id.to_music);
+            multiPortraitView = itemView.findViewById(R.id.multi_portrait_view);
         }
     }
 

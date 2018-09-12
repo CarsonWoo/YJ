@@ -2,6 +2,9 @@ package com.example.carson.yjenglish;
 
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.util.Log;
 
 import org.litepal.LitePal;
 
@@ -21,6 +24,20 @@ public class MyApplication extends Application {
     }
 
     public static Context getContext() {
+//        Log.e("Application", context.getClassLoader().toString());
         return context;
+
+    }
+
+    public static int getVersionCode(Context ctx) {
+        int code = 0;
+        PackageManager pm = ctx.getPackageManager();
+        try {
+            PackageInfo pi = pm.getPackageInfo(ctx.getPackageName(), 0);
+            code = pi.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return code;
     }
 }

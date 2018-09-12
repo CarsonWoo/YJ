@@ -5,15 +5,16 @@ package com.example.carson.yjenglish.register.model;
  */
 
 public class RegisterInfo {
-    private int code;
+    private String status;
     private String msg;
+    private Data data;
 
-    public int getCode() {
-        return code;
+    public String getStatus() {
+        return status;
     }
 
-    public void setCode(int code) {
-        this.code = code;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public String getMsg() {
@@ -22,5 +23,25 @@ public class RegisterInfo {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public Data getData() {
+        return data;
+    }
+
+    public void setData(Data data) {
+        this.data = data;
+    }
+
+    public class Data {
+        private String register_token;
+
+        public String getRegister_token() {
+            return register_token;
+        }
+
+        public void setRegister_token(String register_token) {
+            this.register_token = register_token;
+        }
     }
 }

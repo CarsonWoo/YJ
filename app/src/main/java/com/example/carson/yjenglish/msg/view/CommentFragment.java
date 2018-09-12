@@ -64,7 +64,7 @@ public class CommentFragment extends Fragment {
         recyclerView.setAdapter(mAdapter);
 //        for (int i = 0; i < 10; i++) {
 //            CommentMsg comment = new CommentMsg();
-//            comment.setUsername("carson");
+//            comment.setAuthor_username("carson");
 //            if (i % 2 == 0) {
 //                comment.setType("评论了你");
 //            } else {
@@ -112,7 +112,7 @@ public class CommentFragment extends Fragment {
 //            public void run() {
 //                CommentMsg newComment = new CommentMsg();
 //                newComment.setImgUrl(null);
-//                newComment.setUsername("帅哥");
+//                newComment.setAuthor_username("帅哥");
 //                newComment.setOrigin("原创：嘻嘻");
 //                newComment.setContent("不错嘛小子");
 //                newComment.setDate("2018/9/9");
