@@ -30,11 +30,11 @@ public class TextViewBinder extends ItemViewBinder<Text, TextViewBinder.ViewHold
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull Text item) {
         holder.tv.setTextColor(Color.parseColor("#eb000000"));
-        holder.tv.setTextSize(16);
+        holder.tv.setTextSize(15);
         holder.tv.setText(item.getText());
         holder.mRoot.setBackgroundColor(Color.WHITE);
-        holder.mRoot.setPadding(0, ScreenUtils.dp2px(holder.mRoot.getContext(), 4),
-                0, ScreenUtils.dp2px(holder.mRoot.getContext(), 4));
+        holder.mRoot.setPadding(0, ScreenUtils.dp2px(holder.mRoot.getContext(), 6),
+                0, ScreenUtils.dp2px(holder.mRoot.getContext(), 6));
     }
 
     static class ViewHolder extends BaseViewHolder {

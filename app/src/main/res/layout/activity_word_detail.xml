@@ -62,4 +62,30 @@
         app:layout_constraintBottom_toBottomOf="parent"
         />
 
+    <FrameLayout
+        android:id="@+id/video_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#e9303030"
+        android:visibility="gone"
+        >
+
+        <ImageView
+            android:id="@+id/close_video"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@mipmap/ic_delete_item_gray"
+            android:layout_margin="10dp"
+            android:layout_gravity="end"
+            />
+
+        <FrameLayout
+            android:id="@+id/video_frame"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:layout_gravity="center_vertical"
+            />
+
+    </FrameLayout>
+
 </android.support.constraint.ConstraintLayout>

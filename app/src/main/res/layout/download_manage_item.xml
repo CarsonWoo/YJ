@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="53dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/download_file_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="17sp"
+        android:textColor="@color/colorTextWord"
+        android:text="travel"
+        android:layout_marginStart="12dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <ProgressBar
+        android:id="@+id/hide_progress_bar"
+        android:layout_width="107dp"
+        android:layout_height="10dp"
+        android:progress="0"
+        style="@style/HorizontalProgressBarColorRed"
+        android:layout_marginBottom="14dp"
+        android:layout_marginEnd="52dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="invisible"
+        />
+
+    <ProgressBar
+        android:id="@+id/download_progress"
+        android:layout_width="107dp"
+        android:layout_height="10dp"
+        android:progress="10"
+        style="@style/HorizontalProgressBarColorAccent"
+        android:layout_marginBottom="14dp"
+        android:layout_marginEnd="52dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/tv_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2.2M/30M"
+        android:textSize="10sp"
+        android:layout_marginBottom="5.5dp"
+        app:layout_constraintStart_toStartOf="@id/download_progress"
+        app:layout_constraintBottom_toTopOf="@id/download_progress"
+        />
+    
+    <TextView
+        android:id="@+id/download_finish"
+        android:layout_width="28dp"
+        android:layout_height="wrap_content"
+        android:text="完成"
+        android:textSize="13sp"
+        android:layout_marginEnd="12dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/download_delete"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@mipmap/ic_delete_item_gray"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.1dp"
+        android:background="#f4f6f6"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+</android.support.constraint.ConstraintLayout>

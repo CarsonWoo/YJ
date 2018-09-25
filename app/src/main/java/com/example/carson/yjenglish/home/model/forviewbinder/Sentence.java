@@ -8,10 +8,19 @@ public class Sentence {
     private String sentence;
     private String sentenceTrans;
     private String sentenceSound;
+    private String sentenceOrigin;
+
     public Sentence(String sentence, String sentenceTrans, String sentenceSound) {
+        this.sentenceSound = sentenceSound;
+        this.sentence = sentence;
+        this.sentenceTrans = sentenceTrans;
+    }
+
+    public Sentence(String sentence, String sentenceTrans, String sentenceSound, String sentenceOrigin) {
         this.sentence = sentence;
         this.sentenceTrans = sentenceTrans;
         this.sentenceSound = sentenceSound;
+        this.sentenceOrigin = sentenceOrigin;
     }
 
     public String getSentence() {
@@ -24,5 +33,9 @@ public class Sentence {
 
     public String getSentenceSound() {
         return sentenceSound;
+    }
+
+    public String getSentenceOrigin() {
+        return sentenceOrigin;
     }
 }

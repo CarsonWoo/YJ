@@ -21,8 +21,8 @@ import com.androidkun.callback.PullToRefreshListener;
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.UncheckListAdapter;
-import com.example.carson.yjenglish.home.WordListService;
-import com.example.carson.yjenglish.home.model.UncheckWordInfo;
+import com.example.carson.yjenglish.home.WordService;
+import com.example.carson.yjenglish.home.model.word.UncheckWordInfo;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
 
@@ -66,7 +66,7 @@ public class UncheckTab extends Fragment {
     }
 
     private void executeUncheckTask(final String page) {
-        WordListService service = retrofit.create(WordListService.class);
+        WordService service = retrofit.create(WordService.class);
         Call<UncheckWordInfo> call = service.getUncheckWords(UserConfig.getToken(getContext()),
                 page, "10");
         call.enqueue(new Callback<UncheckWordInfo>() {

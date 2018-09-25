@@ -1,9 +1,12 @@
 package com.example.carson.yjenglish.zone.view.setting;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -12,10 +15,18 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.net.NetTask;
+import com.example.carson.yjenglish.utils.CommonInfo;
+import com.example.carson.yjenglish.utils.DialogUtils;
+import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.zone.AdviceContract;
+import com.example.carson.yjenglish.zone.AdviceTask;
+import com.example.carson.yjenglish.zone.model.AdviceModel;
+import com.example.carson.yjenglish.zone.presenter.AdvicePresenter;
 
 import jp.wasabeef.glide.transformations.BlurTransformation;
 
-public class AdviceAty extends AppCompatActivity implements View.OnClickListener {
+public class AdviceAty extends AppCompatActivity implements View.OnClickListener, AdviceContract.View {
 
     private ImageView bg;
     private ImageView back;
@@ -23,10 +34,22 @@ public class AdviceAty extends AppCompatActivity implements View.OnClickListener
     private Button submit;
     private TextView star1, star3, star6, star10;
 
+    private AdviceContract.Presenter presenter;
+    private AdvicePresenter advicePresenter;
+
+    private Dialog mDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_advice);
+
+        mDialog = DialogUtils.getInstance(this).newAnimatedLoadingDialog();
+        WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
+        lp.width = ScreenUtils.dp2px(this, 260);
+        lp.height = ScreenUtils.dp2px(this, 240);
+        mDialog.getWindow().setAttributes(lp);
+
         initViews();
     }
 
@@ -75,7 +98,7 @@ public class AdviceAty extends AppCompatActivity implements View.OnClickListener
                     Toast.makeText(getApplicationContext(), "请先对我们的应用打一下分吧~", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                //post to server
+                executeSubmitTask();
                 break;
             case R.id.star_one:
                 resetPoint();
@@ -100,6 +123,25 @@ public class AdviceAty extends AppCompatActivity implements View.OnClickListener
         }
     }
 
+    private void executeSubmitTask() {
+        AdviceTask task = AdviceTask.getInstance();
+        advicePresenter = new AdvicePresenter(task, this);
+        this.setPresenter(advicePresenter);
+        presenter.sendAdvice(new AdviceModel(edit.getText().toString(), switchStars()));
+    }
+
+    private String switchStars() {
+        if (star1.isSelected()) {
+            return "1";
+        } else if (star3.isSelected()) {
+            return "2";
+        } else if (star6.isSelected()) {
+            return "3";
+        } else {
+            return "4";
+        }
+    }
+
     private void resetPoint() {
         star1.setSelected(false);
         star3.setSelected(false);
@@ -110,5 +152,33 @@ public class AdviceAty extends AppCompatActivity implements View.OnClickListener
         star3.setTextColor(Color.parseColor("#858585"));
         star6.setTextColor(Color.parseColor("#858585"));
         star10.setTextColor(Color.parseColor("#858585"));
+    }
+
+    @Override
+    public void setPresenter(AdviceContract.Presenter presenter) {
+        this.presenter = presenter;
+    }
+
+    @Override
+    public void showLoading() {
+        mDialog.show();
+    }
+
+    @Override
+    public void hideLoading() {
+        mDialog.dismiss();
+    }
+
+    @Override
+    public void showError(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSuccess(CommonInfo info) {
+        if (info.getStatus().equals("200")) {
+            Toast.makeText(this, "小语反馈成功，谢谢您的提议", Toast.LENGTH_SHORT).show();
+            onBackPressed();
+        }
     }
 }

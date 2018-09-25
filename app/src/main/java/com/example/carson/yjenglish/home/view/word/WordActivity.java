@@ -2,19 +2,23 @@ package com.example.carson.yjenglish.home.view.word;
 
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
-import android.media.AudioAttributes;
-import android.media.SoundPool;
+import android.media.MediaPlayer;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -23,44 +27,62 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.customviews.CorrectOrWrongImageView;
 import com.example.carson.yjenglish.customviews.CorrectOrWrongTextView;
-import com.example.carson.yjenglish.home.model.BaseWord;
+import com.example.carson.yjenglish.home.WordInfoContract;
+import com.example.carson.yjenglish.home.WordInfoTask;
+import com.example.carson.yjenglish.home.model.word.BaseWord;
+import com.example.carson.yjenglish.home.model.word.WordInfo;
+import com.example.carson.yjenglish.home.presenter.WordPresenter;
 import com.example.carson.yjenglish.home.view.HomeFragment;
 import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.UserConfig;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-public class WordActivity extends AppCompatActivity {
+public class WordActivity extends AppCompatActivity implements WordInfoContract.View {
 
     private final String TAG = getClass().getSimpleName();
 
-    public static final int REQUEST_TO_DETAIL = 1000;
+    public static final int REQUEST_TO_DETAIL_NEW = 1000;
+    public static final int REQUEST_TO_DETAIL_OLD = 1001;
+    public static final int RESULT_WORD_NEXT = 1002;
+    public static final int RESULT_WORD_PASS = 1003;
 
     private int type;//判断是再来20个 还是开始背单词的类型
 
     private final int TYPE_GRAPH = 0x1011;//图册选择
     private final int TYPE_MEAN = 0x1012;//释义选择
 
+    private List<WordInfo.ListObject.WordData> newList;
+    private List<WordInfo.ListObject.WordData> oldList;
+    private List<WordInfo.ListObject.WordData> totalList = new ArrayList<>();
+
+    private List<WordInfo.ListObject.WordData> passList = new ArrayList<>();
+
+    private int mTotalSize;
+
     private FloatingActionButton sound;
-    private SoundPool mSoundPool;
-    private int streamId;
 
     private ImageView back;
     private ProgressBar mProgressBar;
     private TextView pass;
-    private TextView senStart, senMiddle, senEnd;//分别代表三个TextView 用于装载targetWord
+    private TextView senStart;
     private TextView word;
     private TextView soundMark;
     private TextSwitcher mTextSwitcher;
@@ -70,7 +92,6 @@ public class WordActivity extends AppCompatActivity {
     private CorrectOrWrongImageView pic1, pic2, pic3, pic4;//分别对应于四张图片
     private CorrectOrWrongTextView tran1, tran2, tran3, tran4;
 
-    private List<BaseWord> mWords;
     private List<CorrectOrWrongImageView> mImgs = new ArrayList<>();
     private List<CorrectOrWrongTextView> mTexts = new ArrayList<>();
     private FrameLayout mWordContainer;
@@ -80,37 +101,54 @@ public class WordActivity extends AppCompatActivity {
     private int mTotalProgress = 1;
     private int wrongCount = 0;
 
+    private MediaPlayer soundPlayer;
+
     private int mWordType = TYPE_GRAPH;
     private int mLastType;
 
     private boolean isOnBackPressed = false;
 
+    private WordInfoContract.Presenter mPresenter;
+    private WordPresenter wordPresenter;
+
+    private int tipsCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_word);
+        bindViews();
         Intent fromIntent = getIntent();
         type = fromIntent.getIntExtra("type", HomeFragment.REQUEST_WORD_CODE);
-        initViews();
+        tipsCount = getSharedPreferences("YJEnglish", MODE_PRIVATE).getInt("tips_count", 0);
+        Log.e(TAG, tipsCount + "");
+        executeLoadTask();
     }
 
-    private void initViews() {
+    private void bindViews() {
         sound = findViewById(R.id.fab_sound);
         back = findViewById(R.id.back);
-        mProgressBar = findViewById(R.id.progress_bar);
         pass = findViewById(R.id.pass);
-        senStart = findViewById(R.id.sentence_1);
-        senMiddle = findViewById(R.id.sentence_2);
-        senEnd = findViewById(R.id.sentence_3);
+        divider = findViewById(R.id.divider);
+        mProgressBar = findViewById(R.id.progress_bar);
+        senStart = findViewById(R.id.sentence);
         word = findViewById(R.id.word);
         soundMark = findViewById(R.id.soundmark);
         mTextSwitcher = findViewById(R.id.text_switcher);
         mWordContainer = findViewById(R.id.word_container);
         mLoadingView = findViewById(R.id.loading_view);
         mLoadingView.setVisibility(View.VISIBLE);
-        divider = findViewById(R.id.divider);
 
-        initLoadingView();
+        soundPlayer = new MediaPlayer();
+        mTextSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
+            @Override
+            public View makeView() {
+                TextView tv = new TextView(WordActivity.this);
+                tv.setTextSize(16);
+                tv.setTextColor(Color.DKGRAY);
+                return tv;
+            }
+        });
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,46 +157,144 @@ public class WordActivity extends AppCompatActivity {
             }
         });
 
-        mSoundPool = new SoundPool.Builder().setMaxStreams(5).setAudioAttributes
-                (new AudioAttributes.Builder().setContentType(AudioAttributes.CONTENT_TYPE_MUSIC).build()).build();
-        mSoundPool.load(this, R.raw.travel, 1);
         sound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!soundPlayer.isPlaying()) {
+                    soundPlayer.start();
+                }
                 final Drawable drawable = sound.getDrawable();
                 if (drawable instanceof Animatable) {
                     ((Animatable) drawable).start();
-                    streamId = mSoundPool.play(1, 1, 1, 0, 0, 1);
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             ((Animatable) drawable).stop();
-                            mSoundPool.stop(streamId);
                         }
                     }, 2000);
                 }
             }
         });
 
-
         pass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogUtils dialogUtils = DialogUtils.getInstance(WordActivity.this);
-                AlertDialog mDialog = dialogUtils.newTipsDialog("小语知道你学会该单词了，不会再让这个单词出现了噢~");
-                dialogUtils.setTipsListener(new DialogUtils.OnTipsListener() {
-                    @Override
-                    public void onConfirm() {
-                        Log.e("Word", "onConfirm");
-                    }
-                });
-                dialogUtils.show(mDialog);
-                WindowManager.LayoutParams params = mDialog.getWindow().getAttributes();
-                params.width = ScreenUtils.dp2px(WordActivity.this, 260);
-                params.height = ScreenUtils.dp2px(WordActivity.this, 240);
-                mDialog.getWindow().setAttributes(params);
+//                mTotalProgress ++;
+                if (tipsCount < 5) {
+                    showmDialog();
+                } else {
+                    doPassWork();
+                }
+            }
+
+        });
+    }
+
+    private void showmDialog() {
+        SharedPreferences.Editor editor = getSharedPreferences("YJEnglish", MODE_PRIVATE).edit();
+        editor.putInt("tips_count", tipsCount + 1).apply();
+        tipsCount++;
+        DialogUtils dialogUtils = DialogUtils.getInstance(WordActivity.this);
+        AlertDialog mDialog = dialogUtils.newTipsDialog("小语知道你学会该单词了，不会再让这个单词出现了噢~");
+        dialogUtils.setTipsListener(new DialogUtils.OnTipsListener() {
+            @Override
+            public void onConfirm() {
+                doPassWork();
             }
         });
+        dialogUtils.show(mDialog);
+        WindowManager.LayoutParams params = mDialog.getWindow().getAttributes();
+        params.width = ScreenUtils.dp2px(WordActivity.this, 260);
+        params.height = ScreenUtils.dp2px(WordActivity.this, 240);
+        mDialog.getWindow().setAttributes(params);
+    }
+
+    private void doPassWork() {
+//        mTotalProgress ++;
+        if (mCurPos == totalList.size()) {
+            Log.e(TAG, "mCurPos >= totalList.size()");
+            if (mWordType == TYPE_GRAPH && totalList.size() > 1) {
+                //还能复习释义选择题
+                Log.e(TAG, "mWordType = TYPE_GRAPH");
+                WordInfo.ListObject.WordData data = totalList.get(mCurPos - 1);
+                if (Integer.parseInt(data.getLevel()) < 2) {
+                    //新单词
+                    mCurPos += 2;
+                    newList.remove(data);
+                } else {
+                    mCurPos += 1;
+                    oldList.remove(data);
+                }
+                data.setLevel("5");
+                totalList.remove(mCurPos - 1);
+                passList.add(data);
+                mCurPos -= totalList.size();
+                mWordType = TYPE_MEAN;
+                loadDatas();
+            } else {
+                totalList.get(mCurPos - 1).setLevel("5");
+                doPostWork();
+            }
+        } else {
+            Log.e(TAG, "mCurPos < totalList.size()");
+            WordInfo.ListObject.WordData data = totalList.get(mCurPos - 1);
+            if (Integer.parseInt(data.getLevel()) < 2) {
+                //新单词
+                mCurPos += 2;
+                newList.remove(data);
+            } else {
+                mCurPos += 1;
+                oldList.remove(data);
+            }
+            data.setLevel("5");
+            totalList.remove(mCurPos - 1);
+            passList.add(data);
+            if (mWordType == TYPE_GRAPH) {
+                initTextViews();
+                initSound();
+                initPics();
+            } else {
+                initTextViews();
+                initSound();
+                initList();
+            }
+        }
+    }
+
+    private void executeLoadTask() {
+        WordInfoTask task = WordInfoTask.getInstance();
+        wordPresenter = new WordPresenter(task, this);
+        this.setPresenter(wordPresenter);
+        mPresenter.getInfo(UserConfig.getToken(this));
+    }
+
+    private void initViews() {
+        initLoadingView();
+    }
+
+    private void doPostWork() {
+        /**
+         * 还要 setResult() 并传回intent putStringExtra("learned_word", newList.size() + oldList.size());
+         */
+
+        Log.e(TAG, new Date().getTime() + "");
+        //将mediaplayer资源释放
+        if (soundPlayer != null) {
+            soundPlayer.release();
+        }
+        DialogUtils utils = DialogUtils.getInstance(this);
+        //到时需要将asGif参数调为true
+        Dialog dialog = utils.newCommonDialog("正在上传中", R.mipmap.gif_loading_video, true);
+        dialog.setCanceledOnTouchOutside(false);
+        utils.show(dialog);
+        mProgressBar.setProgress(100, true);
+        totalList.addAll(passList);
+        for (WordInfo.ListObject.WordData data : totalList) {
+            Log.e(TAG, "level = " + data.getLevel());
+        }
+        Gson gson = new Gson();
+        String jsonData = gson.toJson(totalList, new TypeToken<ArrayList<WordInfo.ListObject.WordData>>(){}.getType());
+        Log.e(TAG, jsonData);
     }
 
     private void initLoadingView() {
@@ -174,7 +310,7 @@ public class WordActivity extends AppCompatActivity {
         final CountDownTimer timer = new CountDownTimer(3000, 100) {
             @Override
             public void onTick(long l) {
-                Log.e(TAG, l + "");
+//                Log.e(TAG, l + "");
                 loadingProgress.setProgress((int) (((float) (3000 - l) / 3000) * 100), true);
             }
 
@@ -194,10 +330,11 @@ public class WordActivity extends AppCompatActivity {
             @Override
             public void run() {
                 if (!isOnBackPressed) {
+                    //判断是否下载过此单词包 若下载过则直接从数据库中读取
                     mLoadingView.removeAllViews();
                     mLoadingView.setVisibility(View.GONE);
                     timer.cancel();
-                    loadJsonData();
+//                    loadJsonData();
                     loadDatas();
                     mProgressBar.setVisibility(View.VISIBLE);
                     back.setVisibility(View.VISIBLE);
@@ -211,65 +348,8 @@ public class WordActivity extends AppCompatActivity {
 
     }
 
-    private void loadJsonData() {
-        //TODO 联网后从这里开始读入数据库 若非首次加载 则直接从数据库中拿取 以供fragment使用
-        String jsonData = "[{" +
-                "\"word\":\"travel\"," +
-                "\"trans\":\"n.旅行；v.旅游\"," +
-                "\"soundMark\":\"/'trea:val/\"," +
-                "\"sentence\":\"I'm going to travel this weekend\"," +
-                "\"sentenceTrans\":\"这个周末我打算去旅行\"," +
-                "\"paraphrase\":\"the act of going from one place to another\"," +
-                "\"wordUrl\":\"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533826261766&di=f516711e90b88667d87da24031eaa3b8&imgtype=0&src=http%3A%2F%2Fpic1.16pic.com%2F00%2F07%2F76%2F16pic_776847_b.jpg\"," +
-                "\"wordPronounce\":null," +
-                "\"count\":0}," +
-                "{" +
-                "\"word\":\"go\"," +
-                "\"trans\":\"v.走，去\"," +
-                "\"soundMark\":\"/gau:/\"," +
-                "\"sentence\":\"Go to the left way.\"," +
-                "\"sentenceTrans\":\"向左走\"," +
-                "\"paraphrase\":\"the act of going\"," +
-                "\"wordUrl\":\"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533826261767&di=8b81407c5d3b2a0ff05218b7ea730e5a&imgtype=0&src=http%3A%2F%2Fpic109.nipic.com%2Ffile%2F20160910%2F8890415_143246750926_2.jpg\"," +
-                "\"wordPronounce\":null," +
-                "\"count\":0}," +
-                "{" +
-                "\"word\":\"play\"," +
-                "\"trans\":\"n.演出；v.玩耍\"," +
-                "\"soundMark\":\"/plai/\"," +
-                "\"sentence\":\"What an amazing play\"," +
-                "\"sentenceTrans\":\"多么令人震惊的表演啊\"," +
-                "\"paraphrase\":\"like a show\"," +
-                "\"wordUrl\":\"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533826261766&di=c4a6f56197a411cb061a56901c142ea3&imgtype=0&src=http%3A%2F%2Fpic23.photophoto.cn%2F20120410%2F0010023544770104_b.jpg\"," +
-                "\"wordPronounce\":null," +
-                "\"count\":0}," +
-                "{" +
-                "\"word\":\"get\"," +
-                "\"trans\":\"v.得到\"," +
-                "\"soundMark\":\"/gat/\"," +
-                "\"sentence\":\"Let's get it.\"," +
-                "\"sentenceTrans\":\"让我们动起来吧!\"," +
-                "\"paraphrase\":\"a meaning close to gain\"," +
-                "\"wordUrl\":\"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533311106938&di=a428eb3a3220df77190f2b9b2abef542&imgtype=0&src=http%3A%2F%2Fphotocdn.sohu.com%2F20150907%2Fmp30906533_1441629699374_2.jpeg\"," +
-                "\"wordPronounce\":null," +
-                "\"count\":0}," +
-                "{" +
-                "\"word\":\"home\"," +
-                "\"trans\":\"n.家\"," +
-                "\"soundMark\":\"/hau:m/\"," +
-                "\"sentence\":\"We're back home\"," +
-                "\"sentenceTrans\":\"我们到家了\"," +
-                "\"paraphrase\":\"a place where you live\"," +
-                "\"wordUrl\":\"https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533826261765&di=ddddb62777aef0ec9b91a9029471fa5b&imgtype=0&src=http%3A%2F%2Fpic25.photophoto.cn%2F20121216%2F0010023993176540_b.jpg\"," +
-                "\"wordPronounce\":null," +
-                "\"count\":0" +
-                "}]";
-        Gson gson = new Gson();
-        jsonData = jsonData.trim();
-        mWords = gson.fromJson(jsonData, new TypeToken<ArrayList<BaseWord>>(){}.getType());
-    }
-
     private void loadDatas() {
+        initSound();
         initTextViews();
         mWordContainer.removeAllViews();
         if (mWordType == TYPE_GRAPH) {
@@ -279,16 +359,17 @@ public class WordActivity extends AppCompatActivity {
             addTranView();
             initList();
         }
+    }
 
-        mTextSwitcher.setFactory(new ViewSwitcher.ViewFactory() {
-            @Override
-            public View makeView() {
-                TextView tv = new TextView(WordActivity.this);
-                tv.setTextSize(16);
-                tv.setTextColor(Color.DKGRAY);
-                return tv;
-            }
-        });
+    private void initSound() {
+        soundPlayer.reset();
+        try {
+            soundPlayer.setDataSource(totalList.get(mCurPos - 1).getPronunciation_us());
+            soundPlayer.prepare();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        soundPlayer.start();
     }
 
     private void addTranView() {
@@ -310,92 +391,98 @@ public class WordActivity extends AppCompatActivity {
     }
 
     private void initTextViews() {
-        word.setText(mWords.get(mCurPos - 1).getWord());
-        soundMark.setText(mWords.get(mCurPos - 1).getSoundMark());
-        mProgressBar.setProgress((int) (((float) mTotalProgress / (mWords.size() * 2)) * 100), true);
-        String sentence = mWords.get(mCurPos - 1).getSentence();
-        String[] sentencePieces = sentence.split(mWords.get(mCurPos - 1).getWord());
+        mTextSwitcher.setText("");
+        word.setText(totalList.get(mCurPos - 1).getWord());
+        soundMark.setText(totalList.get(mCurPos - 1).getPhonetic_symbol_us());
+
+        mProgressBar.setProgress((int) (((float) mTotalProgress / mTotalSize) * 100), true);
+        Log.e(TAG, ((float) mTotalProgress / mTotalSize) + "");
+        String sentence = totalList.get(mCurPos - 1).getSentence();
+        if (sentence.startsWith(" ")) {
+            Log.e(TAG, "before sentence : " + sentence);
+            int end;
+            String regPattern = "[" + " " + "]*+";
+            Pattern pattern = Pattern.compile(regPattern, Pattern.CASE_INSENSITIVE);
+            //去掉开头空格
+            Matcher matcher = pattern.matcher(sentence);
+            if (matcher.lookingAt()) {
+                end = matcher.end();
+                sentence = sentence.substring(end);
+            }
+            Log.e(TAG, "after sentence : " + sentence);
+        }
+        if (!sentence.endsWith(".") && !sentence.endsWith("?") && !sentence.endsWith("!")) {
+            sentence = sentence + ".";
+        }
+        String[] sentencePieces = sentence.split(totalList.get(mCurPos - 1).getWord());
+        //为句子中的单词设置不同颜色与大小
         setmSentence(sentencePieces);
     }
 
-    private void goToNext() {
-
-        mCurPos ++;
-        mTotalProgress++;
-        if (mCurPos > mWords.size()) {
-//            Log.e("Word", "到头了");
-            if (mWordType == TYPE_GRAPH) {
-                mWordType = TYPE_MEAN;
-                mCurPos = 1;
-                mWordContainer.removeAllViews();
-                mTextSwitcher.setText("");
-                wrongCount = 0;
-                initTextViews();
-                initList();
-            } else {
-                //如果是释义复习题也答完了
-                if (type == HomeFragment.REQUEST_WORD_CODE) {
-                    setResult(HomeFragment.RESULT_WORD_OK);
-                } else if (type == HomeFragment.REQUEST_MORE_CODE) {
-                    setResult(RESULT_OK);
-                }
-                onBackPressed();
+    private void setGraphTextSwitcher(int wrongCount) {
+        int level = Integer.parseInt(totalList.get(mCurPos - 1).getLevel());
+        if (level < 2) {
+            //新单词
+            switch (wrongCount) {
+                case 1:
+                    if (totalList.get(mCurPos - 1).getParaphrase() == null) {
+                        totalList.get(mCurPos - 1).setParaphrase("null");
+                    }
+                    mTextSwitcher.setText(totalList.get(mCurPos - 1).getParaphrase());
+                    break;
+                case 2:
+                    mTextSwitcher.setText(totalList.get(mCurPos - 1).getSentence_cn());
+                    break;
+                case 3:
+                    mTextSwitcher.setText(totalList.get(mCurPos - 1).getMeaning());
+                    break;
+                default:
+                    resetCheckImg();
+                    goToDetail(REQUEST_TO_DETAIL_NEW);
+                    break;
             }
         } else {
-            wrongCount = 0;
-            initTextViews();
-            if (mWordType == TYPE_GRAPH) {
-                initPics();
-            } else {
-                initList();
-            }
-            mTextSwitcher.setText("");
+            //旧单词
+            goToDetail(REQUEST_TO_DETAIL_OLD);
         }
+
     }
 
-    private void setGraphTextSwitcher(int wrongCount) {
-        switch (wrongCount) {
-            case 1:
-                mTextSwitcher.setText(mWords.get(mCurPos - 1).getParaphrase());
-                break;
-            case 2:
-                mTextSwitcher.setText(mWords.get(mCurPos - 1).getSentenceTrans());
-                break;
-            case 3:
-                mTextSwitcher.setText(mWords.get(mCurPos - 1).getTrans());
-                break;
-            default:
-                resetCheckImg();
-                Intent toDetail = new Intent(WordActivity.this, WordDetailActivity.class);
-                toDetail.putExtra("tag", mWords.get(mCurPos - 1).getWord());
-                toDetail.putExtra("soundMark", mWords.get(mCurPos - 1).getSoundMark());
-                toDetail.putExtra("trans", mWords.get(mCurPos - 1).getTrans());
-                toDetail.putExtra("paraphrase", mWords.get(mCurPos - 1).getParaphrase());
-                toDetail.putExtra("sentence", mWords.get(mCurPos - 1).getSentence());
-                toDetail.putExtra("sentenceTrans", mWords.get(mCurPos - 1).getSentenceTrans());
-                toDetail.putExtra("imgUrl", mWords.get(mCurPos - 1).getWordUrl());
-                startActivityForResult(toDetail, REQUEST_TO_DETAIL);
-                break;
-        }
+    private void goToDetail(int requestCode) {
+        Intent toDetail = new Intent(WordActivity.this, WordDetailActivity.class);
+        toDetail.putExtra("word_id", totalList.get(mCurPos - 1).getId());
+        toDetail.putExtra("tag", totalList.get(mCurPos - 1).getWord());
+        toDetail.putExtra("soundMark", totalList.get(mCurPos - 1).getPhonetic_symbol_us());
+        toDetail.putExtra("trans", totalList.get(mCurPos - 1).getMeaning());
+        toDetail.putExtra("paraphrase", totalList.get(mCurPos - 1).getParaphrase());
+        toDetail.putExtra("sentence", totalList.get(mCurPos - 1).getSentence());
+        toDetail.putExtra("sentenceTrans", totalList.get(mCurPos - 1).getSentence_cn());
+        toDetail.putExtra("imgUrl", totalList.get(mCurPos - 1).getPic());
+        toDetail.putExtra("pronunciation", totalList.get(mCurPos - 1).getPronunciation_us());
+        toDetail.putExtra("synonym", totalList.get(mCurPos - 1).getSynonym());
+        toDetail.putExtra("sentence_audio", totalList.get(mCurPos - 1).getSentence_audio());
+        toDetail.putExtra("phrase", totalList.get(mCurPos - 1).getPhrase());
+        startActivityForResult(toDetail, requestCode);
+        overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
     }
 
     private void setListTextSwitcher(int wrongCount) {
-        switch (wrongCount) {
-            case 1:
-                mTextSwitcher.setText(mWords.get(mCurPos - 1).getParaphrase());
-                break;
-            default:
-                resetTextImg();
-                Intent toDetail = new Intent(WordActivity.this, WordDetailActivity.class);
-                toDetail.putExtra("tag", mWords.get(mCurPos - 1).getWord());
-                toDetail.putExtra("soundMark", mWords.get(mCurPos - 1).getSoundMark());
-                toDetail.putExtra("trans", mWords.get(mCurPos - 1).getTrans());
-                toDetail.putExtra("paraphrase", mWords.get(mCurPos - 1).getParaphrase());
-                toDetail.putExtra("sentence", mWords.get(mCurPos - 1).getSentence());
-                toDetail.putExtra("sentenceTrans", mWords.get(mCurPos - 1).getSentenceTrans());
-                toDetail.putExtra("imgUrl", mWords.get(mCurPos - 1).getWordUrl());
-                startActivityForResult(toDetail, REQUEST_TO_DETAIL);
-                break;
+        int level = Integer.parseInt(totalList.get(mCurPos - 1).getLevel());
+        if (level < 2) {
+            switch (wrongCount) {
+                case 1:
+                    if (totalList.get(mCurPos - 1).getParaphrase() == null) {
+                        totalList.get(mCurPos - 1).setParaphrase("null");
+                    }
+                    mTextSwitcher.setText(totalList.get(mCurPos - 1).getParaphrase());
+                    break;
+                default:
+                    resetTextImg();
+                    goToDetail(REQUEST_TO_DETAIL_NEW);
+                    break;
+            }
+        } else {
+            goToDetail(REQUEST_TO_DETAIL_OLD);
         }
     }
 
@@ -421,30 +508,63 @@ public class WordActivity extends AppCompatActivity {
 
         List<String> mTrans = new ArrayList<>();
 
-        boolean isCorrectInList = false;
+        if (totalList.size() >= 4) {
+            boolean isCorrectInList = false;
 
-        for (int i = 1; mTrans.size() < 4;) {
-            Random r = new Random();
-            int rNum = Math.abs(r.nextInt() % mWords.size());//index:0 ~ mWords.size() - 1
-            boolean isAdded = false;
-            if (mTrans.size() == 3 && !isCorrectInList) {
-                mTrans.add(mWords.get(mCurPos - 1).getTrans());
-                correctAnswer = 4;
-                break;
-            }
-            for (String tran : mTrans) {
-                if (tran.equals(mWords.get(rNum).getTrans())) {
-                    isAdded = true;
+            for (int i = 1; mTrans.size() < 4;) {
+                int rNum = (int) (Math.random() * 4) + (mCurPos - 1);//index:mCurPos - 1 ~ mCurPos + 4
+                if (rNum > totalList.size() - 1) {
+                    rNum -= totalList.size();
+                }
+                boolean isAdded = false;
+                if (mTrans.size() == 3 && !isCorrectInList) {
+                    mTrans.add(totalList.get(mCurPos - 1).getMeaning());
+                    correctAnswer = 4;
                     break;
                 }
-            }
-            if (!isAdded) {
-                if (rNum == mCurPos - 1) {
-                    correctAnswer = i;
-                    isCorrectInList = true;
+                for (String tran : mTrans) {
+                    if (tran.equals(totalList.get(rNum).getMeaning())) {
+                        isAdded = true;
+                        break;
+                    }
                 }
-                i++;
-                mTrans.add(mWords.get(rNum).getTrans());
+                if (!isAdded) {
+                    if (rNum == mCurPos - 1) {
+                        correctAnswer = i;
+                        isCorrectInList = true;
+                    }
+                    i++;
+                    mTrans.add(totalList.get(rNum).getMeaning());
+                }
+            }
+        } else {
+            switch (totalList.size()) {
+                case 3:
+                case 2:
+                case 1:
+                    correctAnswer = 1;//设定1为正确答案
+                    mTrans.add(totalList.get(mCurPos - 1).getMeaning());
+                    addTextList(newList, mTrans);
+                    Log.e(TAG, "mTrans.size() = " + mTrans.size());
+                    if (mTrans.size() == 4) {
+                        break;
+                    }
+                    addTextList(oldList, mTrans);
+                    Log.e(TAG, "mTrans.size() = " + mTrans.size());
+                    if (mTrans.size() == 4) {
+                        break;
+                    }
+                    addTextList(passList, mTrans);
+                    Log.e(TAG, "mTrans.size() = " + mTrans.size());
+                    if (mTrans.size() == 4) {
+                        break;
+                    }
+                    break;
+                case 0:
+                    Log.e(TAG, "totalList.size() = 0");
+                    break;
+                default:
+                    break;
             }
         }
 
@@ -458,7 +578,7 @@ public class WordActivity extends AppCompatActivity {
                     resetTextImg();
                     if (correctAnswer == j) {
                         tv.setAction(true);
-                        doCorrectAnimation(j);
+                        setCorrectTextAction(j);
                     } else {
                         tv.setAction(false);
                         wrongCount++;
@@ -470,7 +590,7 @@ public class WordActivity extends AppCompatActivity {
         }
     }
 
-    private void doCorrectAnimation(int position) {
+    private void setCorrectTextAction(int position) {
         final List<AnimatorSet> mAnimSets = new ArrayList<>();
         for (int i = 1; i <= mTexts.size(); i++) {
             if (position == i) {
@@ -488,15 +608,55 @@ public class WordActivity extends AppCompatActivity {
         for (AnimatorSet set : mAnimSets) {
             set.start();
         }
+        /** 存在bug */
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                goToNext();
+                //释义选择正确
+                int level = Integer.parseInt(totalList.get(mCurPos - 1).getLevel());
+                if (level < 2) {
+                    //新单词
+                    if (wrongCount > 0) {
+                        //有出错
+                        Log.e(TAG, "text has wrong.");
+//                        WordInfo.ListObject.WordData data = totalList.get(mCurPos - 1);
+//                        totalList.remove(mCurPos - 1);
+//                        data.setLevel("1");
+//                        totalList.add(data);
+//                        initSound();
+//                        initTextViews();
+//                        initList();
+//                        wrongCount = 0;//清零
+                        goToDetail(REQUEST_TO_DETAIL_NEW);
+                    } else {
+                        //没出错
+                        //将其level设为2
+                        totalList.get(mCurPos - 1).setLevel(String.valueOf(level + 1));
+                        mCurPos ++;
+                        if (mCurPos == totalList.size() + 1) {
+                            //post数据到后台
+                            mProgressBar.setProgress(100, true);
+                            doPostWork();
+                        } else {
+                            //继续是释义题 正在复习当天的新单词
+                            mTotalProgress ++;
+                            initTextViews();
+                            initSound();
+                            initList();
+                        }
+                    }
+                } else {
+                    //旧单词 则直接进行下一个单词的图册选择 并将其level设为+1
+                    totalList.get(mCurPos - 1).setLevel(String.valueOf(level + 1));
+                    mCurPos ++;
+                    mTotalProgress ++;
+                    //下一环节是图册题
+                    mWordType = TYPE_GRAPH;
+                    loadDatas();
+                }
             }
         }, 1000);
     }
-
 
     private void resetCheckImg() {
         pic1.getCheckImg().setImageResource(R.drawable.bg_alpha);
@@ -519,39 +679,74 @@ public class WordActivity extends AppCompatActivity {
 
         List<String> imgUrls = new ArrayList<>();
 
-        boolean isCorrectInList = false;
-
-        for (int i = 1; imgUrls.size() < 4;) {
-            Random r = new Random();
-            int rNum = Math.abs(r.nextInt() % mWords.size());//index:0 ~ mWords.size() - 1
-            boolean isAdded = false;
-            if (imgUrls.size() == 3 && !isCorrectInList) {
-                //如果正确答案在size = 3时还没有加进来过
-                imgUrls.add(mWords.get(mCurPos - 1).getWordUrl());
-                correctAnswer = 4;
-                break;
-            }
-            for (String url : imgUrls) {
-                if (url.equals(mWords.get(rNum).getWordUrl())) {
-                    isAdded = true;
+        if (totalList.size() >= 4) {
+            boolean isCorrectInList = false;
+            for (int i = 1; imgUrls.size() < 4;) {
+                int rNum = (int) (Math.random() * 4) + (mCurPos - 1);
+                if (rNum > totalList.size() - 1) {
+                    rNum -= totalList.size();
+                }
+                Log.e(TAG, "rNum = " + rNum);//index:mCurPos - 1 ~ mCurPos + 4
+                boolean isAdded = false;
+                if (imgUrls.size() == 3 && !isCorrectInList) {
+                    //如果正确答案在size = 3时还没有加进来过
+                    imgUrls.add(totalList.get(mCurPos - 1).getPic());
+                    correctAnswer = 4;
                     break;
                 }
-            }
-            if (!isAdded) {
-                if (rNum == mCurPos - 1) {
-                    //rNum == mCurPos - 1 则为正确答案
-                    correctAnswer = i;//index:1-4
-                    isCorrectInList = true;
+                for (String url : imgUrls) {
+                    if (url.equals(totalList.get(rNum).getPic())) {
+                        isAdded = true;
+                        break;
+                    }
                 }
-                i++;
-                imgUrls.add(mWords.get(rNum).getWordUrl());
+                if (!isAdded) {
+                    if (rNum == mCurPos - 1) {
+                        //rNum == mCurPos - 1 则为正确答案
+                        correctAnswer = i;//index:1-4
+                        isCorrectInList = true;
+                    }
+                    i++;
+                    imgUrls.add(totalList.get(rNum).getPic());
+                }
+            }
+        } else {
+            switch (totalList.size()) {
+                case 3:
+                case 2:
+                case 1:
+                    correctAnswer = 1;//设定1为正确答案
+                    imgUrls.add(totalList.get(mCurPos - 1).getPic());
+                    addImgList(newList, imgUrls);
+                    Log.e(TAG, "imgUrl.size() = " + imgUrls.size());
+                    if (imgUrls.size() == 4) {
+                        break;
+                    }
+                    addImgList(oldList, imgUrls);
+                    Log.e(TAG, "imgUrl.size() = " + imgUrls.size());
+                    if (imgUrls.size() == 4) {
+                        break;
+                    }
+                    addImgList(passList, imgUrls);
+                    Log.e(TAG, "imgUrl.size() = " + imgUrls.size());
+                    if (imgUrls.size() == 4) {
+                        break;
+                    }
+                    break;
+                case 0:
+                    Log.e(TAG, "totalList.size() = 0");
+                    break;
+                default:
+                    break;
             }
         }
 
         int l = 0;
         for (CorrectOrWrongImageView img : mImgs) {
             Glide.with(this).load(imgUrls.get(l))
-                    .thumbnail(0.5f)
+                    .placeholder(R.mipmap.loading)
+                    .thumbnail(0.1f)
+                    .crossFade()
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .into(img.getMainImg());
             l++;
@@ -565,7 +760,7 @@ public class WordActivity extends AppCompatActivity {
                     resetCheckImg();
                     if (correctAnswer == j) {
                         //证明本图是正确答案
-                        setCorrectAction(mImgs.get(j - 1), j);
+                        setCorrectPicAction(mImgs.get(j - 1), j);
                     } else {
                         setWrongAction(mImgs.get(j - 1));
                     }
@@ -575,13 +770,46 @@ public class WordActivity extends AppCompatActivity {
         }
     }
 
+    private void addImgList(List<WordInfo.ListObject.WordData> mList, List<String> imgList) {
+        if (mList.size() != 0) {
+            for (int i = 0; i < mList.size(); i++) {
+                if (totalList.get(mCurPos - 1).getPic()
+                        .equals(mList.get(i).getPic())) {
+                    continue;
+                }
+                imgList.add(mList.get(i).getPic());
+                if (imgList.size() == 4) {
+                    //如果满了4 就退出循环
+                    break;
+                }
+            }
+        }
+    }
+
+    private void addTextList(List<WordInfo.ListObject.WordData> mList, List<String> textList) {
+        if (mList.size() != 0) {
+            for (int i = 0; i < mList.size(); i++) {
+                if (totalList.get(mCurPos - 1).getMeaning()
+                        .equals(mList.get(i).getMeaning())) {
+                    continue;
+                }
+                textList.add(mList.get(i).getMeaning());
+                if (textList.size() == 4) {
+                    //如果满了4 就退出循环
+                    break;
+                }
+            }
+        }
+    }
+
     private void setWrongAction(CorrectOrWrongImageView img) {
         wrongCount++;
         img.getCheckImg().setImageResource(R.drawable.bg_wrong);
         setGraphTextSwitcher(wrongCount);
     }
 
-    private void setCorrectAction(CorrectOrWrongImageView img, final int position) {
+    private void setCorrectPicAction(CorrectOrWrongImageView img, final int position) {
+        //将正确的src覆盖于图片之上
         img.getCheckImg().setImageResource(R.drawable.bg_correct);
         final List<AnimatorSet> mAnimSets = new ArrayList<>();
         for (int i = 1; i <= mImgs.size(); i++) {
@@ -603,8 +831,18 @@ public class WordActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-
-                goToNext();
+                int level = Integer.parseInt(totalList.get(mCurPos - 1).getLevel());
+                if (level < 2) {
+                    //新单词
+//                    goToNext();
+                    //将新学单词的level设为1
+                    totalList.get(mCurPos - 1).setLevel(String.valueOf(level + 1));
+                    goToDetail(REQUEST_TO_DETAIL_NEW);
+                } else {
+                    //旧单词复习并正确时直接进入释义复习题
+                    mWordType = TYPE_MEAN;
+                    loadDatas();
+                }
             }
         }, 1000);
     }
@@ -612,55 +850,165 @@ public class WordActivity extends AppCompatActivity {
     private void setmSentence(String[] sentencePieces) {
         setTextEmpty();
         if (sentencePieces.length == 1) {
-            if (mWords.get(mCurPos - 1).getSentence().endsWith(mWords.get(mCurPos - 1).getWord())) {
-//                setTextEmpty();
-                senMiddle.setText(sentencePieces[0]);
-                senEnd.setText(mWords.get(mCurPos - 1).getWord());
-                senEnd.setTextColor(Color.parseColor("#5ee1c9"));
-                senEnd.setTextSize(22);
-            } else {
+            String start = totalList.get(mCurPos - 1).getWord();
+            if (start.equalsIgnoreCase(sentencePieces[0].substring(0, start.length()))) {
                 //单词在句子开头 需大写
-//                setTextEmpty();
-                String start = mWords.get(mCurPos - 1).getWord();
                 start = start.substring(0, 1).toUpperCase() + start.substring(1);
-                senStart.setText(start);
-                senStart.setTextColor(Color.parseColor("#5ee1c9"));
-                senStart.setTextSize(22);
                 //还需去除开头的单词
                 String follow = sentencePieces[0];
-                follow = follow.substring(mWords.get(mCurPos - 1).getWord().length());
-                senMiddle.setText(follow);
+                follow = follow.substring(totalList.get(mCurPos - 1).getWord().length());
+                String mSentence = "<font size=\"22\" color=\"#5ee1c9\">" + start + "</font>"
+                        + follow;
+                senStart.setText(Html.fromHtml(mSentence));
+            } else {
+                //即可能出现变型
+                senStart.setText(sentencePieces[0]);
             }
         } else {
             //可能会出现bug 若同一单词出现两次 则会split多次
-            senStart.setText(sentencePieces[0]);
-            senMiddle.setText(mWords.get(mCurPos - 1).getWord());
-            senEnd.setText(sentencePieces[1]);
-            senMiddle.setTextColor(Color.parseColor("#5ee1c9"));
-            senMiddle.setTextSize(22);
+            String start = sentencePieces[0];
+            String end = sentencePieces[1];
+            /* 字号暂时无法放大 */
+            String mSentence = start + "<font size=\"22\" color=\"#5ee1c9\">"
+                    + totalList.get(mCurPos - 1).getWord() + "</font>"
+                    + end;
+            senStart.setText(Html.fromHtml(mSentence, Html.FROM_HTML_MODE_LEGACY));
         }
     }
 
     private void setTextEmpty() {
         senStart.setText("");
-        senMiddle.setText("");
-        senEnd.setText("");
         senStart.setTextColor(Color.BLACK);
-        senMiddle.setTextColor(Color.BLACK);
-        senEnd.setTextColor(Color.BLACK);
         senStart.setTextSize(18);
-        senMiddle.setTextSize(18);
-        senEnd.setTextSize(18);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_TO_DETAIL_NEW && resultCode == RESULT_WORD_NEXT) {
+            Log.e(TAG, "wrongCount = " + wrongCount);
+            if (wrongCount > 0) {
+                //如果当前当前单词在图册选择有出错过 则添加其到列表后头
+                //然后当前mCurPos不变
+                WordInfo.ListObject.WordData mWrongWord = totalList.get(mCurPos - 1);
+                totalList.remove(mCurPos - 1);
+                wrongCount = 0;
+                if (mWordType == TYPE_GRAPH) {
+                    mWrongWord.setLevel("0");
+                    totalList.add(mWrongWord);
+                    initTextViews();
+                    initSound();
+                    initPics();
+                } else {
+                    mWrongWord.setLevel("1");
+                    totalList.add(mWrongWord);
+                    initTextViews();
+                    initSound();
+                    initList();
+                }
+            } else {
+                /**
+                 * 需要先进行图册复习
+                 */
+                mCurPos ++;
+                if (mCurPos == totalList.size() + 1) {
+                    //说明已经全部load完图册 然后进行释义选择题
+                    Toast.makeText(WordActivity.this, "下面进行复习噢~", Toast.LENGTH_SHORT).show();
+                    mWordType = TYPE_MEAN;
+                    mCurPos -= newList.size();
+                    loadDatas();
+                } else {
+                    mTotalProgress ++;
+                    Log.e(TAG, mTotalProgress + "");
+                    //继续图册选择题
+                    initTextViews();
+                    initSound();
+                    initPics();
+                }
+            }
+        } else if (requestCode == REQUEST_TO_DETAIL_OLD && resultCode == RESULT_WORD_NEXT) {
+            WordInfo.ListObject.WordData mData = totalList.get(mCurPos - 1);
+            wrongCount = 0;
+            if (mWordType == TYPE_GRAPH) {
+                //在图册选择题时就已经选择错误 则将其打回原形 加到新单词队列后
+                totalList.remove(mData);
+                mData.setLevel("0");
+                totalList.add(mData);
+                initTextViews();
+                initSound();
+                initPics();
+            } else {
+                //在释义选择题时选择错误
+                totalList.remove(mData);
+                mData.setLevel("1");
+                totalList.add(mData);
+                //进行下一个单词图册的复习 即便是旧单词最后一个 下一个也是图册选择题
+                mWordType = TYPE_GRAPH;
+                loadDatas();
+            }
+            mTotalSize ++;//因为将旧单词添加到新单词列表后 所以newList.size() + 1 oldLise.size() - 1, mTotalSize就会 +1
+        } else if (resultCode == RESULT_WORD_PASS) {
+            //如果在单词卡片中按了pass
+            doPassWork();
+        }
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.ani_left_get_into, R.anim.ani_right_sign_out);
+    }
+
+    @Override
+    public void setPresenter(WordInfoContract.Presenter presenter) {
+        mPresenter = presenter;
+    }
+
+    @Override
+    public void showError(String msg) {
+        Log.e(TAG, msg);
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void setInfo(WordInfo wordInfo) {
+        if (wordInfo.getStatus().equals("200")) {
+            newList = wordInfo.getData().getNew_list();
+            oldList = wordInfo.getData().getOld_list();
+
+            totalList.addAll(oldList);
+            totalList.addAll(newList);
+
+            Log.e(TAG, newList.size() + "");
+            Log.e(TAG, oldList.size() + "");
+            Log.e(TAG, totalList.size() + "");
+
+            //复习旧单词：图册选择->释义选择（错误则将level设为1）
+            mTotalSize = newList.size() * 2 + oldList.size();//需要复习旧单词以及开始新单词的学习以及复习新单词
+
+            for (int i = 0; i < newList.size(); i++) {
+                Log.e(TAG, i + "");
+                WordInfo.ListObject.WordData data = newList.get(i);
+                data.setLevel("0");
+                Log.e(TAG, data.getLevel());
+                Log.e(TAG, data.getMeaning());
+//                if (data.getMeaning().length() > )
+                Log.e(TAG, data.getPhonetic_symbol_us());
+                Log.e(TAG, data.getPronunciation_us());
+                Log.e(TAG, data.getPic());
+                Log.e(TAG, data.getSentence());
+                Log.e(TAG, data.getWord());
+                Log.e(TAG, data.getSentence_cn());
+            }
+            initViews();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (soundPlayer != null) {
+            soundPlayer.release();
+        }
     }
 }

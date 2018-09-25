@@ -5,9 +5,11 @@ package com.example.carson.yjenglish.home.model.forviewbinder;
  */
 
 public class Video {
+    private String video_id;
     private String bgUrl;
     private String videoUrl;
-    public Video(String bgUrl, String videoUrl) {
+    public Video(String video_id, String bgUrl, String videoUrl) {
+        this.video_id = video_id;
         this.bgUrl = bgUrl;
         this.videoUrl = videoUrl;
     }
@@ -18,5 +20,9 @@ public class Video {
 
     public String getVideoUrl() {
         return videoUrl;
+    }
+
+    public String getVideo_id() {
+        return video_id;
     }
 }

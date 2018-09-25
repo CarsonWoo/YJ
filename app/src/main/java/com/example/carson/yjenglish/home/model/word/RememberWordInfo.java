@@ -1,4 +1,4 @@
-package com.example.carson.yjenglish.home.model;
+package com.example.carson.yjenglish.home.model.word;
 
 import java.util.List;
 

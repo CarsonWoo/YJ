@@ -1,9 +1,12 @@
 package com.example.carson.yjenglish.zone.view.plan;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,11 +23,17 @@ import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.PlanAdapter;
 import com.example.carson.yjenglish.customviews.BaselineTextView;
 import com.example.carson.yjenglish.customviews.PickerView;
+import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.utils.CalculateUtils;
+import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.PlanService;
 import com.example.carson.yjenglish.zone.model.MyLearningPlanInfo;
+import com.example.carson.yjenglish.zone.model.MyPlanDailyInfo;
+
+import org.litepal.LitePal;
+import org.litepal.crud.DataSupport;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -43,6 +52,8 @@ public class PlanActivity extends AppCompatActivity {
      */
 
     private final String TAG = getClass().getSimpleName();
+
+    private View planView;
 
     private ImageView back;
     private TextView edit;
@@ -67,6 +78,9 @@ public class PlanActivity extends AppCompatActivity {
 
     private List<String> words = new ArrayList<>();
     private List<String> days = new ArrayList<>();
+    private List<String> dates = new ArrayList<>();
+
+    private List<String> wordsCp = new ArrayList<>(), daysCp = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,11 +121,18 @@ public class PlanActivity extends AppCompatActivity {
                                 for (MyLearningPlanInfo.Data.WordInfo data : mPlans) {
                                     if (data.getPlan().equals(selected)) {
                                         data.setLearning(true);
-                                        data.setProgress(0);
+                                        LitePal.getDatabase();
+                                        LoadHeader loadData = DataSupport.where("header_id = ?", "1")
+                                                .find(LoadHeader.class).get(0);
+                                        data.setProgress((int) loadData.getProgress());
                                     } else {
                                         data.setLearning(false);
                                     }
                                 }
+                                //先对数据进行空数据化 因为至少要有一项才能加载pickerview
+                                days.add("");
+                                words.add("");
+                                dates.add("");
                             }
                             initViews();
                         }
@@ -156,7 +177,7 @@ public class PlanActivity extends AppCompatActivity {
 
     //初始化planView
     private void initPlanView() {
-        View planView = LayoutInflater.from(this).inflate(R.layout.plan_view, null, false);
+        planView = LayoutInflater.from(this).inflate(R.layout.plan_view, null, false);
         mPlanRv = planView.findViewById(R.id.recycler_view);
         wordTag = planView.findViewById(R.id.learn_tag);
         remain = planView.findViewById(R.id.learn_remain);
@@ -170,35 +191,35 @@ public class PlanActivity extends AppCompatActivity {
         mAdapter = new PlanAdapter(this, mPlans);
         mPlanRv.setLayoutManager(new LinearLayoutManager(this,
                 LinearLayoutManager.HORIZONTAL, false));
+        mPlanRv.setItemAnimator(new DefaultItemAnimator());
         mPlanRv.setAdapter(mAdapter);
 
         //先默认一开始进入的时候就选中第一项
         mTag = mPlans.get(0).getPlan();
         mWordCount = Integer.parseInt(mPlans.get(0).getWord_number());
 
-        initPicker();
+        mDayPicker.setData(days);
+        mWordPiker.setData(words);
+        executeLoadDailyTask(mTag);
 
         mDayPicker.setScrollable(false);
         mWordPiker.setScrollable(false);
         wordTag.setText(mTag);
         remain.setText("（剩余" + mWordCount + "个单词）");
-        expectedDay.setText(date2Str(CalculateUtils.getDateAfter(new Date(), Integer.parseInt(mDayPicker.
-                getText().replace("天", "")))));
-
-        //加载sharepreference的数据
-        loadSaveSp();
 
         mAdapter.setChangeListener(new PlanAdapter.OnItemChangeListener() {
             @Override
             public void onCardClick(View view, String tag, String wordCount) {
+                boolean isClicked = tag.equals(mTag);//判断当前的卡片是否与上次点击的一致 若一致则不再访问网络
                 mTag = tag;
                 mWordCount = Integer.parseInt(wordCount);
                 wordTag.setText(mTag);
                 remain.setText("（剩余" + mWordCount + "个单词）");
-                initPicker();
-                expectedDay.setText(date2Str(CalculateUtils.getDateAfter(new Date(), Integer.parseInt(mDayPicker.
-                        getText().replace("天", "")))));
-                loadSaveSp();
+                if (!isClicked) {
+                    executeLoadDailyTask(mTag);
+                }
+                int pos = daysCp.indexOf(mDayPicker.getText());
+                expectedDay.setText(dates.get(pos));
             }
 
             @Override
@@ -209,13 +230,13 @@ public class PlanActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResetClick(View view, int pos) {
-                Toast.makeText(getApplicationContext(), "重置了位置 " + (pos + 1), Toast.LENGTH_SHORT).show();
+            public void onResetClick(View view, String tag) {
+                Toast.makeText(getApplicationContext(), "重置了" + tag, Toast.LENGTH_SHORT).show();
             }
 
             @Override
-            public void onDeleteClick(View view, int pos) {
-                Toast.makeText(getApplicationContext(), "删除了位置 " + (pos + 1), Toast.LENGTH_SHORT).show();
+            public void onDeleteClick(View view, String tag, int pos) {
+                executeDeleteTask(tag, pos);
             }
         });
 
@@ -233,14 +254,24 @@ public class PlanActivity extends AppCompatActivity {
                     for (MyLearningPlanInfo.Data.WordInfo data : mPlans) {
                         data.setEditing(false);
                     }
+
+                    Log.e(TAG, "mTag = " + mTag);
+                    Log.e(TAG, "cachePlan = " + UserConfig.getSelectedPlan(PlanActivity.this));
+                    if (!mTag.equals(UserConfig.getSelectedPlan(PlanActivity.this))) {
+                        //如果当前选择的计划不是正在学习的计划
+                        executeSelectedPlanTask();
+                    } else {
+                        executeChangePlanTask();
+                    }
+
                     //此时的text为确定 若按了确定
                     mDayPicker.setScrollable(false);
                     mWordPiker.setScrollable(false);
+
                     //post to server & save
-                    SharedPreferences.Editor editor = getSharedPreferences(mTag, MODE_PRIVATE).edit();
-                    editor.putString("plan_day", mDayPicker.getText());
-                    editor.putString("plan_daily_count", mWordPiker.getText()).apply();
-                    edit.setText("编辑");
+//                    SharedPreferences.Editor editor = getSharedPreferences(mTag, MODE_PRIVATE).edit();
+//                    editor.putString("plan_day", mDayPicker.getText());
+//                    editor.putString("plan_daily_count", mWordPiker.getText()).apply();
                 }
                 isEditable = !isEditable;
                 mAdapter.notifyDataSetChanged();
@@ -250,55 +281,166 @@ public class PlanActivity extends AppCompatActivity {
         container.addView(planView);
     }
 
+    private void executeSelectedPlanTask() {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        PlanService service = retrofit.create(PlanService.class);
+        service.setSelectedPlan(UserConfig.getToken(this), mTag).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                CommonInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    UserConfig.cacheSelectedPlan(PlanActivity.this, mTag);
+                    executeChangePlanTask();
+                } else {
+                    Toast.makeText(PlanActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+                Log.e(TAG, t.getMessage());
+            }
+        });
+    }
+
+    private void executeChangePlanTask() {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        PlanService service = retrofit.create(PlanService.class);
+        service.changePlanDaily(UserConfig.getToken(this),
+                mWordPiker.getText().replace("单词", ""),
+                mDayPicker.getText().replace("天", "")).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                CommonInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    edit.setText("编辑");
+                    sendBroadcast(new Intent("HEADER_CHANGE"));
+                    Toast.makeText(PlanActivity.this, "更改计划成功", Toast.LENGTH_SHORT).show();
+                    for (MyLearningPlanInfo.Data.WordInfo data : mPlans) {
+                        if (data.getPlan().equals(UserConfig.getSelectedPlan(MyApplication.getContext()))) {
+                            data.setLearning(true);
+                            LitePal.getDatabase();
+                            LoadHeader loadData = DataSupport.where("header_id = ?", "1")
+                                    .find(LoadHeader.class).get(0);
+                            data.setProgress((int) loadData.getProgress());
+                        } else {
+                            data.setLearning(false);
+                        }
+                    }
+                    SharedPreferences.Editor editor = getSharedPreferences(mTag, MODE_PRIVATE).edit();
+                    editor.putString("plan_day", mDayPicker.getText());
+                    editor.putString("plan_daily_count", mWordPiker.getText()).apply();
+                    mAdapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(PlanActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+                Log.e(TAG, t.getMessage());
+            }
+        });
+    }
+
+    private void executeLoadDailyTask(final String tag) {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        PlanService service = retrofit.create(PlanService.class);
+        service.getPlanDaily(UserConfig.getToken(this), tag).enqueue(new Callback<MyPlanDailyInfo>() {
+            @Override
+            public void onResponse(Call<MyPlanDailyInfo> call, Response<MyPlanDailyInfo> response) {
+                MyPlanDailyInfo info = response.body();
+                days.clear();
+                words.clear();
+                dates.clear();
+                daysCp.clear();
+                wordsCp.clear();
+                if (info.getStatus().equals("200")) {
+                    for (MyPlanDailyInfo.MyPlanDaily daily : info.getData()) {
+                        days.add(daily.getDays() + "天");
+                        words.add(daily.getDaily_word_number() + "单词");
+                        dates.add(daily.getDate());
+                        daysCp.add(daily.getDays() + "天");
+                        wordsCp.add(daily.getDaily_word_number() + "单词");
+                    }
+                } else {
+                    days.add("-天");
+                    words.add("-单词");
+                    dates.add("-");
+                }
+
+                mWordPiker.setData(words);
+                mDayPicker.setData(days);
+                initPicker();
+            }
+
+            @Override
+            public void onFailure(Call<MyPlanDailyInfo> call, Throwable t) {
+                Log.e(TAG, t.getMessage());
+            }
+        });
+
+    }
+
+    private void executeDeleteTask(final String tag, final int pos) {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        PlanService service = retrofit.create(PlanService.class);
+        service.deletePlan(UserConfig.getToken(this), tag).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                CommonInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    mPlans.remove(pos);
+                    mAdapter.notifyItemRemoved(pos);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    }, 500);
+                } else {
+                    Log.e(TAG, info.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+                Log.e(TAG, t.getMessage());
+            }
+        });
+    }
+
     private void loadSaveSp() {
         SharedPreferences getPref = getSharedPreferences(mTag, MODE_PRIVATE);
 //        Log.e(TAG, getPref.getString("plan_day", (mWordCount / 35) + "天"));
 //        Log.e(TAG, getPref.getString("plan_daily_count", "35单词"));
-        mDayPicker.setSelected(getPref.getString("plan_day", (mWordCount / 35) + "天"));
-        mWordPiker.setSelected(getPref.getString("plan_daily_count", "35单词"));
+        mDayPicker.setSelected(getPref.getString("plan_day", days.get(days.size() / 2)));
+        mWordPiker.setSelected(getPref.getString("plan_daily_count", words.get(words.size() / 2)));
     }
 
     private void initPicker() {
-        days.clear();
-        words.clear();
-        for (int i = 10; i <= 60; i += 5) {
-            days.add((mWordCount / i) + "天");
-            words.add(i + "单词");
-        }
-        mDayPicker.setData(days);
-        mWordPiker.setData(words);
-
+        loadSaveSp();
         mWordPiker.setOnSelectListener(new PickerView.onSelectListener() {
             @Override
             public void onSelect(String text, int pos) {
-                String str = (mWordCount / Integer.parseInt(text.replace("单词", ""))) + "天";
-                mDayPicker.setSelected(str);
+                int position = wordsCp.indexOf(text);
+                mDayPicker.setSelected(daysCp.get(position));
                 remain.setText("（剩余" + mWordCount + "个单词）");
-                Date afterDate = CalculateUtils.getDateAfter(new Date(), Integer.
-                        parseInt(mDayPicker.getText().replace("天", "")));
-                String dateStr = date2Str(afterDate);
-                expectedDay.setText(dateStr);
+                expectedDay.setText(dates.get(position));
             }
         });
         mDayPicker.setOnSelectListener(new PickerView.onSelectListener() {
             @Override
             public void onSelect(String text, int pos) {
-                int i = mWordCount / Integer.parseInt(text.replace("天", ""));
-                if (i % 5 != 0) {
-                    i = (i / 5) * 5;
-                }
-                String str = i + "单词";
-                mWordPiker.setSelected(str);
-                Date afterDate = CalculateUtils.getDateAfter(new Date(), Integer.
-                        parseInt(mDayPicker.getText().replace("天", "")));
-                String dateStr = date2Str(afterDate);
-                expectedDay.setText(dateStr);
+                int position = daysCp.indexOf(text);
+                mWordPiker.setSelected(wordsCp.get(position));
+                expectedDay.setText(dates.get(position));
             }
         });
     }
 
     private String date2Str(Date afterDate) {
-        SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");
         return df.format(afterDate);
     }
 
@@ -308,6 +450,7 @@ public class PlanActivity extends AppCompatActivity {
         if (requestCode == 101 && resultCode == RESULT_OK) {
             mAdapter.notifyDataSetChanged();
             executeGetMyPlanTask();
+            sendBroadcast(new Intent("HEADER_CHANGE"));
         } else if (requestCode == 102 && resultCode == RESULT_OK) {
             container.removeAllViews();
             initPlanView();

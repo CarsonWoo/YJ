@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.example.carson.yjenglish.login.view.LoginActivity;
 import com.jude.swipbackhelper.SwipeBackHelper;
 
 /**
@@ -24,6 +26,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public abstract int getLayoutResource();
+
+    public static void tokenOutOfDate(Activity activity) {
+        Intent intent = new Intent(activity, LoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(intent);
+        activity.overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_right_sign_out);
+    }
 
     protected void setSwipeBack(Activity activity) {
         SwipeBackHelper.onCreate(activity);

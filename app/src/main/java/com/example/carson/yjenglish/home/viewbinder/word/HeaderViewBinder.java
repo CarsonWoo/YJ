@@ -1,5 +1,6 @@
 package com.example.carson.yjenglish.home.viewbinder.word;
 
+import android.media.MediaPlayer;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,13 @@ import me.drakeet.multitype.ItemViewBinder;
  */
 
 public class HeaderViewBinder extends ItemViewBinder<Header, HeaderViewBinder.ViewHolder> {
+
+    private HeaderSoundListener listener;
+
+    public HeaderViewBinder(HeaderSoundListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     protected ViewHolder onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent) {
@@ -30,7 +38,14 @@ public class HeaderViewBinder extends ItemViewBinder<Header, HeaderViewBinder.Vi
         holder.word.setText(item.getWord());
         holder.basicTrans.setText(item.getBasicTrans());
         holder.soundMark.setText(item.getSoundMark());
-        //TODO bind the voice url to the sound imageview
+        holder.sound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onPronunciationClick();
+                }
+            }
+        });
     }
 
     static class ViewHolder extends BaseViewHolder {
@@ -46,4 +61,9 @@ public class HeaderViewBinder extends ItemViewBinder<Header, HeaderViewBinder.Vi
             sound = itemView.findViewById(R.id.play_sound);
         }
     }
+
+    public interface HeaderSoundListener {
+        void onPronunciationClick();
+    }
+
 }

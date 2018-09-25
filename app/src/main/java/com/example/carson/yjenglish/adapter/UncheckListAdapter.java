@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.home.model.UncheckWordInfo;
+import com.example.carson.yjenglish.home.model.word.UncheckWordInfo;
 
 import java.util.List;
 

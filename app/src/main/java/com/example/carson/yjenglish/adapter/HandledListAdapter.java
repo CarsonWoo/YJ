@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.home.model.HandledWordInfo;
+import com.example.carson.yjenglish.home.model.word.HandledWordInfo;
 
 import java.util.List;
 

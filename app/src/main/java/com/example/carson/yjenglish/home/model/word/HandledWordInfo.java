@@ -1,4 +1,4 @@
-package com.example.carson.yjenglish.home.model;
+package com.example.carson.yjenglish.home.model.word;
 
 import java.util.List;
 
@@ -6,11 +6,11 @@ import java.util.List;
  * Created by 84594 on 2018/8/3.
  */
 
-public class UncheckWordInfo {
+public class HandledWordInfo {
 
     private String status;
     private String msg;
-    private List<UncheckWord> data;
+    private List<HandleWord> data;
 
     public String getStatus() {
         return status;
@@ -28,16 +28,16 @@ public class UncheckWordInfo {
         this.msg = msg;
     }
 
-    public List<UncheckWord> getData() {
+    public List<HandleWord> getData() {
         return data;
     }
 
-    public void setData(List<UncheckWord> data) {
+    public void setData(List<HandleWord> data) {
         this.data = data;
     }
 
-    public class UncheckWord {
 
+    public static class HandleWord {
         private String id;
         private String word;
         private String meaning;

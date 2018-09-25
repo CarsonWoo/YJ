@@ -105,6 +105,8 @@
         android:background="@android:color/white"
         android:enabled="false"
         android:textSize="16sp"
+        android:textAlignment="viewEnd"
+        android:gravity="end"
         android:textColor="@color/colorText"
         android:maxLength="11"
         android:minWidth="80dp"

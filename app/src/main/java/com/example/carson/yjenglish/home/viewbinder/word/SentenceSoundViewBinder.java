@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish.home.viewbinder.word;
 
 import android.support.annotation.NonNull;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,13 @@ import me.drakeet.multitype.ItemViewBinder;
  */
 
 public class SentenceSoundViewBinder extends ItemViewBinder<Sentence, SentenceSoundViewBinder.ViewHolder> {
+
+    private OnSentenceSoundListener listener;
+
+    public SentenceSoundViewBinder(OnSentenceSoundListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     protected ViewHolder onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent) {
@@ -26,20 +34,36 @@ public class SentenceSoundViewBinder extends ItemViewBinder<Sentence, SentenceSo
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull Sentence item) {
-        holder.sentence.setText(item.getSentence());
+    protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull final Sentence item) {
+        holder.sentence.setText(Html.fromHtml(item.getSentence()));
+        holder.trans.setTextColor(holder.trans.getResources().getColor(R.color.colorTextWord));
         holder.trans.setText(item.getSentenceTrans());
+        holder.origin.setText(item.getSentenceOrigin());
+        holder.sound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onVideoSentenceSoundClick(item.getSentenceSound());
+                }
+            }
+        });
     }
 
     static class ViewHolder extends BaseViewHolder {
         private TextView sentence;
         private TextView trans;
         private ImageView sound;
+        private TextView origin;
         public ViewHolder(View itemView) {
             super(itemView);
             sentence = itemView.findViewById(R.id.sentence);
             trans = itemView.findViewById(R.id.sentence_trans);
             sound = itemView.findViewById(R.id.play_sound);
+            origin = itemView.findViewById(R.id.sentence_origin);
         }
+    }
+
+    public interface OnSentenceSoundListener {
+        void onVideoSentenceSoundClick(String url);
     }
 }

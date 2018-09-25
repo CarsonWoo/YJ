@@ -69,7 +69,7 @@ public class SettingAty extends AppCompatActivity {
         setContentView(R.layout.activity_setting);
 
         initViews();
-        sp = getSharedPreferences(TAG, MODE_PRIVATE);
+        sp = getSharedPreferences("YJEnglish", MODE_PRIVATE);
         soundSwtich.setChecked(sp.getBoolean("sound", false));
         lockScreenSwitch.setChecked(sp.getBoolean("lock", false));
         autoWifiSwitch.setChecked(sp.getBoolean("wifi", false));
@@ -193,6 +193,19 @@ public class SettingAty extends AppCompatActivity {
                 isPriEllipse = !isPriEllipse;
             }
         });
+
+        downloadControl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toDownloadManage();
+            }
+        });
+    }
+
+    private void toDownloadManage() {
+        Intent toDownload = new Intent(this, DownloadManageAty.class);
+        startActivity(toDownload);
+        overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
     }
 
     private void doEllipseTask(ImageView img, final ConstraintLayout layout, final ConstraintSet apply,

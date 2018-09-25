@@ -1,8 +1,10 @@
 package com.example.carson.yjenglish.zone.view.setting;
 
+import android.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -11,6 +13,9 @@ import android.widget.TextView;
 
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.customviews.PickerView;
+import com.example.carson.yjenglish.home.view.word.WordActivity;
+import com.example.carson.yjenglish.utils.DialogUtils;
+import com.example.carson.yjenglish.utils.ScreenUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
 
 import java.util.ArrayList;
@@ -69,6 +74,12 @@ public class RememSettingAty extends AppCompatActivity implements View.OnClickLi
             confirm.setVisibility(View.VISIBLE);
             hourPicker.setScrollable(true);
             minutePicker.setScrollable(true);
+            String time = UserConfig.getNotificationTime(this);
+            if (time != null) {
+                String[] split = time.split(";");
+                hourPicker.setSelected(split[0]);
+                minutePicker.setSelected(split[1]);
+            }
         } else {
             notifySwitch.setChecked(false);
             control.setEnabled(false);
@@ -95,8 +106,6 @@ public class RememSettingAty extends AppCompatActivity implements View.OnClickLi
                 }
             }
         });
-
-
     }
 
     @Override
@@ -120,6 +129,22 @@ public class RememSettingAty extends AppCompatActivity implements View.OnClickLi
     }
 
     private void doConfirmWork() {
-        UserConfig.cacheShouldSendNotification(this, true);
+        DialogUtils dialogUtils = DialogUtils.getInstance(this);
+        String tips = "客官~小语将会在" + hourPicker.getText() + minutePicker.getText() + "提醒背单词噢~";
+        AlertDialog dialog = dialogUtils.newTipsDialog(tips);
+        dialogUtils.show(dialog);
+        dialogUtils.setTipsListener(new DialogUtils.OnTipsListener() {
+            @Override
+            public void onConfirm() {
+                UserConfig.cacheShouldSendNotification(RememSettingAty.this, true);
+                UserConfig.cacheNotificationTime(RememSettingAty.this, hourPicker.getText(),
+                        minutePicker.getText());
+                onBackPressed();
+            }
+        });
+        WindowManager.LayoutParams params = dialog.getWindow().getAttributes();
+        params.width = ScreenUtils.dp2px(RememSettingAty.this, 260);
+        params.height = ScreenUtils.dp2px(RememSettingAty.this, 240);
+        dialog.getWindow().setAttributes(params);
     }
 }

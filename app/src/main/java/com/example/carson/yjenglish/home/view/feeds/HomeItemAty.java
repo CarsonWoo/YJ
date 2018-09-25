@@ -2,6 +2,10 @@ package com.example.carson.yjenglish.home.view.feeds;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.nfc.Tag;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -10,23 +14,41 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.text.style.ImageSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.DrawableTypeRequest;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.example.carson.yjenglish.EmptyValue;
 import com.example.carson.yjenglish.FullScreenVideo;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.ExpressionAdapter;
 import com.example.carson.yjenglish.customviews.MyVideoView;
+import com.example.carson.yjenglish.home.HomeService;
+import com.example.carson.yjenglish.home.model.HomeItem;
+import com.example.carson.yjenglish.home.model.HomeItemInfo;
 import com.example.carson.yjenglish.home.model.forviewbinder.Comment;
 import com.example.carson.yjenglish.home.model.forviewbinder.Content;
 import com.example.carson.yjenglish.home.model.forviewbinder.Recommend;
@@ -38,15 +60,25 @@ import com.example.carson.yjenglish.home.viewbinder.feeds.ContentViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.feeds.RecommendListViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.feeds.VideoViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.FieldTitleViewBinder;
+import com.example.carson.yjenglish.utils.CommonInfo;
+import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.UserConfig;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
+import javax.security.auth.login.LoginException;
 
 import me.drakeet.multitype.ClassLinker;
 import me.drakeet.multitype.ItemViewBinder;
 import me.drakeet.multitype.Items;
 import me.drakeet.multitype.MultiTypeAdapter;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.OnVideoClickListener,
         ContentViewBinder.OnLikeFabClickListener, CommentViewBinder.OnItemSelectListener{
@@ -76,6 +108,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
     private String title;
     private String likeNum;
     private boolean requestComment;
+    private String id;
 
     private ImageView expression;
     private EditText editComment;
@@ -87,15 +120,28 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
     private boolean hasComment = false;
     private boolean isLike;
 
+    private List<HomeItemInfo.HomeItemData.Order> orders;
+    private SpannableStringBuilder mContent;
+
     private List<Comment> mHitComments = new ArrayList<>();
     private List<Comment> mLatestComments = new ArrayList<>();
+
+    private List<HomeItemInfo.HomeItemData.Comment> hitComments, newComments;
+    private List<HomeItemInfo.HomeItemData.Recommendation> recommendations;
+
+    private LinearLayout mContentLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_item);
+
+        mContentLayout = new LinearLayout(this);
+        mContentLayout.setOrientation(LinearLayout.VERTICAL);
+        mContentLayout.setGravity(Gravity.CENTER_HORIZONTAL);
         //读取数据
         Intent fromData = getIntent();
+        id = fromData.getStringExtra("id");
         videoUrl = fromData.getStringExtra("video_url");
         imgUrl = fromData.getStringExtra("img_url");
         username = fromData.getStringExtra("username");
@@ -105,37 +151,125 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         requestComment = fromData.getBooleanExtra("request_comment", false);
         isLike = fromData.getBooleanExtra("is_like", false);
 
-        for (int i = 0; i < 3; i++) {
-            if (i == 1) {
-                mHitComments.add(new Comment("Carson", "http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg",
-                        "今天13:01", "I love this style.", "您的支持是我们最宝贵的财富", 666, new Comment.Reply("Lexie",
-                        "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533311106938&di=a428eb3a3220df77190f2b9b2abef542&imgtype=0&src=http%3A%2F%2Fphotocdn.sohu.com%2F20150907%2Fmp30906533_1441629699374_2.jpeg",
-                        "刚刚", "哎呦不错噢", 20)));
-            } else if (i == 2) {
-                mHitComments.add(new Comment("Nelson", "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533311106938&di=a428eb3a3220df77190f2b9b2abef542&imgtype=0&src=http%3A%2F%2Fphotocdn.sohu.com%2F20150907%2Fmp30906533_1441629699374_2.jpeg",
-                        "刚刚", "好文章！", "谢谢您的支持", 10, null));
-            } else {
-                mHitComments.add(new Comment("Nelson", "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533311106938&di=a428eb3a3220df77190f2b9b2abef542&imgtype=0&src=http%3A%2F%2Fphotocdn.sohu.com%2F20150907%2Fmp30906533_1441629699374_2.jpeg",
-                        "刚刚", "好文章！", null, 10, null));
-            }
-        }
-
-        for (int i = 0; i < 3; i++) {
-            if (i % 2 == 0) {
-                mLatestComments.add(new Comment("Tiffany",
-                        "https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=2648413720,1172680468&fm=27&gp=0.jpg",
-                        "今天11:08", "我觉得OK", null, 0, null));
-            } else {
-                mLatestComments.add(new Comment("帅的被人砍",
-                        "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533311106938&di=a428eb3a3220df77190f2b9b2abef542&imgtype=0&src=http%3A%2F%2Fphotocdn.sohu.com%2F20150907%2Fmp30906533_1441629699374_2.jpeg",
-                        "刚刚", "我觉得不行", null, 0, null));
-            }
-        }
-        initViews();
+        bindViews();
+        executeLoadTask();
+//        initViews();
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    private void initViews() {
+    private void executeLoadTask() {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        HomeService service = retrofit.create(HomeService.class);
+        service.getHomeItemInfo(UserConfig.getToken(this), id).enqueue(new Callback<HomeItemInfo>() {
+            @Override
+            public void onResponse(Call<HomeItemInfo> call, Response<HomeItemInfo> response) {
+                HomeItemInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    orders = info.getData().getOrder();
+                    initContent();
+
+                    recommendations = info.getData().getRecommendations();
+                    hitComments = info.getData().getHot_comment();
+                    newComments = info.getData().getNew_comment();
+
+                    if (hitComments.size() == 0 && newComments.size() == 0) {
+                        hasComment = false;
+                    } else {
+                        hasComment = true;
+                    }
+
+                    loadCommentList(info.getData().getUser_id());
+
+                    initViews();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<HomeItemInfo> call, Throwable t) {
+                Log.e("HomeItemAty", "连接超时");
+            }
+        });
+    }
+
+    private void loadCommentList(String user_id) {
+        mHitComments.clear();
+        mLatestComments.clear();
+        for (int i = 0; i < hitComments.size(); i++) {
+            mHitComments.add(new Comment(hitComments.get(i).getUsername(), hitComments.get(i).getPortrait(),
+                    hitComments.get(i).getSet_time(), hitComments.get(i).getComment(),
+                    hitComments.get(i).getInner_comment().size() == 0 ? null :
+                            hitComments.get(i).getInner_comment().get(Integer.parseInt(user_id) - 1).getComment(),
+                    Integer.parseInt(hitComments.get(i).getLikes()),
+                    hitComments.get(i).getInner_comment().size() == 0 ? null :
+                            new Comment.Reply(hitComments.get(0).getUsername(),
+                                    hitComments.get(0).getPortrait(), hitComments.get(0).getSet_time(),
+                                    hitComments.get(0).getComment(),
+                                    Integer.parseInt(hitComments.get(0).getLikes()))
+            ));
+        }
+        for (int i = 0; i < newComments.size(); i++) {
+            mLatestComments.add(new Comment(newComments.get(i).getUsername(), newComments.get(i).getPortrait(),
+                    newComments.get(i).getSet_time(), newComments.get(i).getComment(),
+                    newComments.get(i).getInner_comment().size() == 0 ? null :
+                            newComments.get(i).getInner_comment().get(Integer.parseInt(user_id) - 1).getComment(),
+                    Integer.parseInt(newComments.get(i).getLikes()),
+                    newComments.get(i).getInner_comment().size() == 0 ? null :
+                            new Comment.Reply(newComments.get(0).getUsername(),
+                                    newComments.get(0).getPortrait(), newComments.get(0).getSet_time(),
+                                    newComments.get(0).getComment(),
+                                    Integer.parseInt(newComments.get(0).getLikes()))
+            ));
+        }
+    }
+
+    private void initContent() {
+        for (final HomeItemInfo.HomeItemData.Order order : orders) {
+            if (order.getPic() != null) {
+                final ImageView imageView = new ImageView(HomeItemAty.this);
+                mContentLayout.addView(imageView);
+                ViewGroup.LayoutParams params = imageView.getLayoutParams();
+                params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                imageView.setLayoutParams(params);
+                /* 将图片宽度设为MATCH_PARENT 并使高度自适配 */
+                Glide.with(HomeItemAty.this).load(order.getPic())
+                        .listener(new RequestListener<String, GlideDrawable>() {
+                            @Override
+                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                if (imageView.getScaleType() != ImageView.ScaleType.FIT_XY) {
+                                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                                }
+                                ViewGroup.LayoutParams lp = imageView.getLayoutParams();
+                                int vw = imageView.getWidth() - imageView.getPaddingLeft() - imageView.getPaddingRight();
+
+                                //获取比例
+                                float scale = (float) vw / (float) resource.getIntrinsicWidth();
+
+                                int vh = Math.round(resource.getIntrinsicHeight() * scale);
+                                lp.height = vh + imageView.getPaddingTop() + imageView.getPaddingBottom();
+
+                                imageView.setLayoutParams(lp);
+                                return false;
+                            }
+                        })
+                        .thumbnail(0.5f).into(imageView);
+            } else {
+                String s = order.getParagraph();
+                TextView textView = new TextView(HomeItemAty.this);
+                textView.setText(s + "\n");
+                mContentLayout.addView(textView);
+                ViewGroup.LayoutParams params = textView.getLayoutParams();
+                params.width = ViewGroup.LayoutParams.MATCH_PARENT;
+                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            }
+        }
+    }
+
+    private void bindViews() {
         mRoot = findViewById(R.id.root_view);
         mToolbar = findViewById(R.id.toolbar);
         setToolbarAlpha(0);
@@ -161,6 +295,11 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                 }
             }
         });
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private void initViews() {
+        Log.e("HomeItemAty", "initViews");
         initEditText();
         initRecyclerViews();
         if (requestComment) {
@@ -214,38 +353,58 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
 
     private void doSendWork() {
         if (!hasComment) {
+            //将原本没有评论的emptyView去除
             mItems.remove(4);
-            hasComment = true;
-            mLatestComments.add(0, new Comment(username, portraitUrl, "刚刚",
-                    editComment.getText().toString(), null, 0, null));
-            initComment(true);
-        } else {
-            if (editComment.getHint().toString().startsWith("回复")) {
-                Log.e("HomeItemAty", "回复了");
-                editComment.setHint("发表评论");
-            } else {
-                mLatestComments.add(0, new Comment(username, portraitUrl, "刚刚",
-                        editComment.getText().toString(), null, 0, null));
-                mItems.removeAll(mLatestComments);
-                for (int i = 0; i < 2; i++) {
-                    mItems.remove(mItems.size() - 1);
+        }
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).sendComment(UserConfig.getToken(this), id,
+                editComment.getText().toString()).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                if (response.body().getStatus().equals("200")) {
+//                    initComment(true);
+                    refreshCommentList();
                 }
-                for (int i = 0; i < 3; i++) {
-                    mItems.add(mLatestComments.get(i));
-                }
-                mItems.add(new EmptyValue(""));
-                mItems.add(new EmptyValue(""));
             }
 
-        }
-        //TODO 届时需联网
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+                Toast.makeText(HomeItemAty.this, "连接超时", Toast.LENGTH_SHORT).show();
+            }
+        });
         if (imm.isActive()) {
             imm.hideSoftInputFromWindow(editComment.getWindowToken(), 0);
         }
         editComment.setFocusable(false);
         expressionRv.setVisibility(View.GONE);
-        editComment.setText("");
-        mAdapter.notifyDataSetChanged();
+
+    }
+
+    private void refreshCommentList() {
+        NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST).create(HomeService.class)
+                .getHomeItemInfo(UserConfig.getToken(this), id)
+                .enqueue(new Callback<HomeItemInfo>() {
+                    @Override
+                    public void onResponse(Call<HomeItemInfo> call, Response<HomeItemInfo> response) {
+                        HomeItemInfo info = response.body();
+                        if (info.getStatus().equals("200")) {
+                            hitComments.clear();
+                            newComments.clear();
+                            hitComments.addAll(info.getData().getHot_comment());
+                            newComments.addAll(info.getData().getNew_comment());
+
+                            loadCommentList(info.getData().getUser_id());
+
+                            editComment.setText("");
+                            initComment(true);
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<HomeItemInfo> call, Throwable t) {
+                        Toast.makeText(HomeItemAty.this, "连接超时", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void initRecyclerViews() {
@@ -261,7 +420,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 mDistance += dy;
-                float percent = mDistance * 1f / maxDistance;
+                float percent = mDistance * 0.5f / maxDistance;
                 int alpha = (int) (percent * 255);
                 setToolbarAlpha(alpha);
                 if (imm.isActive()) {
@@ -274,7 +433,10 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         });
 
         mAdapter.register(Video.class, new VideoViewBinder(this));
-        mAdapter.register(Content.class, new ContentViewBinder(this));
+        /**
+         * 需要改ContentViewBinder
+         */
+        mAdapter.register(Content.class, new ContentViewBinder(this, mContentLayout));
         mAdapter.register(EmptyValue.class).to(new FieldTitleViewBinder(), new EmptyViewBinder())
                 .withClassLinker(new ClassLinker<EmptyValue>() {
                     @NonNull
@@ -288,15 +450,18 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                 });
         mAdapter.register(RecommendList.class, new RecommendListViewBinder());
         mAdapter.register(Comment.class, new CommentViewBinder(this));
-        mItems.add(new Video(imgUrl, videoUrl));
-        mItems.add(new Content(title, portraitUrl, username, "content", likeNum));
+        mItems.add(new Video("", imgUrl, videoUrl));
+        mItems.add(new Content(title, portraitUrl, username, mContent, likeNum));
         mItems.add(new EmptyValue("热门推荐"));
 
         List<Recommend> recommendList = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            Recommend recommend = new Recommend("原来学英语这么简单", "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1533311106938&di=a428eb3a3220df77190f2b9b2abef542&imgtype=0&src=http%3A%2F%2Fphotocdn.sohu.com%2F20150907%2Fmp30906533_1441629699374_2.jpeg",
-                    "http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg", "Moon",
-                    "#记忆方法");
+        for (int i = 0; i < recommendations.size(); i++) {
+            if (recommendations.get(i).getKind() == null) {
+                recommendations.get(i).setKind("");
+            }
+            Recommend recommend = new Recommend(recommendations.get(i).getTitle(), recommendations.get(i).getPic(),
+                    recommendations.get(i).getAuthor_portrait(), recommendations.get(i).getAuthor_username(),
+                    "#" + recommendations.get(i).getKind());
             recommendList.add(recommend);
         }
         mItems.add(new RecommendList(recommendList));
@@ -326,6 +491,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             firstTimeInitComment();
             mItems.add(new EmptyValue(""));
             mItems.add(new EmptyValue(""));
+            mAdapter.notifyItemRangeChanged(4, mItems.size() - 4);
         } else {
             firstTimeInitComment();
         }
@@ -333,22 +499,22 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
     }
 
     private void firstTimeInitComment() {
-        mItems.add(new EmptyValue("热门评论"));
-        for (int i = 0 ; i < 3; i++) {
-            mItems.add(mHitComments.get(i));
+        if (hitComments.size() != 0) {
+            mItems.add(new EmptyValue("热门评论"));
+            mItems.addAll(mHitComments);
         }
-        mItems.add(new EmptyValue("最新评论"));
-        for (int i = 0; i < 3; i++) {
-            mItems.add(mLatestComments.get(i));
+        if (newComments.size() != 0) {
+            mItems.add(new EmptyValue("最新评论"));
+            mItems.addAll(mLatestComments);
         }
     }
 
     private void setToolbarAlpha(int alpha) {
-        if (alpha >= 125) {
-            alpha = 125;
-        } else {
-            mToolbar.getBackground().setAlpha(alpha);
+        if (alpha >= 255) {
+            alpha = 255;
         }
+        mToolbar.getBackground().setAlpha(alpha);
+
     }
 
     private void showVideo(View view, final String path) {
@@ -395,7 +561,6 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
 
         lastView = view;
     }
-
 
     private void removeVideoView() {
         View v;

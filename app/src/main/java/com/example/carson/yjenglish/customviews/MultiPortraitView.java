@@ -91,7 +91,7 @@ public class MultiPortraitView extends FrameLayout {
         } else {
             Log.e("MultiPortrait", "urls is null");
             for (int i = 0; i < mPortraits.size(); i++) {
-                Glide.with(context).load(mResList.get(i)).thumbnail(0.5f).fitCenter().into(mPortraits.get(i));
+                Glide.with(context).load(mResList.get(i)).thumbnail(0.3f).fitCenter().into(mPortraits.get(i));
             }
         }
     }

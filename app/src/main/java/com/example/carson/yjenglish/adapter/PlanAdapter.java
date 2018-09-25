@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,8 +35,6 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     private int mLastPos = -1;//由于recyclerview的复用item的问题 需要记录上一次选择的item的position
 
     private Map<Integer, Boolean> mCardSelected = new HashMap<>();
-
-    private int resType = 1001;//1001代表reset 1002代表delete
 
     public PlanAdapter(Context ctx, List<MyLearningPlanInfo.Data.WordInfo> mPlans) {
         this.ctx = ctx;
@@ -81,12 +78,10 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 mHolder.seekBar.setVisibility(View.VISIBLE);
                 mHolder.seekBar.setProgress(mHolder.item.getProgress());
                 mHolder.resetOrDelete.setImageResource(R.mipmap.ic_reset_plan);
-                resType = 1001;
             } else {
                 mHolder.isLearning.setVisibility(View.INVISIBLE);
                 mHolder.seekBar.setVisibility(View.INVISIBLE);
                 mHolder.resetOrDelete.setImageResource(R.mipmap.ic_delete_gray);
-                resType = 1002;
             }
             if (mCardSelected.get(position)) {
                 mHolder.mCard.setSelected(true);
@@ -129,10 +124,10 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 @Override
                 public void onClick(View view) {
                     if (mChangeListener != null) {
-                        if (resType == 1001) {
-                            mChangeListener.onDeleteClick(view, position);
+                        if (!mHolder.item.isLearning()) {
+                            mChangeListener.onDeleteClick(view, mHolder.item.getPlan(), position);
                         } else {
-                            mChangeListener.onResetClick(view, position);
+                            mChangeListener.onResetClick(view, mHolder.item.getPlan());
                         }
                     }
                 }
@@ -190,7 +185,7 @@ public class PlanAdapter extends RecyclerView.Adapter<BaseViewHolder> {
     public interface OnItemChangeListener {
         void onCardClick(View view, String tag, String wordCount);
         void onAddClick(View view);
-        void onResetClick(View view, int pos);
-        void onDeleteClick(View view, int pos);
+        void onResetClick(View view, String tag);
+        void onDeleteClick(View view, String tag, int pos);
     }
 }

@@ -34,7 +34,8 @@ public class DiscoverFragment extends Fragment {
     private CanotSlidingViewPager viewPager;
     private PullToRefreshRecyclerView rvAty, rvGame;
 
-    private List<String> imgUrls;
+//    private List<String> imgUrls;
+    private List<Integer> imgUrls;
     private List<String> mList;
 
     private DiscoverAdapters.AtyAdapter mAdapter;
@@ -62,15 +63,20 @@ public class DiscoverFragment extends Fragment {
         rvGame = view.findViewById(R.id.rv_game);
 
         imgUrls = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            imgUrls.add("http://pic.qiantucdn.com/58pic/19/57/12/47B58PICxdD_1024.jpg");
-        }
+        imgUrls.add(R.mipmap.card1);
+        imgUrls.add(R.mipmap.card2);
+        imgUrls.add(R.mipmap.card3);
+        imgUrls.add(R.mipmap.card4);
+        imgUrls.add(R.mipmap.card5);
+        imgUrls.add(R.mipmap.card6);
 
         viewPager.setAdapter(new MyPagerAdapter());
         viewPager.setOffscreenPageLimit(2);
         viewPager.setPageMargin(70);
 //        viewPager.setScrollable(false);
         viewPager.setCurrentItem(9);
+        viewPager.setFocusable(true);
+        viewPager.setFocusableInTouchMode(true);
 //        ViewGroup.LayoutParams params = viewPager.getLayoutParams();
 //        params.width = ScreenUtils.getScreenWidth(getContext()) - ScreenUtils.dp2px(getContext(), 80);
 //        viewPager.setLayoutParams(params);
@@ -108,7 +114,7 @@ public class DiscoverFragment extends Fragment {
     private class MyPagerAdapter extends PagerAdapter {
         @Override
         public int getCount() {
-            return 10;
+            return imgUrls.size();
         }
 
         @Override

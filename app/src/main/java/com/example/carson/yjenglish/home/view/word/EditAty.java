@@ -46,17 +46,17 @@ public class EditAty extends AppCompatActivity {
         soundMark.setText(soundMarkStr);
 
         edit.addTextChangedListener(new MyTextWatcher());
-        SharedPreferences pref = getSharedPreferences(wordStr, MODE_PRIVATE);
+        SharedPreferences pref = getSharedPreferences("YJEnglish", MODE_PRIVATE);
         if (pref != null) {
-            edit.setText(pref.getString("edits", ""));
+            edit.setText(pref.getString(wordStr, ""));
         }
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                SharedPreferences sp = getSharedPreferences(wordStr, MODE_PRIVATE);
+                SharedPreferences sp = getSharedPreferences("YJEnglish", MODE_PRIVATE);
                 if (!edit.getText().toString().isEmpty()) {
-                    sp.edit().putString("edits", edit.getText().toString()).apply();
+                    sp.edit().putString(wordStr, edit.getText().toString()).apply();
                 } else {
                     if (sp != null) {
                         sp.edit().clear().apply();

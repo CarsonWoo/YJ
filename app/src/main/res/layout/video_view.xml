@@ -13,6 +13,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <ImageView
+        android:id="@+id/cover_img"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
     <View
         android:id="@+id/video_click"
         android:layout_width="match_parent"
@@ -23,17 +31,39 @@
         android:id="@+id/video_playpause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_play"
+        android:src="@mipmap/ic_video_play"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <ImageView
+        android:id="@+id/video_play_former"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_video_former_normal"
+        android:layout_marginStart="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/video_play_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_video_next_normal"
+        android:layout_marginEnd="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
     <LinearLayout
         android:id="@+id/video_control_ll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#53cccccc"
+        android:background="#12cccccc"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:padding="3dp"
@@ -41,9 +71,9 @@
 
         <ImageView
             android:id="@+id/video_control_play_pause"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_play" />
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@mipmap/ic_video_play" />
 
         <SeekBar
             android:id="@+id/video_seekbar"
@@ -55,7 +85,7 @@
             android:id="@+id/video_full_screen"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:src="@drawable/ic_fullscreen" />
+            android:src="@mipmap/ic_video_fullscreen" />
 
     </LinearLayout>
 

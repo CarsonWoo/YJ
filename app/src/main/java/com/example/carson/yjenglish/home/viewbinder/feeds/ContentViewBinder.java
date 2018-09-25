@@ -2,10 +2,13 @@ package com.example.carson.yjenglish.home.viewbinder.feeds;
 
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -24,9 +27,11 @@ import me.drakeet.multitype.ItemViewBinder;
 public class ContentViewBinder extends ItemViewBinder<Content, ContentViewBinder.ViewHolder> {
 
     private OnLikeFabClickListener mListener;
+    private LinearLayout mLinearLayout;
 
-    public ContentViewBinder(OnLikeFabClickListener listener) {
+    public ContentViewBinder(OnLikeFabClickListener listener, LinearLayout layout) {
         this.mListener = listener;
+        this.mLinearLayout = layout;
     }
 
     @NonNull
@@ -40,13 +45,13 @@ public class ContentViewBinder extends ItemViewBinder<Content, ContentViewBinder
     protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull final Content item) {
         holder.title.setText(item.getTitle());
         holder.username.setText(item.getUsername());
-        holder.text.setText(item.getText());
+        holder.text.removeAllViews();
+        holder.text.addView(mLinearLayout);
         holder.likeNum.setText(item.getLikeNum());
         Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).thumbnail(0.8f).into(holder.portrait);
         holder.fabLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                holder.likeNum.setText(Integer.parseInt(item.getLikeNum())+ 1 + "");
                 if (mListener != null) {
                     mListener.onLikeClick();
                 }
@@ -67,7 +72,7 @@ public class ContentViewBinder extends ItemViewBinder<Content, ContentViewBinder
         private TextView title;
         private CircleImageView portrait;
         private TextView username;
-        private TextView text;
+        private FrameLayout text;
         private TextView likeNum;
         private Button fabLike;
         public ViewHolder(View itemView) {

@@ -19,6 +19,13 @@ import me.drakeet.multitype.ItemViewBinder;
  */
 
 public class VideoViewBinder extends ItemViewBinder<Video, VideoViewBinder.ViewHolder> {
+
+    private OnVideoClickListener videoClickListener;
+
+    public VideoViewBinder(OnVideoClickListener videoClickListener) {
+        this.videoClickListener = videoClickListener;
+    }
+
     @NonNull
     @Override
     protected ViewHolder onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent) {
@@ -27,13 +34,17 @@ public class VideoViewBinder extends ItemViewBinder<Video, VideoViewBinder.ViewH
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull Video item) {
-        Glide.with(holder.videoBg.getContext()).load(item.getBgUrl()).thumbnail(0.5f).into(holder.videoBg);
+    protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull final Video item) {
+        Glide.with(holder.videoBg.getContext()).load(item.getBgUrl()).thumbnail(0.3f).into(holder.videoBg);
         holder.videoBg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Toast.makeText(holder.videoBg.getContext(), "position = " + holder.getAdapterPosition(),
                         Toast.LENGTH_SHORT).show();
+                if (videoClickListener != null) {
+                    videoClickListener.onVideoClick(item.getVideo_id(), item.getVideoUrl(),
+                            holder.getAdapterPosition());
+                }
             }
         });
     }
@@ -44,5 +55,9 @@ public class VideoViewBinder extends ItemViewBinder<Video, VideoViewBinder.ViewH
             super(itemView);
             videoBg = itemView.findViewById(R.id.video_bg);
         }
+    }
+
+    public interface OnVideoClickListener {
+        void onVideoClick(String video_id, String videoUrl, int pos);
     }
 }

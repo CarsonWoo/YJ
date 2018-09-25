@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.carson.yjenglish.EmptyValue;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.home.view.HomeFragment;
 import com.example.carson.yjenglish.home.viewbinder.word.FieldTitleViewBinder;
@@ -158,7 +160,7 @@ public class CollegeTab extends Fragment implements PlanGetContract.View,
     }
 
     @Override
-    public void onTagClick(final String tag, int pos) {
+    public void onTagClick(final String tag, final int pos) {
         DialogUtils dialogUtils = DialogUtils.getInstance(getActivity());
         final Dialog mDialog = dialogUtils.newPickerDialog(tag, mList.get(pos).getWord_number());
         dialogUtils.show(mDialog);
@@ -167,13 +169,14 @@ public class CollegeTab extends Fragment implements PlanGetContract.View,
             public void onConfirm(String day, String count, String date) {
 //                Toast.makeText(getContext(), "day = " + day + " count = " + count
 //                        + " date = " + date, Toast.LENGTH_SHORT).show();
-                executeAddTask(tag, day.replace("天", ""), count.replace("单词", ""));
+                executeAddTask(tag, day.replace("天", ""),
+                        count.replace("单词", ""), mList.get(pos).getWord_number());
                 mDialog.dismiss();
             }
         });
     }
 
-    private void executeAddTask(final String tag, final String day, final String count) {
+    private void executeAddTask(final String tag, final String day, final String count, final int word_number) {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         PlanService service = retrofit.create(PlanService.class);
         Call<CommonInfo> call = service.addPlan(UserConfig.getToken(getContext()),
@@ -183,6 +186,7 @@ public class CollegeTab extends Fragment implements PlanGetContract.View,
             public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
                 CommonInfo info = response.body();
                 if (info.getStatus().equals("200")) {
+                    UserConfig.cacheSelectedPlan(MyApplication.getContext(), tag);
                     Toast.makeText(getContext(), "添加计划成功", Toast.LENGTH_SHORT).show();
                     SharedPreferences.Editor editor = getContext().getSharedPreferences(tag, Context.MODE_PRIVATE).edit();
                     editor.putString("plan_day", day + "天");
@@ -195,7 +199,7 @@ public class CollegeTab extends Fragment implements PlanGetContract.View,
                         if (PlanAddAty.fromIntent == PlanAddAty.INTENT_FROM_PLAN) {
                             getActivity().setResult(Activity.RESULT_OK);
                         } else {
-                            getActivity().setResult(HomeFragment.RESULT_ADD_PLAN_OK);
+                            setHomeResult(day, word_number);
                         }
                     }
                 } else {
@@ -208,5 +212,17 @@ public class CollegeTab extends Fragment implements PlanGetContract.View,
                 Log.e("error", t.getMessage());
             }
         });
+    }
+
+    private void setHomeResult(String day, int word_number) {
+        Intent backIntent = new Intent();
+        if (!UserConfig.HasPlan(getContext())) {
+            UserConfig.cacheHasPlan(getContext(), true);
+        }
+        backIntent.putExtra("rest_days", day);
+        backIntent.putExtra("plan_number", word_number);
+        if (getActivity() != null) {
+            getActivity().setResult(HomeFragment.RESULT_ADD_PLAN_OK);
+        }
     }
 }

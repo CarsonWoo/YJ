@@ -20,7 +20,6 @@ import com.example.carson.yjenglish.broadcastreceiver.NetworkReceiver;
 import com.example.carson.yjenglish.discover.DiscoverFragment;
 import com.example.carson.yjenglish.home.HomeInfoTask;
 import com.example.carson.yjenglish.home.model.HomeInfo;
-import com.example.carson.yjenglish.home.model.HomeItem;
 import com.example.carson.yjenglish.home.presenter.HomeInfoPresenter;
 import com.example.carson.yjenglish.home.view.HomeFragment;
 import com.example.carson.yjenglish.home.view.feeds.HomeItemAty;
@@ -177,7 +176,7 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
         switch (netMobile) {
             case -1://无网络
                 DialogUtils dialogUtils = DialogUtils.getInstance(HomeActivity.this);
-                AlertDialog mDialog = dialogUtils.newCommonDialog("无网络连接", R.mipmap.ic_no_network);
+                AlertDialog mDialog = dialogUtils.newCommonDialog("无网络连接", R.mipmap.ic_no_network, false);
                 dialogUtils.show(mDialog);
                 break;
             case 0://移动网络
@@ -250,6 +249,7 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
     public void onItemClick(ArrayList item, boolean requestComment) {
         HomeInfo.Data.Feed mItem = (HomeInfo.Data.Feed) item.get(0);
         Intent toDetail = new Intent(this, HomeItemAty.class);
+        toDetail.putExtra("id", mItem.getId());
         toDetail.putExtra("video_url", mItem.getVideo());
         toDetail.putExtra("img_url", mItem.getPic());
         toDetail.putExtra("username", mItem.getAuthor_username());
@@ -257,7 +257,7 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
         toDetail.putExtra("portrait_url", mItem.getAuthor_portrait());
         toDetail.putExtra("like_num", mItem.getLikes());
         toDetail.putExtra("request_comment", requestComment);
-        toDetail.putExtra("is_like", mItem.getIsLike().equals("1"));
+        toDetail.putExtra("is_like", mItem.getIs_favour().equals("1"));
         startActivity(toDetail);
     }
 

@@ -18,6 +18,8 @@ public class UserConfig {
 
     public static final String HOST = "http://123.207.85.37:8080/";
 
+    public static final String WECHAT_APP_ID = "wx3a33fd1f25154473";
+
     public static void cacheToken(Context context, String token) {
         SharedPreferences sp = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
@@ -99,6 +101,15 @@ public class UserConfig {
         return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getBoolean("should_send_notification", false);
     }
 
+    public static void cacheNotificationTime(Context context, String hour, String minute) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).edit();
+        editor.putString("notification_time", hour + ";" + minute).apply();
+    }
+
+    public static String getNotificationTime(Context context) {
+        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getString("notification_time", null);
+    }
+
     public static void cacheHasPlan(Context context, boolean hasPlan) {
         SharedPreferences.Editor editor = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).edit();
         editor.putBoolean("has_plan", hasPlan).apply();
@@ -106,5 +117,14 @@ public class UserConfig {
 
     public static boolean HasPlan(Context context) {
         return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getBoolean("has_plan", false);
+    }
+
+    public static void cacheSelectedPlan(Context context, String plan) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).edit();
+        editor.putString("selected_plan", plan).apply();
+    }
+
+    public static String getSelectedPlan(Context context) {
+        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getString("selected_plan", "");
     }
 }

@@ -3,6 +3,7 @@ package com.example.carson.yjenglish.home.viewbinder.feeds;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Gravity;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.BaseViewHolder;
 import com.example.carson.yjenglish.home.model.forviewbinder.Comment;
@@ -46,10 +48,17 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
     @Override
     protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull final Comment item) {
         Log.e("BindHolder", "holder position = " + holder.getAdapterPosition());
+        holder.itemView.setVisibility(View.VISIBLE);
         if (item.isAuthorReplied()) {
             holder.content.setVisibility(View.VISIBLE);
-            holder.content.setText("作者回复：" + item.getContent());
+            holder.content.setText("作者回复" + item.getUsername() + "：" + item.getContent());
             holder.content.setTextColor(Color.parseColor("#656565"));
+            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) holder.content.getLayoutParams();
+            lp.width = ScreenUtils.dp2px(MyApplication.getContext(), 260);
+            lp.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+            holder.content.setLayoutParams(lp);
+        } else {
+            holder.content.setLayoutParams(new ConstraintLayout.LayoutParams(0, 0));
         }
         if (item.isHasReply()) {
             holder.replyComment.setVisibility(View.VISIBLE);
@@ -57,6 +66,12 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
                     null, false);
             initChildView(childView, item);
             holder.replyComment.addView(childView);
+            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) holder.replyComment.getLayoutParams();
+            lp.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
+            lp.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+            holder.replyComment.setLayoutParams(lp);
+        } else {
+            holder.replyComment.setLayoutParams(new ConstraintLayout.LayoutParams(0, 0));
         }
         holder.divider.setVisibility(View.VISIBLE);
         Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).thumbnail(0.8f).into(holder.portrait);
@@ -129,7 +144,7 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         content.setVisibility(View.VISIBLE);
         content.setTextColor(Color.parseColor("#5ee1c9"));
         content.setText("查看更多回复");
-        Glide.with(portrait.getContext()).load(item.getReply().getPortraitUrl()).thumbnail(0.8f)
+        Glide.with(portrait.getContext()).load(item.getReply().getPortraitUrl()).thumbnail(0.5f)
                 .into(portrait);
         username.setText(item.getReply().getUsername());
         reply.setText(item.getReply().getReply());

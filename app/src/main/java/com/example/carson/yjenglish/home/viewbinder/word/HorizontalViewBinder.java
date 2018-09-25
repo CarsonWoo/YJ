@@ -22,6 +22,13 @@ import me.drakeet.multitype.MultiTypeAdapter;
  */
 
 public class HorizontalViewBinder extends ItemViewBinder<VideoList, HorizontalViewBinder.ViewHolder> {
+
+    private VideoViewBinder.OnVideoClickListener mListener;
+
+    public HorizontalViewBinder(VideoViewBinder.OnVideoClickListener listener) {
+        this.mListener = listener;
+    }
+
     @NonNull
     @Override
     protected ViewHolder onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent) {
@@ -31,20 +38,22 @@ public class HorizontalViewBinder extends ItemViewBinder<VideoList, HorizontalVi
 
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull VideoList item) {
+        holder.recyclerView.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(),
+                LinearLayoutManager.HORIZONTAL, false));
+        holder.adapter = new MultiTypeAdapter();
+        holder.adapter.register(Video.class, new VideoViewBinder(mListener));
+        holder.recyclerView.setAdapter(holder.adapter);
         holder.setItems(item.getmList());
     }
 
     static class ViewHolder extends BaseViewHolder {
         private RecyclerView recyclerView;
         private MultiTypeAdapter adapter;
+        private View itemView;
         public ViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             recyclerView = itemView.findViewById(R.id.recycler_view);
-            recyclerView.setLayoutManager(new LinearLayoutManager(itemView.getContext(),
-                    LinearLayoutManager.HORIZONTAL, false));
-            adapter = new MultiTypeAdapter();
-            adapter.register(Video.class, new VideoViewBinder());
-            recyclerView.setAdapter(adapter);
         }
 
         private void setItems(List<Video> urls) {

@@ -2,12 +2,15 @@ package com.example.carson.yjenglish.zone.view;
 
 import android.Manifest;
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
@@ -23,6 +26,7 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -31,22 +35,48 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.signature.StringSignature;
 import com.example.carson.yjenglish.BuildConfig;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.net.NetTask;
+import com.example.carson.yjenglish.net.NullOnEmptyConverterFactory;
+import com.example.carson.yjenglish.utils.CommonInfo;
+import com.example.carson.yjenglish.utils.DialogUtils;
+import com.example.carson.yjenglish.utils.NetUtils;
+import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.UserConfig;
+import com.example.carson.yjenglish.zone.UserInfoContract;
+import com.example.carson.yjenglish.zone.UserInfoTask;
+import com.example.carson.yjenglish.zone.ZoneService;
+import com.example.carson.yjenglish.zone.model.UserBasicModel;
+import com.example.carson.yjenglish.zone.presenter.UserInfoPresenter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import cn.qqtheme.framework.picker.OptionPicker;
 import cn.qqtheme.framework.picker.WheelPicker;
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.Interceptor;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class InfoAty extends AppCompatActivity {
+public class InfoAty extends AppCompatActivity implements UserInfoContract.View {
 
     private ImageView back;
     private CircleImageView ivPortrait;
@@ -66,19 +96,33 @@ public class InfoAty extends AppCompatActivity {
     private String name;
     private String signature;
     private String imgUrl;
+    private String gender;
 
     private Uri photoUri;
     private File photoFile;
+
+    private Dialog mDialog;
+    private UserInfoContract.Presenter mPresenter;
+    private UserInfoPresenter infoPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.zone_user_info);
+        mDialog = DialogUtils.getInstance(this).newAnimatedLoadingDialog();
 
         Intent fromData = getIntent();
         name = fromData.getStringExtra("name");
         signature = fromData.getStringExtra("sign");
         imgUrl = fromData.getStringExtra("img_url");
+        gender = fromData.getStringExtra("gender");
+        if (gender != null) {
+            if (gender.equals("0")) {
+                gender = "男";
+            } else {
+                gender = "女";
+            }
+        }
 
         initViews();
     }
@@ -98,6 +142,7 @@ public class InfoAty extends AppCompatActivity {
 
         etName.setText(name);
         etSign.setText(signature);
+        tvGender.setText(gender);
         Glide.with(this).load(imgUrl).thumbnail(0.5f).into(ivPortrait);
 
         back.setOnClickListener(new View.OnClickListener() {
@@ -138,24 +183,57 @@ public class InfoAty extends AppCompatActivity {
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                boolean ableToPost = false;
                 if (etName.isEnabled()) {
-                    if (!etName.getText().toString().equals(name)) {
-                        //TODO post 上服务器
+                    if (etName.getText().toString().isEmpty()) {
+                        DialogUtils utils = DialogUtils.getInstance(InfoAty.this);
+                        final AlertDialog mDialog = utils.newTipsDialog("请先输入用户名", TextView.TEXT_ALIGNMENT_CENTER);
+                        utils.show(mDialog);
+                        WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
+                        lp.width = ScreenUtils.dp2px(InfoAty.this, 260);
+                        lp.height = ScreenUtils.dp2px(InfoAty.this, 240);
+                        mDialog.getWindow().setAttributes(lp);
+                        utils.setTipsListener(new DialogUtils.OnTipsListener() {
+                            @Override
+                            public void onConfirm() {
+                                mDialog.dismiss();
+                            }
+                        });
+                        return;
+                    } else if (!etName.getText().toString().equals(name)) {
+                        ableToPost = true;
+//                        ableToPost = false;
                     }
-                    etName.setEnabled(false);
+//                    etName.setEnabled(false);
                 }
                 if (etSign.isEnabled()) {
                     if (!etSign.getText().toString().equals(signature)) {
-                        //TODO post 服务器
+                        ableToPost = true;
                     }
-                    etSign.setEnabled(false);
+//                    etSign.setEnabled(false);
                 }
-                if (!tvGender.getText().toString().isEmpty()) {
-                    //TODO post 服务器
+                if (ableToPost) {
+                    etName.setEnabled(false);
+                    etSign.setEnabled(false);
+                    doPostWork();
+                }
+                InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+                if (imm != null  && imm.isActive()) {
+                    imm.hideSoftInputFromWindow(confirm.getWindowToken(), 0);
                 }
                 confirm.setVisibility(View.GONE);
             }
         });
+    }
+
+    private void doPostWork() {
+        Log.e("Info", "doPostWord");
+        UserInfoTask task = UserInfoTask.getInstance();
+        infoPresenter = new UserInfoPresenter(task, this);
+        this.setPresenter(infoPresenter);
+        mPresenter.getUserInfo(new UserBasicModel(UserConfig.getToken(this),
+                etName.getText().toString(), tvGender.getText().toString().equals("男") ? "0" : "1",
+                etSign.getText().toString()));
     }
 
     private void initPhotoView() {
@@ -266,7 +344,7 @@ public class InfoAty extends AppCompatActivity {
 
     private Uri get24MediaFileUri() {
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/YuJingEnglish/" + System.currentTimeMillis() + ".jpg";
+                + "/语境背单词/" + System.currentTimeMillis() + ".jpg";
         File mediaFile = new File(filePath);
         if (!mediaFile.getParentFile().exists()) {
             mediaFile.getParentFile().mkdir();
@@ -345,6 +423,7 @@ public class InfoAty extends AppCompatActivity {
     private void setPickerAction() {
         confirm.setVisibility(View.VISIBLE);
         OptionPicker genderPicker = new OptionPicker(InfoAty.this, new String[]{"男", "女"});
+        genderPicker.setSelectedItem(tvGender.getText().toString());
         genderPicker.setOnOptionPickListener(new OptionPicker.OnOptionPickListener() {
             @Override
             public void onOptionPicked(int index, String item) {
@@ -370,7 +449,6 @@ public class InfoAty extends AppCompatActivity {
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.showSoftInput(editText, editText.getPaintFlags());
         editText.setSelection(editText.getText().length());
-
     }
 
     @Override
@@ -386,19 +464,96 @@ public class InfoAty extends AppCompatActivity {
                 }
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" +
                         photoFile.getAbsolutePath())));
-                Glide.with(this).load(photoUri).into(bigImg);
+                Glide.with(this).load(photoFile).into(bigImg);
+
+                executeChangePortraitTask();
             }
         } else if (requestCode == 2) {
             if (resultCode == RESULT_OK) {
                 selectPic(data);
                 Glide.with(this).load(photoFile).into(bigImg);
+
+                executeChangePortraitTask();
             }
         }
+    }
+
+    private void executeChangePortraitTask() {
+        OkHttpClient client = NetUtils.getInstance().getTokenClientInstance();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(UserConfig.HOST).addConverterFactory(new NullOnEmptyConverterFactory())
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(client)
+                .build();
+        ZoneService service = retrofit.create(ZoneService.class);
+
+        RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), photoFile);
+        MultipartBody.Part part = MultipartBody.Part.createFormData("portrait", photoFile.getName(), fileBody);
+        service.changeUserPortrait(UserConfig.getToken(InfoAty.this), part).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                CommonInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    imgUrl = info.getData();
+                    Glide.with(InfoAty.this).load(photoFile).thumbnail(0.5f).into(ivPortrait);
+                    setBackIntent();
+                } else {
+                    Toast.makeText(InfoAty.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+                Log.e("InfoAty", t.getMessage());
+            }
+        });
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         overridePendingTransition(R.anim.translate_dialog_in, R.anim.translate_dialog_out);
+    }
+
+    @Override
+    public void setPresenter(UserInfoContract.Presenter presenter) {
+        this.mPresenter = presenter;
+    }
+
+    @Override
+    public void showLoading() {
+        mDialog.show();
+    }
+
+    @Override
+    public void hideLoading() {
+        mDialog.dismiss();
+    }
+
+    @Override
+    public void showError(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void updateUserInfo(CommonInfo info) {
+        if (info.getStatus().equals("200")) {
+            Toast.makeText(this, "修改成功", Toast.LENGTH_SHORT).show();
+            name = etName.getText().toString();
+            signature = etSign.getText().toString();
+            setBackIntent();
+        } else {
+            Toast.makeText(this, info.getMsg(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void setBackIntent() {
+        Intent backIntent = new Intent();
+        backIntent.putExtra("username", name);
+        backIntent.putExtra("signature", signature);
+        backIntent.putExtra("portrait_url", imgUrl);
+        setResult(RESULT_OK, backIntent);
     }
 }

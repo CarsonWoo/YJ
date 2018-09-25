@@ -4,6 +4,9 @@ package com.example.carson.yjenglish.zone.view.plan;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -16,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.example.carson.yjenglish.EmptyValue;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.home.view.HomeFragment;
 import com.example.carson.yjenglish.home.viewbinder.word.FieldTitleViewBinder;
@@ -152,20 +156,21 @@ public class JuniorTab extends Fragment implements WordTagViewBinder.OnTagClickL
     }
 
     @Override
-    public void onTagClick(final String tag, int pos) {
+    public void onTagClick(final String tag, final int pos) {
         DialogUtils dialogUtils = DialogUtils.getInstance(getActivity());
         final Dialog mDialog = dialogUtils.newPickerDialog(tag, mList.get(pos).getWord_number());
         dialogUtils.show(mDialog);
         dialogUtils.setPickerListener(new DialogUtils.OnPickerListener() {
             @Override
             public void onConfirm(String day, String count, String date) {
-                executeAddTask(tag, day.replace("天", ""), count.replace("单词", ""));
+                executeAddTask(tag, day.replace("天", ""),
+                        count.replace("单词", ""), mList.get(pos).getWord_number());
                 mDialog.dismiss();
             }
         });
     }
 
-    private void executeAddTask(String tag, String day, String count) {
+    private void executeAddTask(final String tag, final String day, final String count, final int word_number) {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         PlanService service = retrofit.create(PlanService.class);
         Call<CommonInfo> call = service.addPlan(UserConfig.getToken(getContext()),
@@ -175,7 +180,12 @@ public class JuniorTab extends Fragment implements WordTagViewBinder.OnTagClickL
             public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
                 CommonInfo info = response.body();
                 if (info.getStatus().equals("200")) {
+                    UserConfig.cacheSelectedPlan(MyApplication.getContext(), tag);
                     Toast.makeText(getContext(), "添加计划成功", Toast.LENGTH_SHORT).show();
+                    SharedPreferences.Editor editor = getContext().getSharedPreferences(tag, Context.MODE_PRIVATE).edit();
+                    editor.putString("plan_day", day + "天");
+                    editor.putString("plan_daily_count", count + "单词");
+                    editor.apply();
                     if (getActivity() != null) {
                         if (!UserConfig.HasPlan(getContext())) {
                             UserConfig.cacheHasPlan(getContext(), true);
@@ -183,7 +193,7 @@ public class JuniorTab extends Fragment implements WordTagViewBinder.OnTagClickL
                         if (PlanAddAty.fromIntent == PlanAddAty.INTENT_FROM_PLAN) {
                             getActivity().setResult(Activity.RESULT_OK);
                         } else {
-                            getActivity().setResult(HomeFragment.RESULT_ADD_PLAN_OK);
+                            setHomeResult(day, word_number);
                         }
                     }
                 } else {
@@ -196,5 +206,17 @@ public class JuniorTab extends Fragment implements WordTagViewBinder.OnTagClickL
                 Log.e("error", t.getMessage());
             }
         });
+    }
+
+    private void setHomeResult(String day, int word_number) {
+        Intent backIntent = new Intent();
+        if (!UserConfig.HasPlan(getContext())) {
+            UserConfig.cacheHasPlan(getContext(), true);
+        }
+        backIntent.putExtra("rest_days", day);
+        backIntent.putExtra("plan_number", word_number);
+        if (getActivity() != null) {
+            getActivity().setResult(HomeFragment.RESULT_ADD_PLAN_OK);
+        }
     }
 }

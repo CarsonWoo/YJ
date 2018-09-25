@@ -186,6 +186,9 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
                     toCode.putExtra("type", 0);
                     startActivityForResult(toCode, 2);
                     overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                } else {
+                    //提示用户信息
+                    Toast.makeText(ForgetActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
                 }
             }
         });

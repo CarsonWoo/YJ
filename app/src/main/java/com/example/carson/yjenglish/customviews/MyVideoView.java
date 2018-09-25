@@ -7,6 +7,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
@@ -16,6 +17,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.pili.pldroid.player.PLOnCompletionListener;
 import com.pili.pldroid.player.PLOnErrorListener;
@@ -48,6 +52,12 @@ public class MyVideoView extends ConstraintLayout {
 
     private ImageView fullScreen;
 
+    private ImageView playFormer;
+
+    private ImageView playLatter;
+
+    private ImageView coverImg;
+
     private static final int SHOW_CONTROL = 0x0001;
 
     private static final int HIDE_CONTROL = 0x0002;
@@ -61,6 +71,8 @@ public class MyVideoView extends ConstraintLayout {
     private boolean isPause = false;
 
     private boolean isFull = false;
+
+    private boolean hasMulVideos = false;
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -87,12 +99,21 @@ public class MyVideoView extends ConstraintLayout {
 
     private IOnStopListener onStopListener;
 
+    private IOnChangeSourceListener changeSourceListener;
+
     public void setFullScreenListener(IFullScreenListener listener) {
         this.listener = listener;
     }
 
     public MyVideoView(Context context) {
+        this(context, false, false);
+//        initViews();
+    }
+
+    public MyVideoView(Context context, boolean hasMulVideos, boolean isFull) {
         super(context);
+        this.hasMulVideos = hasMulVideos;
+        this.isFull = isFull;
         initViews();
     }
 
@@ -115,20 +136,41 @@ public class MyVideoView extends ConstraintLayout {
         playOrPauseControl = rootView.findViewById(R.id.video_control_play_pause);
         seekBar = rootView.findViewById(R.id.video_seekbar);
         fullScreen = rootView.findViewById(R.id.video_full_screen);
+        playFormer = rootView.findViewById(R.id.video_play_former);
+        playLatter = rootView.findViewById(R.id.video_play_next);
+        coverImg = rootView.findViewById(R.id.cover_img);
         initSetting();
         initEvents();
     }
 
     private void initSetting() {
-        playOrPauseView.setImageResource(R.drawable.ic_play);
+        playOrPauseView.setImageResource(R.mipmap.ic_video_play);
         showControl();
-        playOrPauseControl.setImageResource(R.drawable.ic_play);
+        playOrPauseControl.setImageResource(R.mipmap.ic_video_play);
         seekBar.setProgress(0);
-        fullScreen.setImageResource(R.drawable.ic_fullscreen);
+        if (isFull) {
+            fullScreen.setImageResource(R.mipmap.ic_video_grabscreen);
+            playFormer.setImageResource(R.mipmap.ic_video_former_large);
+            playLatter.setImageResource(R.mipmap.ic_video_next_large);
+        } else {
+            fullScreen.setImageResource(R.mipmap.ic_video_fullscreen);
+            playFormer.setImageResource(R.mipmap.ic_video_former_normal);
+            playLatter.setImageResource(R.mipmap.ic_video_next_normal);
+        }
+        if (hasMulVideos) {
+            playLatter.setVisibility(VISIBLE);
+            playFormer.setVisibility(VISIBLE);
+        } else {
+            playFormer.setVisibility(GONE);
+            playLatter.setVisibility(GONE);
+        }
         seekBar.setEnabled(false);
     }
 
     private void initEvents() {
+        Glide.with(MyApplication.getContext()).load(R.mipmap.gif_loading_video).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                .placeholder(R.mipmap.bg_plan_box).into(coverImg);
+        mVideoView.setBufferingIndicator(coverImg);
         mVideoView.setOnCompletionListener(new PLOnCompletionListener() {
             @Override
             public void onCompletion() {
@@ -139,14 +181,18 @@ public class MyVideoView extends ConstraintLayout {
             @Override
             public boolean onError(int what) {
                 Toast.makeText(getContext(), "播放出错", Toast.LENGTH_SHORT).show();
+                coverImg.setVisibility(VISIBLE);
+                Glide.with(MyApplication.getContext()).load(R.mipmap.gif_loading_video).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE)
+                        .placeholder(R.mipmap.bg_plan_box).into(coverImg);
                 return false;
             }
         });
+
         mVideoView.setOnPreparedListener(new PLOnPreparedListener() {
             @Override
             public void onPrepared(int i) {
-                playOrPauseView.setImageResource(R.drawable.ic_pause);
-                playOrPauseControl.setImageResource(R.drawable.ic_pause);
+                playOrPauseView.setImageResource(R.mipmap.ic_video_pause);
+                playOrPauseControl.setImageResource(R.mipmap.ic_video_pause);
                 seekBar.setMax((int) mVideoView.getDuration());
                 seekBar.setProgress((int) mVideoView.getCurrentPosition());
                 seekBar.setEnabled(true);
@@ -216,6 +262,30 @@ public class MyVideoView extends ConstraintLayout {
                 }
             }
         });
+        playFormer.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initSetting();
+                mHandler.removeCallbacksAndMessages(null);
+                mVideoView.stopPlayback();
+//                pause();
+                if (changeSourceListener != null) {
+                    changeSourceListener.onFormerClick();
+                }
+            }
+        });
+        playLatter.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initSetting();
+                mHandler.removeCallbacksAndMessages(null);
+                mVideoView.stopPlayback();
+//                pause();
+                if (changeSourceListener != null) {
+                    changeSourceListener.onLatterClick();
+                }
+            }
+        });
     }
 
     /**
@@ -239,6 +309,10 @@ public class MyVideoView extends ConstraintLayout {
         isShowControl = false;
         mHandler.removeMessages(HIDE_CONTROL);
         playOrPauseView.setVisibility(GONE);
+        if (hasMulVideos) {
+            playLatter.setVisibility(GONE);
+            playFormer.setVisibility(GONE);
+        }
         controlView.clearAnimation();
         controlView.animate().translationY(controlView.getHeight()).setDuration(500).start();
     }
@@ -250,6 +324,10 @@ public class MyVideoView extends ConstraintLayout {
         isShowControl = true;
         mHandler.sendEmptyMessageDelayed(HIDE_CONTROL, 3000);
         playOrPauseView.setVisibility(VISIBLE);
+        if (hasMulVideos) {
+            playFormer.setVisibility(VISIBLE);
+            playLatter.setVisibility(VISIBLE);
+        }
         controlView.clearAnimation();
         controlView.animate().translationY(0).setDuration(500).start();
     }
@@ -304,8 +382,8 @@ public class MyVideoView extends ConstraintLayout {
         isPause = true;
         mHandler.removeMessages(UPDATE_POSITION);
         mVideoView.pause();
-        playOrPauseView.setImageResource(R.drawable.ic_play);
-        playOrPauseControl.setImageResource(R.drawable.ic_play);
+        playOrPauseView.setImageResource(R.mipmap.ic_video_play);
+        playOrPauseControl.setImageResource(R.mipmap.ic_video_play);
     }
 
     /**
@@ -322,8 +400,8 @@ public class MyVideoView extends ConstraintLayout {
         isPause = false;
         mHandler.sendEmptyMessageDelayed(UPDATE_POSITION, 500);
         mVideoView.start();
-        playOrPauseView.setImageResource(R.drawable.ic_pause);
-        playOrPauseControl.setImageResource(R.drawable.ic_pause);
+        playOrPauseView.setImageResource(R.mipmap.ic_video_pause);
+        playOrPauseControl.setImageResource(R.mipmap.ic_video_pause);
     }
 
     public int getPosition() {
@@ -344,6 +422,12 @@ public class MyVideoView extends ConstraintLayout {
         if (onStopListener != null) {
             onStopListener.onVideoStop();
         }
+    }
+
+    public void release() {
+        initSetting();
+        mHandler.removeCallbacksAndMessages(null);
+        mVideoView.stopPlayback();
     }
 
     private void setFullScreen(boolean fullScreen) {
@@ -367,12 +451,21 @@ public class MyVideoView extends ConstraintLayout {
         this.onStopListener = onStopListener;
     }
 
+    public void setChangeSourceListener(IOnChangeSourceListener changeSourceListener) {
+        this.changeSourceListener = changeSourceListener;
+    }
+
     public interface IFullScreenListener {
         void onClickFull(boolean isFull);
     }
 
     public interface IOnStopListener {
         void onVideoStop();
+    }
+
+    public interface IOnChangeSourceListener {
+        void onFormerClick();
+        void onLatterClick();
     }
 
 

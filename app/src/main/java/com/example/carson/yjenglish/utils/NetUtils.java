@@ -1,25 +1,26 @@
 package com.example.carson.yjenglish.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.example.carson.yjenglish.MyApplication;
-import com.example.carson.yjenglish.net.InDiskCookieStore;
+import com.example.carson.yjenglish.login.view.LoginActivity;
 import com.example.carson.yjenglish.net.NullOnEmptyConverterFactory;
-import com.franmontiel.persistentcookiejar.ClearableCookieJar;
-import com.franmontiel.persistentcookiejar.PersistentCookieJar;
-import com.franmontiel.persistentcookiejar.cache.SetCookieCache;
-import com.franmontiel.persistentcookiejar.persistence.SharedPrefsCookiePersistor;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.URLDecoder;
 
+import okhttp3.Interceptor;
 import okhttp3.JavaNetCookieJar;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
@@ -92,6 +93,23 @@ public class NetUtils {
         builder.addInterceptor(new SaveCookiesInterceptor());
         builder.addInterceptor(new AddCookiesInterceptor());
         return builder.build();
+    }
+
+    public OkHttpClient getTokenClientInstance() {
+        Interceptor interceptor = new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request re = chain.request();
+                re.newBuilder().addHeader("token", UserConfig.getToken(MyApplication.getContext()));
+                return chain.proceed(re);
+            }
+        };
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(interceptor)
+                .addInterceptor(new SaveCookiesInterceptor())
+                .addInterceptor(new AddCookiesInterceptor())
+                .build();
+        return client;
     }
 
     public Retrofit getRetrofitInstance(String url) {

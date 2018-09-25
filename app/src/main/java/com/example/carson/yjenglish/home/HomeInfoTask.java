@@ -38,7 +38,7 @@ public class HomeInfoTask implements NetTask<String> {
 
     @Override
     public Subscription execute(String token, final LoadTasksCallback callback) {
-        HomeInfoService service = retrofit.create(HomeInfoService.class);
+        HomeService service = retrofit.create(HomeService.class);
         Subscription subscription = service.getHomeInfo(token).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<HomeInfo>() {
                     @Override

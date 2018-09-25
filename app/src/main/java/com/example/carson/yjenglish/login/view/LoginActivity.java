@@ -37,6 +37,7 @@ import com.example.carson.yjenglish.utils.UserConfig;
 import com.tencent.connect.UserInfo;
 import com.tencent.connect.auth.QQToken;
 import com.tencent.connect.common.Constants;
+import com.tencent.mm.opensdk.modelmsg.SendAuth;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
@@ -232,10 +233,22 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
                 executeQQLogin();
                 break;
             case R.id.btn_wechat:
+                executeWechatLogin();
                 break;
             default:
                 break;
         }
+    }
+
+    private void executeWechatLogin() {
+        if (!MyApplication.mWXApi.isWXAppInstalled()) {
+            Toast.makeText(this, "您还未安装微信客户端", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        final SendAuth.Req req = new SendAuth.Req();
+        req.scope = "snsapi_userinfo";
+        req.state = "diandi_wx_login";
+        MyApplication.mWXApi.sendReq(req);
     }
 
     private void executeQQLogin() {

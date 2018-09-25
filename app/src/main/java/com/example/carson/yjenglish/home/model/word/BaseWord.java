@@ -1,4 +1,4 @@
-package com.example.carson.yjenglish.home.model;
+package com.example.carson.yjenglish.home.model.word;
 
 /**
  * Created by 84594 on 2018/8/9.

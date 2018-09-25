@@ -1,5 +1,7 @@
 package com.example.carson.yjenglish.utils;
 
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -14,9 +16,11 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.customviews.PickerView;
 
@@ -24,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by 84594 on 2018/8/13.
@@ -83,17 +88,50 @@ public class DialogUtils {
         return mDialog;
     }
 
+    public AlertDialog newTipsDialog(String text, int textAlignment) {
+        View contentView = View.inflate(ctx, R.layout.layout_tips_dialog, null);
+        TextView tipsText = contentView.findViewById(R.id.tips_text);
+        TextView tipsCancel = contentView.findViewById(R.id.tips_cancel);
+        TextView tipsConfirm = contentView.findViewById(R.id.tips_confirm);
+        tipsText.setTextAlignment(textAlignment);
+        tipsText.setText(text);
+        final AlertDialog mDialog = new AlertDialog.Builder(ctx).setView(contentView).create();
+        Window window = mDialog.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        tipsCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDialog.dismiss();
+            }
+        });
+        tipsConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (tipsListener != null) {
+                    tipsListener.onConfirm();
+                    mDialog.dismiss();
+                }
+            }
+        });
+        return mDialog;
+    }
+
     /**
      * common dialog
      * @param text
      * @param imgRes
+     * @param asGif
      */
-    public AlertDialog newCommonDialog(String text, int imgRes) {
+    public AlertDialog newCommonDialog(String text, int imgRes, boolean asGif) {
         View contentView = View.inflate(ctx, R.layout.layout_common_dialog, null);
         ImageView commonImg = contentView.findViewById(R.id.common_img);
         TextView commonText = contentView.findViewById(R.id.common_text);
         commonText.setText(text);
-        Glide.with(ctx).load(imgRes).into(commonImg);
+        if (asGif) {
+            Glide.with(ctx).load(imgRes).asGif().diskCacheStrategy(DiskCacheStrategy.SOURCE).into(commonImg);
+        } else {
+            Glide.with(ctx).load(imgRes).into(commonImg);
+        }
         AlertDialog mDialog = new AlertDialog.Builder(ctx).setView(contentView).create();
         Window window = mDialog.getWindow();
         window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -256,6 +294,27 @@ public class DialogUtils {
             }
         });
         return dialog;
+    }
+
+    public Dialog newAnimatedLoadingDialog() {
+        View contentView = View.inflate(ctx, R.layout.layout_common_dialog, null);
+        ImageView commonImg = contentView.findViewById(R.id.common_img);
+        TextView commonText = contentView.findViewById(R.id.common_text);
+        commonText.setText("加载中");
+        Glide.with(contentView.getContext()).load(R.mipmap.ic_load_more).into(commonImg);
+        final ObjectAnimator animator = ObjectAnimator.ofFloat(commonImg, "rotation", 0, 360);
+        animator.setDuration(500).start();
+
+        AlertDialog mDialog = new AlertDialog.Builder(ctx).setView(contentView).create();
+        Window window = mDialog.getWindow();
+        window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        mDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                animator.cancel();
+            }
+        });
+        return mDialog;
     }
 
     public void setPickerListener(OnPickerListener mPickerListener) {

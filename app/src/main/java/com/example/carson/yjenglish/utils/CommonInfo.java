@@ -7,6 +7,7 @@ package com.example.carson.yjenglish.utils;
 public class CommonInfo {
     private String status;
     private String msg;
+    private String data;
 
     public String getStatus() {
         return status;
@@ -22,5 +23,13 @@ public class CommonInfo {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    public void setData(String data) {
+        this.data = data;
     }
 }

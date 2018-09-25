@@ -23,9 +23,9 @@
 
         <ImageView
             android:id="@+id/like"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:src="@drawable/ic_like_white_stroke"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/sel_discover_like"
             android:layout_marginEnd="20dp"
             android:layout_marginTop="15dp"
             app:layout_constraintTop_toTopOf="parent"

@@ -101,16 +101,14 @@ public class MyProgressView extends View {
         int paddingBottom = getPaddingBottom();
         int width = getWidth() - paddingLeft - paddingRight;
         int height = getHeight() - paddingBottom - paddingTop;
-//        canvas.drawLine(170 + paddingLeft, height + paddingTop - 48,
-//                190 + paddingLeft, height + paddingTop - 80, mBgPaint);
+
         canvas.drawArc(paddingLeft, paddingTop, width + paddingLeft,
                 height + paddingTop, -240, 300, false, mBgPaint);
         canvas.drawArc(20 + paddingLeft, 20 + paddingTop, width - 20 + paddingLeft,
                 height - 20 + paddingTop, -238, 296, false, mTrackPaint);
         canvas.drawArc(40 + paddingLeft, 40 + paddingTop, width - 40 + paddingLeft,
                 height - 40 + paddingTop, -240, 300, false, mBgPaint);
-//        canvas.drawLine(width - 170 + paddingLeft, height + paddingTop - 48,
-//                width - 190 + paddingLeft, height + paddingTop - 80, mBgPaint);
+
         canvas.drawArc(20 + paddingLeft, 20 + paddingTop, width - 20 + paddingLeft,
                 height - 20 + paddingTop, -237, 295 * (progress / 100), false, mProgressPaint);
     }

@@ -23,7 +23,6 @@ import android.widget.Toast;
 
 import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.TestService;
 import com.example.carson.yjenglish.checkcode.CodeContract;
 import com.example.carson.yjenglish.checkcode.CodeTask;
 import com.example.carson.yjenglish.checkcode.SmsContent;
@@ -360,12 +359,6 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
 
     @Override
     public void getCode(CommonInfo info) {
-//        if (code == 200) {
-//            Toast.makeText(this, "OK", Toast.LENGTH_SHORT).show();
-//            //开始倒数
-//            startCountDown();
-//            doReadAction();
-//        }
         if (info.getStatus().equals("200")) {
             if (mIntentType == INTENT_TYPE_REGISTER) {
                 Intent toSetPwd = new Intent(this, SetupPasswordActivity.class);

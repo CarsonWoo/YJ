@@ -138,7 +138,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
     }
 
     private void bindPicHolder(PicHolder picHolder) {
-        if (picItem.getNumber() != null) {
+        if (picItem != null && picItem.getNumber() != null) {
             picHolder.learnerNum.setText(picItem.getNumber());
         }
         picHolder.start.setOnClickListener(new View.OnClickListener() {
@@ -362,7 +362,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         TextView learnerNum;
         Button start;
         RelativeLayout toMusic;
-       FrameLayout multiPortraitView;
+        FrameLayout multiPortraitView;
 
         public PicHolder(View itemView) {
             super(itemView);

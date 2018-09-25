@@ -20,6 +20,13 @@ import me.drakeet.multitype.ItemViewBinder;
  */
 
 public class SituationViewBinder extends ItemViewBinder<WordSituation, SituationViewBinder.ViewHolder> {
+
+    private SituationListener listener;
+
+    public SituationViewBinder(SituationListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     protected ViewHolder onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent) {
@@ -28,10 +35,18 @@ public class SituationViewBinder extends ItemViewBinder<WordSituation, Situation
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull WordSituation item) {
+    protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull final WordSituation item) {
         holder.sentence.setText(item.getText());
         holder.sentenceTrans.setText(item.getTrans());
-        Glide.with(holder.img.getContext()).load(item.getImgUrl()).thumbnail(0.5f).into(holder.img);
+        Glide.with(holder.img.getContext()).load(item.getImgUrl()).thumbnail(0.2f).into(holder.img);
+        holder.sound.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onSentenceSoundClick(item.getSoundUrl());
+                }
+            }
+        });
     }
 
     static class ViewHolder extends BaseViewHolder {
@@ -46,5 +61,9 @@ public class SituationViewBinder extends ItemViewBinder<WordSituation, Situation
             sentenceTrans = itemView.findViewById(R.id.sentence_trans);
             sound = itemView.findViewById(R.id.play_sound);
         }
+    }
+
+    public interface SituationListener {
+        void onSentenceSoundClick(String mAACFile);
     }
 }

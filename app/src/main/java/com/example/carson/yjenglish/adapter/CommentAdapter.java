@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.home.model.forviewbinder.Comment;
 import com.example.carson.yjenglish.utils.ScreenUtils;
@@ -54,6 +56,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             holder.content.setVisibility(View.VISIBLE);
             holder.content.setText("作者回复：" + holder.item.getContent());
             holder.content.setTextColor(Color.parseColor("#656565"));
+            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) holder.content.getLayoutParams();
+            lp.width = ScreenUtils.dp2px(MyApplication.getContext(), 260);
+            lp.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+            holder.content.setLayoutParams(lp);
+        } else {
+            holder.content.setLayoutParams(new ConstraintLayout.LayoutParams(0, 0));
         }
         if (holder.item.isHasReply()) {
             holder.replyComment.setVisibility(View.VISIBLE);
@@ -61,6 +69,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                     null, false);
             initChildView(childView, holder.item);
             holder.replyComment.addView(childView);
+            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) holder.replyComment.getLayoutParams();
+            lp.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
+            lp.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+            holder.replyComment.setLayoutParams(lp);
+        } else {
+            holder.replyComment.setLayoutParams(new ConstraintLayout.LayoutParams(0, 0));
         }
         holder.divider.setVisibility(View.VISIBLE);
         Glide.with(ctx).load(holder.item.getPortraitUrl()).thumbnail(0.8f).into(holder.portrait);

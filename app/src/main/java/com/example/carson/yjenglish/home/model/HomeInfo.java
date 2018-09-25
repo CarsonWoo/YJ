@@ -42,7 +42,9 @@ public class HomeInfo {
         private String rest_days;
         private String my_plan;
         private String plan_number;
+        private String study_people;
         private List<Feed> feeds;
+        private List<String> head_user_portrait;
 
         public List<Feed> getFeeds() {
             return feeds;
@@ -100,6 +102,22 @@ public class HomeInfo {
             this.flag = flag;
         }
 
+        public String getStudy_people() {
+            return study_people;
+        }
+
+        public void setStudy_people(String study_people) {
+            this.study_people = study_people;
+        }
+
+        public List<String> getHead_user_portrait() {
+            return head_user_portrait;
+        }
+
+        public void setHead_user_portrait(List<String> head_user_portrait) {
+            this.head_user_portrait = head_user_portrait;
+        }
+
         public class Feed {
             private String id;
             private String comments;
@@ -110,7 +128,7 @@ public class HomeInfo {
             private String author_portrait;
             private String video;
             private String type;
-            private String isLike;
+            private String is_favour;
 
             public String getType() {
                 return type;
@@ -184,12 +202,12 @@ public class HomeInfo {
                 this.id = id;
             }
 
-            public String getIsLike() {
-                return isLike;
+            public String getIs_favour() {
+                return is_favour;
             }
 
-            public void setIsLike(String isLike) {
-                this.isLike = isLike;
+            public void setIs_favour(String is_favour) {
+                this.is_favour = is_favour;
             }
         }
     }
