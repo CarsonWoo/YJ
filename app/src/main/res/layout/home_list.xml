@@ -95,7 +95,7 @@
                 android:id="@+id/comment_num"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="238"
+                android:hint="123"
                 android:gravity="center"
                 android:drawablePadding="4dp"
                 android:drawableStart="@drawable/ic_comment_black"
@@ -105,15 +105,23 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 />
 
+            <ImageView
+                android:id="@+id/iv_favour"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
+                android:src="@drawable/selector_homepage_feeds_like"
+                app:layout_constraintEnd_toStartOf="@id/like_num"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
             <TextView
                 android:id="@+id/like_num"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:hint="233"
+                android:hint="999w"
                 android:layout_marginEnd="10dp"
                 android:gravity="center"
-                android:drawablePadding="4dp"
-                android:drawableStart="@drawable/ic_like_black_stroke"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"

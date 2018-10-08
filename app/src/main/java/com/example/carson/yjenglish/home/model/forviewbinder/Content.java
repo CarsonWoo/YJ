@@ -1,6 +1,5 @@
 package com.example.carson.yjenglish.home.model.forviewbinder;
 
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 
 /**
@@ -8,18 +7,18 @@ import android.text.SpannableStringBuilder;
  */
 
 public class Content {
+    private String author_id;
     private String title;
     private String portraitUrl;
     private String username;
-    private SpannableStringBuilder text;
     private String likeNum;
 
-    public Content(String title, String portraitUrl, String username, SpannableStringBuilder text,
+    public Content(String author_id, String title, String portraitUrl, String username,
                    String likeNum) {
+        this.author_id = author_id;
         this.title = title;
         this.portraitUrl = portraitUrl;
         this.username = username;
-        this.text = text;
         this.likeNum = likeNum;
     }
 
@@ -35,11 +34,11 @@ public class Content {
         return username;
     }
 
-    public SpannableStringBuilder getText() {
-        return text;
-    }
-
     public String getLikeNum() {
         return likeNum;
+    }
+
+    public String getAuthor_id() {
+        return author_id;
     }
 }

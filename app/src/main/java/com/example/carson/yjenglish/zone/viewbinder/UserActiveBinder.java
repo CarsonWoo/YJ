@@ -13,6 +13,7 @@ import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.BaseViewHolder;
 import com.example.carson.yjenglish.customviews.RoundRectImageView;
 import com.example.carson.yjenglish.zone.model.forviewbinder.UserActive;
+import com.example.carson.yjenglish.zone.view.users.ActiveFragment;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.drakeet.multitype.ItemViewBinder;
@@ -22,6 +23,12 @@ import me.drakeet.multitype.ItemViewBinder;
  */
 
 public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinder.ViewHolder> {
+
+    private ActiveFragment.OnActiveItemListener mListener;
+
+    public UserActiveBinder(ActiveFragment.OnActiveItemListener listener) {
+        this.mListener = listener;
+    }
 
     @NonNull
     @Override
@@ -83,12 +90,20 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         }
     }
 
-    private void initDailyView(View view, UserActive item) {
+    private void initDailyView(View view, final UserActive item) {
         RoundRectImageView img = view.findViewById(R.id.cover_img);
         TextView time = view.findViewById(R.id.like_time);
 
         Glide.with(view.getContext()).load(item.getDailyCardItem().getImgUrl()).thumbnail(0.5f).into(img);
         time.setText(item.getDailyCardItem().getTime());
+        img.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onItemClick(item.getItemType());
+                }
+            }
+        });
     }
 
     private void initWordView(View view, UserActive item) {
@@ -104,7 +119,7 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         time.setText(item.getWordItem().getTime());
     }
 
-    private void initMusicView(View view, UserActive item) {
+    private void initMusicView(View view, final UserActive item) {
         RoundRectImageView mMusicView = view.findViewById(R.id.my_card_view);
         TextView word = view.findViewById(R.id.word_tag);
         TextView meaning = view.findViewById(R.id.meaning);
@@ -113,9 +128,17 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         word.setText(item.getMusicItem().getWord());
         meaning.setText(item.getMusicItem().getMeaning());
         time.setText(item.getMusicItem().getTime());
+        mMusicView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onItemClick(item.getItemType());
+                }
+            }
+        });
     }
 
-    private void initTVView(View view, UserActive item) {
+    private void initTVView(View view, final UserActive item) {
         CardView mTVView = view.findViewById(R.id.my_card_view);
         RoundRectImageView img = view.findViewById(R.id.cover_img);
         TextView viewNum = view.findViewById(R.id.view_num);
@@ -128,9 +151,17 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         word.setText(item.getTvFeeds().getTag());
         soundMark.setText(item.getTvFeeds().getSoundMark());
         time.setText(item.getTvFeeds().getTime());
+        mTVView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onItemClick(item.getItemType());
+                }
+            }
+        });
     }
 
-    private void initHomeView(View view, UserActive item) {
+    private void initHomeView(View view, final UserActive item) {
         CardView mHomeView = view.findViewById(R.id.my_card_view);
         TextView title = view.findViewById(R.id.title);
         CircleImageView authorPortrait = view.findViewById(R.id.portrait);
@@ -145,6 +176,14 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         time.setText(item.getHomeFeeds().getTime());
 
         //mHomeView.setClickListener
+        mHomeView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onItemClick(item.getItemType());
+                }
+            }
+        });
     }
 
     static class ViewHolder extends BaseViewHolder {

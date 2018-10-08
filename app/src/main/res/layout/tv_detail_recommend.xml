@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="2dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/tv_detail_card"
+        android:layout_width="180dp"
+        android:layout_height="120dp"
+        app:cardBackgroundColor="@android:color/transparent"
+        app:cardCornerRadius="8dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginEnd="6dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.example.carson.yjenglish.customviews.RoundRectImageView
+            android:id="@+id/tv_detail_header"
+            android:layout_width="180dp"
+            android:layout_height="120dp"
+            android:src="@color/colorPrimary"
+            app:radius="20" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:src="@drawable/ic_play_white_solid" />
+
+        <TextView
+            android:id="@+id/tv_detail_view_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="2dp"
+            android:layout_marginStart="25dp"
+            android:text="12.3w"
+            android:textColor="@android:color/white"
+            android:textSize="14sp" />
+    </android.support.v7.widget.CardView>
+
+    <TextView
+        android:id="@+id/tv_detail_word"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:text="color"
+        android:textSize="15sp"
+        android:textColor="@color/colorTextWord"
+        app:layout_constraintStart_toStartOf="@id/tv_detail_card"
+        app:layout_constraintTop_toBottomOf="@id/tv_detail_card" />
+
+</android.support.constraint.ConstraintLayout>

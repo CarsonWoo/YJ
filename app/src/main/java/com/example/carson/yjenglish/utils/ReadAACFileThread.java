@@ -1,5 +1,6 @@
 package com.example.carson.yjenglish.utils;
 
+import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
@@ -25,6 +26,12 @@ public class ReadAACFileThread extends Thread {
     private int PRE_FRAME_TIME = 1000 / 50;
     //记录获取的帧数
     private int count = 0;
+
+    public ReadAACFileThread() {
+        this.audioUtil = new AACDecoderUtil();
+        this.filePath = Environment.getExternalStorageDirectory().getPath() + "/Carson" + "/test.mp3";
+        this.audioUtil.start();
+    }
 
     public ReadAACFileThread(String path) {
         this.audioUtil = new AACDecoderUtil();
@@ -97,7 +104,7 @@ public class ReadAACFileThread extends Thread {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            Log.e("ReadAACFileThread", "AllCount:" + count + "Error Count : " + audioUtil.getCount());
+            Log.e("ReadAACFileThread", "AllCount:" + count + " Error Count : " + audioUtil.getCount());
         } else {
             Log.e("ReadH264FileThread", "File not found");
         }

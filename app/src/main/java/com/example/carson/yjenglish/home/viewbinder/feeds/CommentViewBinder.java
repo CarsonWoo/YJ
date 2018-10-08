@@ -50,17 +50,25 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         Log.e("BindHolder", "holder position = " + holder.getAdapterPosition());
         holder.itemView.setVisibility(View.VISIBLE);
         if (item.isAuthorReplied()) {
+            Log.e("CommentHolder", "author replied");
             holder.content.setVisibility(View.VISIBLE);
             holder.content.setText("作者回复" + item.getUsername() + "：" + item.getContent());
             holder.content.setTextColor(Color.parseColor("#656565"));
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) holder.content.getLayoutParams();
             lp.width = ScreenUtils.dp2px(MyApplication.getContext(), 260);
             lp.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+            lp.topToBottom = holder.menuMore.getId();
+            lp.startToStart = holder.time.getId();
             holder.content.setLayoutParams(lp);
         } else {
-            holder.content.setLayoutParams(new ConstraintLayout.LayoutParams(0, 0));
+            ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) holder.content.getLayoutParams();
+            lp.width = 0;
+            lp.height = 0;
+            holder.content.setLayoutParams(lp);
+            Log.e("CommentHolder", "author not replied");
         }
         if (item.isHasReply()) {
+            Log.e("CommentHolder", "has sub comment");
             holder.replyComment.setVisibility(View.VISIBLE);
             View childView = LayoutInflater.from(holder.replyComment.getContext()).inflate(R.layout.home_detail_comment,
                     null, false);
@@ -69,25 +77,33 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) holder.replyComment.getLayoutParams();
             lp.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
             lp.height = ConstraintLayout.LayoutParams.WRAP_CONTENT;
+            lp.topToBottom = holder.menuMore.getId();
+            if (item.isAuthorReplied()) {
+                lp.setMargins(0, ScreenUtils.dp2px(holder.itemView.getContext(), 30),
+                        0, 0);
+            }
             holder.replyComment.setLayoutParams(lp);
         } else {
+            Log.e("CommentHolder", "has not sub comment");
             holder.replyComment.setLayoutParams(new ConstraintLayout.LayoutParams(0, 0));
         }
         holder.divider.setVisibility(View.VISIBLE);
-        Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).thumbnail(0.8f).into(holder.portrait);
+        Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).thumbnail(0.5f).into(holder.portrait);
         holder.username.setText(item.getUsername());
         holder.time.setText(item.getTime());
         holder.comment.setText(item.getComment());
         if (item.getLikeNum() == 0) {
             holder.likeNum.setText("");
         } else {
-            holder.likeNum.setText(item.getLikeNum() + "");
+            holder.likeNum.setText(String.valueOf(item.getLikeNum()));
         }
         holder.btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onLikeButtonClick(false);
+                    mListener.onLikeButtonClick(holder.likeNum, item.getComment_id(), false,
+                            item.isLike());
+                    item.setLike(!item.isLike());
                 }
             }
         });
@@ -95,7 +111,8 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onReply(item.getUsername(), holder.getAdapterPosition());
+                    mListener.onReply(item.getUsername(), holder.getAdapterPosition(),
+                            item.getComment_id());
                 }
             }
         });
@@ -103,6 +120,16 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
             @Override
             public void onClick(View view) {
                 initWindow(holder.menuMore);
+            }
+        });
+        holder.itemView.measure(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
+
+        holder.portrait.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onUserPortraitClick(item.getUser_id());
+                }
             }
         });
     }
@@ -132,12 +159,12 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         });
     }
 
-    private void initChildView(View childView, Comment item) {
+    private void initChildView(View childView, final Comment item) {
         ImageView portrait = childView.findViewById(R.id.portrait);
         TextView username = childView.findViewById(R.id.username);
         TextView reply = childView.findViewById(R.id.comment);
         ImageView btnLike = childView.findViewById(R.id.like_btn);
-        TextView likeNum = childView.findViewById(R.id.like_num);
+        final TextView likeNum = childView.findViewById(R.id.like_num);
         final ImageView menuMore = childView.findViewById(R.id.menu_more);
         TextView time = childView.findViewById(R.id.time);
         TextView content = childView.findViewById(R.id.fit_content);
@@ -151,14 +178,14 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         if (item.getReply().getLikeNum() == 0) {
             likeNum.setText("");
         } else {
-            likeNum.setText(item.getReply().getLikeNum() + "");
+            likeNum.setText(String.valueOf(item.getReply().getLikeNum()));
         }
         time.setText(item.getReply().getTime());
         content.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onLoadMoreReply();
+                    mListener.onLoadMoreReply(item.getUser_id());
                 }
             }
         });
@@ -166,7 +193,9 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onLikeButtonClick(true);
+                    mListener.onLikeButtonClick(likeNum, item.getComment_id(), true,
+                            item.isLike());
+                    item.setLike(!item.isLike());
                 }
             }
         });
@@ -174,6 +203,14 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
             @Override
             public void onClick(View view) {
                 initWindow(menuMore);
+            }
+        });
+        portrait.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onUserPortraitClick(item.getReply().getUser_id());
+                }
             }
         });
     }
@@ -209,8 +246,9 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
     }
 
     public interface OnItemSelectListener {
-        void onLoadMoreReply();
-        void onReply(String username, int pos);
-        void onLikeButtonClick(boolean isReply);
+        void onLoadMoreReply(String user_id);
+        void onReply(String username, int pos, String comment_id);
+        void onLikeButtonClick(TextView tv, String comment_id, boolean isReply, boolean isLike);
+        void onUserPortraitClick(String user_id);
     }
 }

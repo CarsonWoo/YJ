@@ -21,11 +21,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.carson.yjenglish.BaseActivity;
 import com.example.carson.yjenglish.FullScreenVideo;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.VideoCaptionModel;
 import com.example.carson.yjenglish.adapter.HomeListAdapter;
 import com.example.carson.yjenglish.customviews.MyVideoView;
 import com.example.carson.yjenglish.home.HomeInfoContract;
@@ -33,9 +36,11 @@ import com.example.carson.yjenglish.home.HomeService;
 import com.example.carson.yjenglish.home.model.HomeInfo;
 import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.home.model.PicHeader;
+import com.example.carson.yjenglish.home.view.feeds.HomeItemAty;
 import com.example.carson.yjenglish.home.view.word.SignAty;
 import com.example.carson.yjenglish.home.view.word.SignInAty;
 import com.example.carson.yjenglish.home.view.word.WordActivity;
+import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
@@ -49,6 +54,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -58,7 +66,7 @@ import rx.schedulers.Schedulers;
  * A simple {@link Fragment} subclass.
  */
 public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoListener,
-        HomeInfoContract.View{
+        HomeInfoContract.View {
 
     private final String TAG = "HomeFragment";
 
@@ -66,9 +74,11 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     public static final int REQUEST_SIGN_CODE = 102;
     public static final int REQUEST_MORE_CODE = 103;
     public static final int REQUEST_ADD_PLAN_CODE = 104;
+    public static final int REQUEST_TO_DETAIL = 105;
     public static final int RESULT_WORD_OK = 201;
     public static final int RESULT_SIGN_OK = 202;
     public static final int RESULT_ADD_PLAN_OK = 204;
+    public static final int RESULT_LIKE_CHANGE = 205;
 
     private RecyclerView recyclerView;
     private MyVideoView mVideoView;
@@ -88,7 +98,11 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     private List<String> portraits = new ArrayList<>();
     private List<HomeInfo.Data.Feed> mListData = new ArrayList<>();
 
+    private List<VideoCaptionModel> models;
+
     private boolean isFullClick = false;
+
+    private int clickFeedPos = 0;
 
     private String mCurDate;
 
@@ -115,7 +129,9 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         super.onActivityCreated(savedInstanceState);
         //作UI请求
         mDialog = new ProgressDialog(getActivity());
-        mPresenter.getInfo(UserConfig.getToken(getContext()));
+        if (mPresenter != null) {
+            mPresenter.getInfo(UserConfig.getToken(getContext()));
+        }
     }
 
     @Override
@@ -195,8 +211,10 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                 toFullScreen.putExtra("progress", progress);
                 toFullScreen.putExtra("path", path);
                 startActivityForResult(toFullScreen, 1);
-                getActivity().overridePendingTransition(R.anim.anim_top_rotate_get_into,
-                        R.anim.anim_top_rotate_sign_out);
+                if (getActivity() != null) {
+                    getActivity().overridePendingTransition(R.anim.anim_top_rotate_get_into,
+                            R.anim.anim_top_rotate_sign_out);
+                }
             }
         });
 
@@ -255,8 +273,6 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         initAdapterListener();
         recyclerView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
-
-
     }
 
     private void initAdapterListener() {
@@ -301,8 +317,66 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                 }
             }
         });
+
+        mAdapter.setItemListener(new HomeListAdapter.OnItemClickListener() {
+            /**
+             * 点击item的回调
+             * @param item
+             * @param requestComment 是否一进入就跳转到评论区
+             */
+            @Override
+            public void onClick(ArrayList item, boolean requestComment, int position) {
+                clickFeedPos = position;
+                HomeInfo.Data.Feed mItem = (HomeInfo.Data.Feed) item.get(0);
+                Intent toDetail = new Intent(getContext(), HomeItemAty.class);
+                toDetail.putExtra("id", mItem.getId());
+                toDetail.putExtra("video_url", mItem.getVideo());
+                toDetail.putExtra("img_url", mItem.getPic());
+                toDetail.putExtra("username", mItem.getAuthor_username());
+                toDetail.putExtra("title", mItem.getTitle());
+                toDetail.putExtra("portrait_url", mItem.getAuthor_portrait());
+                toDetail.putExtra("like_num", mItem.getLikes());
+                toDetail.putExtra("request_comment", requestComment);
+//        toDetail.putExtra("is_like", mItem.getIs_favour().equals("1"));
+                startActivityForResult(toDetail, REQUEST_TO_DETAIL);
+            }
+
+            @Override
+            public void onLikeClick(String id, String isFavour, TextView tv) {
+                executeFavourTask(id, isFavour, tv);
+            }
+        });
     }
 
+    private void executeFavourTask(String id, final String isFavour, final TextView tv) {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).postFavours(UserConfig.getToken(getContext()), id)
+                .enqueue(new Callback<CommonInfo>() {
+                    @Override
+                    public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                        if (response.body().getStatus().equals("200")) {
+                            String s = tv.getText().toString();
+                            int num = Integer.parseInt(s);
+                            if (isFavour.equals("1")) {
+                                //点击响应了说明取消了赞
+//                                imageView.setSelected(false);
+                                tv.setText(String.valueOf(num - 1));
+                            } else {
+//                                imageView.setSelected(true);
+                                tv.setText(String.valueOf(num + 1));
+                            }
+
+                        } else {
+                            Log.e(TAG, response.body().getMsg());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CommonInfo> call, Throwable t) {
+                        Toast.makeText(getContext(), "连接超时", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -316,7 +390,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             } else if (resultCode == FullScreenVideo.RESULT_VIDEO_NOT_FINISH) {
                 if (mVideoView != null) {
                     mVideoView.seekTo(data.getIntExtra("progress", 0));
-                    mVideoView.start();
+                    mVideoView.resume();
                 }
                 isFullClick = false;
             }
@@ -325,12 +399,13 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             if (data != null) {
                 String learned_word = data.getStringExtra("learned_word");
                 if (learned_word != null) {
-                    mLoadData.setWordsCount(Integer.parseInt(learned_word));
+                    mLoadData.setWordsCount(mLoadData.getWordsCount() +
+                            Integer.parseInt(learned_word));
                 }
                 mLoadData.setInsistCount(mLoadData.getInsistCount() + 1);
             }
-            float progress = ((float) mLoadData.getWordsCount() /
-                    mLoadData.getTargetCount()) * 100;
+            float progress = ((float) mLoadData.getWordsCount() * 100 /
+                    mLoadData.getTargetCount());
             mLoadData.setProgress(progress);
             mLoadData.setTodayFinish(true);
             mLoadData.save();
@@ -368,6 +443,22 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             mLoadData.save();
 
             initViews(view);
+        } else if (requestCode == REQUEST_TO_DETAIL && resultCode == RESULT_LIKE_CHANGE) {
+//            Log.e(TAG, "onActivityResult(1)");
+            mListData.get(clickFeedPos).setIs_favour(data.getStringExtra("favour_change"));
+            RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(clickFeedPos + 1);
+            if (holder != null && holder instanceof HomeListAdapter.HomeViewHolder) {
+//                Log.e(TAG, "onActivityResult(2)");
+                ((HomeListAdapter.HomeViewHolder) holder).ivFavour.setSelected(
+                        mListData.get(clickFeedPos).getIs_favour().equals("1"));
+                int num = Integer.parseInt(((HomeListAdapter.HomeViewHolder) holder).likeNum.getText().toString());
+                if (mListData.get(clickFeedPos).getIs_favour().equals("1")) {
+                    ((HomeListAdapter.HomeViewHolder) holder).likeNum.setText(String.valueOf(num + 1));
+                } else {
+                    ((HomeListAdapter.HomeViewHolder) holder).likeNum.setText(String.valueOf(num - 1));
+                }
+            }
+//            mAdapter.notifyItemChanged(clickFeedPos + 1);//跳过头部
         }
     }
 
@@ -545,7 +636,6 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 
     public interface OnHomeInteractListener {
         void onMusicPressed(View view);
-        void onItemClick(ArrayList item, boolean requestComment);
         void onProgressClick(View view);
     }
 

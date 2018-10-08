@@ -17,12 +17,10 @@ import android.util.Log;
 import android.view.View;
 
 import com.example.carson.yjenglish.broadcastreceiver.NetworkReceiver;
-import com.example.carson.yjenglish.discover.DiscoverFragment;
+import com.example.carson.yjenglish.discover.view.DiscoverFragment;
 import com.example.carson.yjenglish.home.HomeInfoTask;
-import com.example.carson.yjenglish.home.model.HomeInfo;
 import com.example.carson.yjenglish.home.presenter.HomeInfoPresenter;
 import com.example.carson.yjenglish.home.view.HomeFragment;
-import com.example.carson.yjenglish.home.view.feeds.HomeItemAty;
 import com.example.carson.yjenglish.login.view.LoginActivity;
 import com.example.carson.yjenglish.music.view.MusicActivity;
 import com.example.carson.yjenglish.home.view.word.WordListAty;
@@ -33,8 +31,6 @@ import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.view.setting.SettingAty;
 import com.example.carson.yjenglish.zone.view.ZoneFragment;
-
-import java.util.ArrayList;
 
 public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInteractListener,
         NetUtils.NetEvent, ZoneFragment.OnZoneEventListener {
@@ -240,27 +236,6 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
         overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
     }
 
-    /**
-     * 点击item的回调
-     * @param item
-     * @param requestComment 是否一进入就跳转到评论区
-     */
-    @Override
-    public void onItemClick(ArrayList item, boolean requestComment) {
-        HomeInfo.Data.Feed mItem = (HomeInfo.Data.Feed) item.get(0);
-        Intent toDetail = new Intent(this, HomeItemAty.class);
-        toDetail.putExtra("id", mItem.getId());
-        toDetail.putExtra("video_url", mItem.getVideo());
-        toDetail.putExtra("img_url", mItem.getPic());
-        toDetail.putExtra("username", mItem.getAuthor_username());
-        toDetail.putExtra("title", mItem.getTitle());
-        toDetail.putExtra("portrait_url", mItem.getAuthor_portrait());
-        toDetail.putExtra("like_num", mItem.getLikes());
-        toDetail.putExtra("request_comment", requestComment);
-        toDetail.putExtra("is_like", mItem.getIs_favour().equals("1"));
-        startActivity(toDetail);
-    }
-
     @Override
     public void onProgressClick(View view) {
         Intent toWordList = new Intent(HomeActivity.this, WordListAty.class);
@@ -341,6 +316,8 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
                 Log.e(TAG, "finish");
                 MusicActivity.INSTANCE.finishAffinity();
             }
+        } else if (requestCode == 200 && resultCode == 201) {
+
         }
     }
 }

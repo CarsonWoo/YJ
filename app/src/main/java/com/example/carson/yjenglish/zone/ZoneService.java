@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish.zone;
 
 import com.example.carson.yjenglish.utils.CommonInfo;
+import com.example.carson.yjenglish.zone.model.OtherUsersPlanInfo;
 import com.example.carson.yjenglish.zone.model.ZoneInfo;
 
 import java.io.File;
@@ -32,7 +33,7 @@ public interface ZoneService {
 
     @Multipart
     @POST("user/edit_portrait.do")
-    Call<CommonInfo> changeUserPortrait(@Header("token") String token,
+    Call<CommonInfo> changeUserPortrait(/*@Header("token") String token,*/
                                         @Part MultipartBody.Part img);
 
     @POST("various/advice.do")
@@ -40,4 +41,9 @@ public interface ZoneService {
     Observable<CommonInfo> sendAdvice(@Header("token") String token,
                                       @Field("advice") String advice,
                                       @Field("level") String level);
+
+    @POST("user/its_plan.do")
+    @FormUrlEncoded
+    Call<OtherUsersPlanInfo> getPlans(@Header("token") String token,
+                                      @Field("user_id") String user_id);
 }

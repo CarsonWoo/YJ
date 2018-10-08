@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -18,106 +20,263 @@
         app:layout_constraintStart_toStartOf="parent"
         />
 
-    <android.support.v7.widget.CardView
-        android:id="@+id/card_first"
-        android:layout_width="160dp"
-        android:layout_height="100dp"
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:scrollbars="none"
         android:layout_marginTop="80dp"
-        app:cardCornerRadius="8dp"
-        app:cardBackgroundColor="@android:color/transparent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/card_second">
-        <com.example.carson.yjenglish.customviews.RoundRectImageView
-            android:id="@+id/header_first"
-            android:layout_width="160dp"
-            android:layout_height="100dp"
-            app:radius="20"
-            android:src="@color/colorPrimary"
-            />
-    </android.support.v7.widget.CardView>
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/card_first"
+                    android:layout_width="160dp"
+                    android:layout_height="100dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="8dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="6dp"
+                    app:layout_constraintEnd_toStartOf="@id/card_second"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.example.carson.yjenglish.customviews.RoundRectImageView
+                        android:id="@+id/header_first"
+                        android:layout_width="160dp"
+                        android:layout_height="100dp"
+                        android:src="@color/colorPrimary"
+                        app:radius="20" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|start"
+                        android:src="@drawable/ic_play_white_solid" />
+
+                    <TextView
+                        android:id="@+id/first_view_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginStart="25dp"
+                        android:text="12.3w"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+                </android.support.v7.widget.CardView>
+
+                <TextView
+                    android:id="@+id/word_first"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="color"
+                    android:textColor="@color/colorTextWord"
+                    app:layout_constraintStart_toStartOf="@id/card_first"
+                    app:layout_constraintTop_toBottomOf="@id/card_first" />
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/card_second"
+                    android:layout_width="160dp"
+                    android:layout_height="100dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="8dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="6dp"
+                    app:layout_constraintEnd_toStartOf="@id/card_third"
+                    app:layout_constraintStart_toEndOf="@id/card_first"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.example.carson.yjenglish.customviews.RoundRectImageView
+                        android:id="@+id/header_second"
+                        android:layout_width="160dp"
+                        android:layout_height="100dp"
+                        android:src="@color/colorAccent"
+                        app:radius="20" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|start"
+                        android:src="@drawable/ic_play_white_solid" />
+
+                    <TextView
+                        android:id="@+id/second_view_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginStart="25dp"
+                        android:text="14.6w"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+                </android.support.v7.widget.CardView>
+
+                <TextView
+                    android:id="@+id/word_second"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="beautiful"
+                    android:textColor="@color/colorTextWord"
+                    app:layout_constraintStart_toStartOf="@id/card_second"
+                    app:layout_constraintTop_toBottomOf="@id/card_second" />
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/card_third"
+                    android:layout_width="160dp"
+                    android:layout_height="100dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="8dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="6dp"
+                    app:layout_constraintEnd_toStartOf="@id/card_fourth"
+                    app:layout_constraintStart_toEndOf="@id/card_second"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.example.carson.yjenglish.customviews.RoundRectImageView
+                        android:id="@+id/header_third"
+                        android:layout_width="160dp"
+                        android:layout_height="100dp"
+                        android:src="@color/colorAccent"
+                        app:radius="20" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|start"
+                        android:src="@drawable/ic_play_white_solid" />
+
+                    <TextView
+                        android:id="@+id/third_view_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginStart="25dp"
+                        android:text="11.6w"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+
+                </android.support.v7.widget.CardView>
+                <TextView
+                    android:id="@+id/word_third"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="travel"
+                    android:textColor="@color/colorTextWord"
+                    app:layout_constraintStart_toStartOf="@id/card_third"
+                    app:layout_constraintTop_toBottomOf="@id/card_third" />
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/card_fourth"
+                    android:layout_width="160dp"
+                    android:layout_height="100dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="8dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="6dp"
+                    app:layout_constraintEnd_toStartOf="@id/card_fifth"
+                    app:layout_constraintStart_toEndOf="@id/card_third"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.example.carson.yjenglish.customviews.RoundRectImageView
+                        android:id="@+id/header_fourth"
+                        android:layout_width="160dp"
+                        android:layout_height="100dp"
+                        android:src="@color/colorAccent"
+                        app:radius="20" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|start"
+                        android:src="@drawable/ic_play_white_solid" />
+
+                    <TextView
+                        android:id="@+id/fourth_view_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginStart="25dp"
+                        android:text="11.6w"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+
+                </android.support.v7.widget.CardView>
+                <TextView
+                    android:id="@+id/word_fourth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="travel"
+                    android:textColor="@color/colorTextWord"
+                    app:layout_constraintStart_toStartOf="@id/card_fourth"
+                    app:layout_constraintTop_toBottomOf="@id/card_fourth" />
+
+                <android.support.v7.widget.CardView
+                    android:id="@+id/card_fifth"
+                    android:layout_width="160dp"
+                    android:layout_height="100dp"
+                    app:cardBackgroundColor="@android:color/transparent"
+                    app:cardCornerRadius="8dp"
+                    android:layout_marginStart="6dp"
+                    android:layout_marginEnd="12dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/card_fourth"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <com.example.carson.yjenglish.customviews.RoundRectImageView
+                        android:id="@+id/header_fifth"
+                        android:layout_width="160dp"
+                        android:layout_height="100dp"
+                        android:src="@color/colorAccent"
+                        app:radius="20" />
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom|start"
+                        android:src="@drawable/ic_play_white_solid" />
+
+                    <TextView
+                        android:id="@+id/fifth_view_num"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:layout_marginBottom="2dp"
+                        android:layout_marginStart="25dp"
+                        android:text="11.6w"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp" />
+
+                </android.support.v7.widget.CardView>
+                <TextView
+                    android:id="@+id/word_fifth"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="travel"
+                    android:textColor="@color/colorTextWord"
+                    app:layout_constraintStart_toStartOf="@id/card_fifth"
+                    app:layout_constraintTop_toBottomOf="@id/card_fifth" />
+
+            </android.support.constraint.ConstraintLayout>
+
+        </LinearLayout>
 
 
-
-    <TextView
-        android:id="@+id/word_first"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="color"
-        android:textColor="@color/colorTextWord"
-        android:layout_marginTop="5dp"
-        app:layout_constraintStart_toStartOf="@id/card_first"
-        app:layout_constraintTop_toBottomOf="@id/card_first"/>
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/card_second"
-        android:layout_width="160dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="80dp"
-        app:cardCornerRadius="8dp"
-        app:cardBackgroundColor="@android:color/transparent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/card_first"
-        app:layout_constraintEnd_toEndOf="parent">
-        <com.example.carson.yjenglish.customviews.RoundRectImageView
-            android:id="@+id/header_second"
-            android:layout_width="160dp"
-            android:layout_height="100dp"
-            app:radius="20"
-            android:src="@color/colorAccent"
-            />
-    </android.support.v7.widget.CardView>
-
-
-    <TextView
-        android:id="@+id/word_second"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="beautiful"
-        android:textColor="@color/colorTextWord"
-        android:layout_marginTop="5dp"
-        app:layout_constraintStart_toStartOf="@id/card_second"
-        app:layout_constraintTop_toBottomOf="@id/card_second"/>
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_play_white_solid"
-        app:layout_constraintBottom_toBottomOf="@id/card_first"
-        app:layout_constraintStart_toStartOf="@id/card_first"
-        />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_play_white_solid"
-        app:layout_constraintBottom_toBottomOf="@id/card_second"
-        app:layout_constraintStart_toStartOf="@id/card_second"
-        />
-
-    <TextView
-        android:id="@+id/first_view_num"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:text="12.3w"
-        android:textSize="14sp"
-        android:layout_marginBottom="2dp"
-        android:layout_marginStart="25dp"
-        app:layout_constraintStart_toStartOf="@id/card_first"
-        app:layout_constraintBottom_toBottomOf="@id/card_first"
-        />
-
-    <TextView
-        android:id="@+id/second_view_num"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:text="14.6w"
-        android:textSize="14sp"
-        android:layout_marginBottom="2dp"
-        android:layout_marginStart="25dp"
-        app:layout_constraintStart_toStartOf="@id/card_second"
-        app:layout_constraintBottom_toBottomOf="@id/card_second"
-        />
+    </HorizontalScrollView>
 </android.support.constraint.ConstraintLayout>

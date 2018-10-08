@@ -31,8 +31,8 @@ public class HomeFeedsBinder extends ItemViewBinder<HomeFeeds, HomeFeedsBinder.V
 
     @Override
     protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull HomeFeeds item) {
-        Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).thumbnail(0.5f).into(holder.portrait);
-        Glide.with(holder.coverImg.getContext()).load(item.getImgUrl()).thumbnail(0.5f).into(holder.coverImg);
+        Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).crossFade().thumbnail(0.3f).into(holder.portrait);
+        Glide.with(holder.coverImg.getContext()).load(item.getImgUrl()).thumbnail(0.3f).into(holder.coverImg);
         holder.title.setText(item.getTitle());
         holder.time.setText(item.getTime());
         holder.authorName.setText(item.getAuthorName());

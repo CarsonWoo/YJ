@@ -3,6 +3,7 @@ package com.example.carson.yjenglish;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +12,8 @@ import android.view.View;
 import com.example.carson.yjenglish.login.view.LoginActivity;
 import com.example.carson.yjenglish.register.view.RegisterActivity;
 import com.example.carson.yjenglish.utils.UserConfig;
+
+import java.io.File;
 
 public class StartActivity extends AppCompatActivity {
 
@@ -22,6 +25,12 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start);
 
         mLayout = findViewById(R.id.start_layout);
+
+        File recordDirectory = new File(Environment.getExternalStorageDirectory().getPath() +
+                    "/YuJingRecorder");
+        if (!recordDirectory.exists()) {
+            recordDirectory.mkdirs();
+        }
 
         mLayout.postDelayed(new Runnable() {
             @Override

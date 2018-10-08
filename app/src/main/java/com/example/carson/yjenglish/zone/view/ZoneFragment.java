@@ -23,6 +23,7 @@ import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.ZoneTask;
 import com.example.carson.yjenglish.zone.model.ZoneInfo;
 import com.example.carson.yjenglish.zone.presenter.ZonePresenter;
+import com.example.carson.yjenglish.zone.view.comment.MyCommentAty;
 import com.example.carson.yjenglish.zone.view.download.MyDownloadAty;
 import com.example.carson.yjenglish.zone.view.like.MyLikeAty;
 import com.example.carson.yjenglish.zone.view.plan.PlanActivity;
@@ -104,7 +105,21 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
         initPlan();
         initLike();
         initDownload();
+        initComment();
         initSetting();
+    }
+
+    private void initComment() {
+        comment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent toComment = new Intent(getContext(), MyCommentAty.class);
+                startActivity(toComment);
+                if (getActivity() != null) {
+                    getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                }
+            }
+        });
     }
 
     private void executeTask() {

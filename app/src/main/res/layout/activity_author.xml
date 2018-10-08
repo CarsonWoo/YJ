@@ -51,6 +51,16 @@
                     app:layout_constraintTop_toTopOf="@id/zone_bg_img"
                     />
 
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/gender"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_male"
+                    android:layout_margin="3dp"
+                    app:layout_constraintEnd_toEndOf="@id/portrait"
+                    app:layout_constraintBottom_toBottomOf="@id/portrait"
+                    />
+
                 <TextView
                     android:id="@+id/username"
                     android:layout_width="wrap_content"

@@ -47,6 +47,8 @@ public class RememberTab extends Fragment {
 
     private Retrofit retrofit;
 
+    private View view;
+
     private int refreshCount = 1;
 
     public static RememberTab newInstance() {
@@ -58,10 +60,10 @@ public class RememberTab extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.layout_pull_to_refresh_recyclerview, container, false);
+       view = inflater.inflate(R.layout.layout_pull_to_refresh_recyclerview, container, false);
         retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         executeRememberTask(String.valueOf(refreshCount));
-        initRecyclerView(view);
+//        initRecyclerView(view);
         return view;
     }
 
@@ -77,6 +79,7 @@ public class RememberTab extends Fragment {
                     if (page.equals("1")) {
                         //第一次加载10条
                         mList = info.getData();
+                        initRecyclerView(view);
                     } else {
                         //后面加载的直接往后加
                         if (info.getData() != null && info.getData().size() > 0) {
@@ -141,6 +144,7 @@ public class RememberTab extends Fragment {
                 ViewGroup.LayoutParams.MATCH_PARENT));
 
         recyclerView.setEmptyView(emptyView);
+
 
         /**
          * 还需添加按钮的响应 如按下了pass后

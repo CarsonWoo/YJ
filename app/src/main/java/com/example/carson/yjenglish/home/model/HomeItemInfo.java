@@ -38,7 +38,7 @@ public class HomeItemInfo {
     public class HomeItemData {
         private String hot_comment_number;//热门评论数
         private String is_favour;//用户是否已经点了喜欢，0代表否，1代表是
-        private String user_id;
+        private String user_id;//作者id
         private List<Comment> new_comment;
         private String author_portrait;
         private String video;

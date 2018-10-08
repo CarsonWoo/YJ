@@ -1,5 +1,6 @@
 package com.example.carson.yjenglish.home;
 
+import com.example.carson.yjenglish.home.model.AuthorInfo;
 import com.example.carson.yjenglish.home.model.HomeInfo;
 import com.example.carson.yjenglish.home.model.HomeItemInfo;
 import com.example.carson.yjenglish.utils.CommonInfo;
@@ -32,5 +33,70 @@ public interface HomeService {
                                  @Field("id") String id,
                                  @Field("comment") String comment);
 
+    @FormUrlEncoded
+    @POST("home/author_page.do")
+    Observable<AuthorInfo> getAuthorInfo(@Header("token") String token,
+                                         @Field("author_id") String author_id,
+                                         @Field("page") String page,
+                                         @Field("size") String size);
+
+    @FormUrlEncoded
+    @POST("home/liquidation_word.do")
+    Call<CommonInfo> postWords(@Header("token") String token, @Field("word_list") String word_list);
+
+    /**
+     * 文章喜欢
+     * @param token
+     * @param id
+     * @return
+     */
+    @FormUrlEncoded
+    @POST("home/favour_feeds.do")
+    Call<CommonInfo> postFavours(@Header("token") String token, @Field("id") String id);
+
+    /**
+     * 文章点赞
+     * @param token
+     * @param id
+     * @return
+     */
+    @FormUrlEncoded
+    @POST("home/like_feeds.do")
+    Call<CommonInfo> postLikes(@Header("token") String token, @Field("id") String id);
+
+    /**
+     * 副评论
+     * @param token
+     * @param id 主评论的id
+     * @param comment 评论内容
+     * @return
+     */
+    @POST("home/comment_feeds_comment.do")
+    @FormUrlEncoded
+    Call<CommonInfo> sendSubComments(@Header("token") String token,
+                                     @Field("id") String id,
+                                     @Field("comment") String comment);
+
+    /**
+     * 给主评论点赞
+     * @param token
+     * @param id 主评论的id
+     * @return
+     */
+    @POST("home/like_feeds_comment.do")
+    @FormUrlEncoded
+    Call<CommonInfo> postCommentLike(@Header("token") String token,
+                                     @Field("id") String id);
+
+    /**
+     * 删除主评论
+     * @param token
+     * @param id 主评论的id
+     * @return
+     */
+    @POST("home/delete_comment.do")
+    @FormUrlEncoded
+    Call<CommonInfo> deleteComment(@Header("token") String token,
+                                   @Field("id") String id);
 
 }

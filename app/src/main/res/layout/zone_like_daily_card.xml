@@ -10,7 +10,7 @@
     <com.example.carson.yjenglish.customviews.RoundRectImageView
         android:id="@+id/cover_img"
         android:layout_width="match_parent"
-        android:layout_height="145dp"
+        android:layout_height="153dp"
         app:radius="18"
         android:src="@color/colorAccent"
         android:layout_marginStart="10dp"
@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="每日一句"
-        android:textSize="11sp"
+        android:textSize="10sp"
         android:textColor="@android:color/white"
         android:layout_marginStart="20dp"
         android:layout_marginTop="10dp"
@@ -34,6 +34,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="18:50"
+        android:textSize="10sp"
         android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"
         android:textColor="@color/colorTextHint"
@@ -43,8 +44,8 @@
 
     <ImageView
         android:id="@+id/delete"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
         android:src="@mipmap/ic_delete_item_gray"
         android:visibility="gone"
         android:layout_marginBottom="5dp"

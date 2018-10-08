@@ -6,6 +6,7 @@ package com.example.carson.yjenglish.home.model.forviewbinder;
 
 public class Comment {
 
+    private String user_id;
     private String username;
     private String portraitUrl;
     private String comment;
@@ -15,9 +16,12 @@ public class Comment {
     private boolean hasReply;
     private boolean isAuthorReplied;
     private String time;
+    private String comment_id;
+    private boolean isLike;
 
-    public Comment(String username, String portraitUrl, String time, String comment, String content, int likeNum,
-                   Reply reply) {
+    public Comment(String user_id, String username, String portraitUrl, String time, String comment, String content, int likeNum,
+                   Reply reply, String comment_id, boolean isLike) {
+        this.user_id = user_id;
         this.username = username;
         this.portraitUrl = portraitUrl;
         this.comment = comment;
@@ -25,6 +29,8 @@ public class Comment {
         this.likeNum = likeNum;
         this.mReply = reply;
         this.time = time;
+        this.comment_id = comment_id;
+        this.isLike = isLike;
         if (reply == null) {
             hasReply = false;
         } else {
@@ -73,14 +79,33 @@ public class Comment {
         return time;
     }
 
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public String getComment_id() {
+        return comment_id;
+    }
+
+    public boolean isLike() {
+        return isLike;
+    }
+
+    public void setLike(boolean like) {
+        isLike = like;
+    }
+
     public static class Reply {
+
+        private String user_id;
         private String username;
         private String portraitUrl;
         private String reply;
         private int likeNum;
         private String time;
 
-        public Reply(String username, String portraitUrl, String time, String reply, int likeNum) {
+        public Reply(String user_id, String username, String portraitUrl, String time, String reply, int likeNum) {
+            this.user_id = user_id;
             this.username = username;
             this.portraitUrl = portraitUrl;
             this.reply = reply;
@@ -122,6 +147,10 @@ public class Comment {
 
         public void setPortraitUrl(String portraitUrl) {
             this.portraitUrl = portraitUrl;
+        }
+
+        public String getUser_id() {
+            return user_id;
         }
     }
 

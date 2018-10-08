@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish.zone.view.plan;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Handler;
@@ -26,6 +27,7 @@ import com.example.carson.yjenglish.customviews.PickerView;
 import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.utils.CalculateUtils;
 import com.example.carson.yjenglish.utils.CommonInfo;
+import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.PlanService;
@@ -230,8 +232,19 @@ public class PlanActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onResetClick(View view, String tag) {
-                Toast.makeText(getApplicationContext(), "重置了" + tag, Toast.LENGTH_SHORT).show();
+            public void onResetClick(View view, final String tag) {
+                DialogUtils utils = DialogUtils.getInstance(PlanActivity.this);
+                Dialog dialog = utils.newTipsDialog("确定重置" + tag + "吗",
+                        View.TEXT_ALIGNMENT_CENTER);
+                utils.setTipsListener(new DialogUtils.OnTipsListener() {
+                    @Override
+                    public void onConfirm() {
+                        Toast.makeText(getApplicationContext(), "重置了" + tag,
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+                dialog.show();
+
             }
 
             @Override
@@ -292,13 +305,14 @@ public class PlanActivity extends AppCompatActivity {
                     UserConfig.cacheSelectedPlan(PlanActivity.this, mTag);
                     executeChangePlanTask();
                 } else {
-                    Toast.makeText(PlanActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(PlanActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, info.getMsg());
                 }
             }
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e(TAG, t.getMessage());
+                Toast.makeText(PlanActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -332,7 +346,8 @@ public class PlanActivity extends AppCompatActivity {
                     editor.putString("plan_daily_count", mWordPiker.getText()).apply();
                     mAdapter.notifyDataSetChanged();
                 } else {
-                    Toast.makeText(PlanActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(PlanActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, info.getMsg());
                 }
             }
 
@@ -376,7 +391,8 @@ public class PlanActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<MyPlanDailyInfo> call, Throwable t) {
-                Log.e(TAG, t.getMessage());
+//                Log.e(TAG, t.getMessage());
+                Toast.makeText(getApplicationContext(), "连接超时", Toast.LENGTH_SHORT).show();
             }
         });
 

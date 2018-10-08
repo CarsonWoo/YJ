@@ -47,13 +47,14 @@ public class ContentViewBinder extends ItemViewBinder<Content, ContentViewBinder
         holder.username.setText(item.getUsername());
         holder.text.removeAllViews();
         holder.text.addView(mLinearLayout);
+        //点赞数
         holder.likeNum.setText(item.getLikeNum());
-        Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).thumbnail(0.8f).into(holder.portrait);
+        Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).thumbnail(0.6f).into(holder.portrait);
         holder.fabLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onLikeClick();
+                    mListener.onLikeClick(holder.likeNum, item.getLikeNum());
                 }
             }
         });
@@ -63,6 +64,7 @@ public class ContentViewBinder extends ItemViewBinder<Content, ContentViewBinder
                 Intent toPortrait = new Intent(holder.portrait.getContext(), AuthorAty.class);
                 toPortrait.putExtra("portrait_url", item.getPortraitUrl());
                 toPortrait.putExtra("username", item.getUsername());
+                toPortrait.putExtra("author_id", item.getAuthor_id());
                 holder.portrait.getContext().startActivity(toPortrait);
             }
         });
@@ -87,6 +89,6 @@ public class ContentViewBinder extends ItemViewBinder<Content, ContentViewBinder
     }
 
     public interface OnLikeFabClickListener {
-        void onLikeClick();
+        void onLikeClick(TextView textView, String likeNum);
     }
 }

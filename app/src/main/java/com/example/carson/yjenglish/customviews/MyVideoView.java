@@ -10,25 +10,26 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.VideoCaptionModel;
 import com.pili.pldroid.player.PLOnCompletionListener;
 import com.pili.pldroid.player.PLOnErrorListener;
 import com.pili.pldroid.player.PLOnPreparedListener;
 import com.pili.pldroid.player.widget.PLVideoTextureView;
 
 import android.os.Handler;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by 84594 on 2018/8/2.
@@ -58,6 +59,10 @@ public class MyVideoView extends ConstraintLayout {
 
     private ImageView coverImg;
 
+    private TextView mEnglishCaption;
+
+    private TextView mChineseCaption;
+
     private static final int SHOW_CONTROL = 0x0001;
 
     private static final int HIDE_CONTROL = 0x0002;
@@ -73,6 +78,10 @@ public class MyVideoView extends ConstraintLayout {
     private boolean isFull = false;
 
     private boolean hasMulVideos = false;
+
+    private List<VideoCaptionModel> videoCaptionModels;
+
+    private List<VideoCaptionModel> mCps = new ArrayList<>();
 
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
@@ -101,6 +110,8 @@ public class MyVideoView extends ConstraintLayout {
 
     private IOnChangeSourceListener changeSourceListener;
 
+    private IOnPrepareListener prepareListener;
+
     public void setFullScreenListener(IFullScreenListener listener) {
         this.listener = listener;
     }
@@ -112,6 +123,14 @@ public class MyVideoView extends ConstraintLayout {
 
     public MyVideoView(Context context, boolean hasMulVideos, boolean isFull) {
         super(context);
+        this.hasMulVideos = hasMulVideos;
+        this.isFull = isFull;
+        initViews();
+    }
+
+    public MyVideoView(Context context, boolean hasMulVideos, boolean isFull, List<VideoCaptionModel> mCaptions) {
+        super(context);
+        videoCaptionModels = mCaptions;
         this.hasMulVideos = hasMulVideos;
         this.isFull = isFull;
         initViews();
@@ -139,6 +158,8 @@ public class MyVideoView extends ConstraintLayout {
         playFormer = rootView.findViewById(R.id.video_play_former);
         playLatter = rootView.findViewById(R.id.video_play_next);
         coverImg = rootView.findViewById(R.id.cover_img);
+        mEnglishCaption = rootView.findViewById(R.id.en_caption);
+        mChineseCaption = rootView.findViewById(R.id.cn_caption);
         initSetting();
         initEvents();
     }
@@ -196,7 +217,13 @@ public class MyVideoView extends ConstraintLayout {
                 seekBar.setMax((int) mVideoView.getDuration());
                 seekBar.setProgress((int) mVideoView.getCurrentPosition());
                 seekBar.setEnabled(true);
+                start();
+//                resume();
                 mHandler.sendEmptyMessage(UPDATE_POSITION);
+                if (prepareListener != null) {
+                    prepareListener.onPrepared();
+                }
+                Log.e("Video", "-----onPrepare()");
             }
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -289,6 +316,18 @@ public class MyVideoView extends ConstraintLayout {
     }
 
     /**
+     * 设置字幕
+     */
+    public void setCaption(List<VideoCaptionModel> models) {
+        this.videoCaptionModels = models;
+        this.mCps.clear();
+        if (videoCaptionModels.isEmpty()) {
+            mEnglishCaption.setText("暂无字幕");
+            mChineseCaption.setText("");
+        }
+    }
+
+    /**
      * 更新进度
      */
     private void updatePosition() {
@@ -297,6 +336,26 @@ public class MyVideoView extends ConstraintLayout {
             int currentPos = (int) mVideoView.getCurrentPosition();
             if (!isTrackingTouch) {
                 seekBar.setProgress(currentPos);
+            }
+            if (videoCaptionModels != null && !videoCaptionModels.isEmpty()) {
+                if (mVideoView.getCurrentPosition() >= Long.parseLong(videoCaptionModels.get(0).getSt())) {
+                    Log.e("MyVideo", "get caption start");
+                    mEnglishCaption.setText(videoCaptionModels.get(0).getEn());
+                    mChineseCaption.setText(videoCaptionModels.get(0).getCn());
+                    VideoCaptionModel model = videoCaptionModels.get(0);
+                    videoCaptionModels.remove(0);
+//                    videoCaptionModels.add(model);
+                    mCps.add(model);
+                }
+//                for (VideoCaptionModel model : videoCaptionModels) {
+//                    if (mVideoView.getCurrentPosition() >= Long.parseLong(model.getSt())) {
+//                        mEnglishCaption.setText(model.getEn());
+//                        videoCaptionModels.remove(model);
+//                        break;
+//                    }
+//                }
+            } else {
+//                mEnglishCaption.setText("暂无字幕");
             }
             mHandler.sendEmptyMessageDelayed(UPDATE_POSITION, 500);
         }
@@ -338,6 +397,7 @@ public class MyVideoView extends ConstraintLayout {
      */
     public void setVideoPath(String path) {
         mVideoView.setVideoPath(path);
+        Log.e("Video", "------setPath()");
     }
 
     /**
@@ -384,6 +444,7 @@ public class MyVideoView extends ConstraintLayout {
         mVideoView.pause();
         playOrPauseView.setImageResource(R.mipmap.ic_video_play);
         playOrPauseControl.setImageResource(R.mipmap.ic_video_play);
+        Log.e("Video", "-----pause");
     }
 
     /**
@@ -402,6 +463,7 @@ public class MyVideoView extends ConstraintLayout {
         mVideoView.start();
         playOrPauseView.setImageResource(R.mipmap.ic_video_pause);
         playOrPauseControl.setImageResource(R.mipmap.ic_video_pause);
+        Log.e("Video", "------resume");
     }
 
     public int getPosition() {
@@ -410,12 +472,17 @@ public class MyVideoView extends ConstraintLayout {
 
     public void seekTo(int position) {
         mVideoView.seekTo(position);
+        Log.e("Video", "------seekTo");
     }
 
     /**
      * 停止
      */
     public void stop() {
+        if (videoCaptionModels != null && videoCaptionModels.size() == 0) {
+            videoCaptionModels.addAll(mCps);
+            mCps.clear();
+        }
         initSetting();
         mHandler.removeCallbacksAndMessages(null);
         mVideoView.stopPlayback();
@@ -425,6 +492,10 @@ public class MyVideoView extends ConstraintLayout {
     }
 
     public void release() {
+        if (videoCaptionModels != null && videoCaptionModels.size() == 0) {
+            videoCaptionModels.addAll(mCps);
+            mCps.clear();
+        }
         initSetting();
         mHandler.removeCallbacksAndMessages(null);
         mVideoView.stopPlayback();
@@ -455,6 +526,18 @@ public class MyVideoView extends ConstraintLayout {
         this.changeSourceListener = changeSourceListener;
     }
 
+    public void setPrepareListener(IOnPrepareListener prepareListener) {
+        this.prepareListener = prepareListener;
+    }
+
+    public void setHasMulVideos(boolean hasMulVideos) {
+        this.hasMulVideos = hasMulVideos;
+    }
+
+    public void setFull(boolean full) {
+        isFull = full;
+    }
+
     public interface IFullScreenListener {
         void onClickFull(boolean isFull);
     }
@@ -466,6 +549,10 @@ public class MyVideoView extends ConstraintLayout {
     public interface IOnChangeSourceListener {
         void onFormerClick();
         void onLatterClick();
+    }
+
+    public interface IOnPrepareListener {
+        void onPrepared();
     }
 
 

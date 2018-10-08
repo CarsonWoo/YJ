@@ -49,6 +49,8 @@ public class HandleTab extends Fragment {
 
     private int refreshCount = 1;
 
+    private View view;
+
     public static HandleTab newInstance() {
         HandleTab tab = new HandleTab();
         return tab;
@@ -58,10 +60,10 @@ public class HandleTab extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.layout_pull_to_refresh_recyclerview, container, false);
+        view = inflater.inflate(R.layout.layout_pull_to_refresh_recyclerview, container, false);
         retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         executeHandleTask(String.valueOf(refreshCount));
-        initRecyclerView(view);
+//        initRecyclerView(view);
         return view;
     }
 
@@ -77,6 +79,7 @@ public class HandleTab extends Fragment {
                     if (page.equals("1")) {
                         //第一次加载10条
                         mList = info.getData();
+                        initRecyclerView(view);
                     } else {
                         //后面加载的直接往后加
                         if (info.getData() != null && info.getData().size() > 0) {

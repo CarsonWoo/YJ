@@ -13,6 +13,7 @@
         android:layout_height="95dp"
         app:cardBackgroundColor="#f4f1f4"
         app:cardCornerRadius="4dp"
+        app:cardElevation="0dp"
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="1dp"
@@ -37,9 +38,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="travel"
-                android:textSize="23sp"
+                android:textSize="20sp"
                 android:textColor="@color/colorTextWord"
-                android:layout_marginStart="35dp"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="20dp"
                 android:layout_toEndOf="@id/cover_img"
                 />
@@ -49,10 +50,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="/trae:vl/"
-                android:textSize="16sp"
+                android:textSize="13sp"
                 android:layout_toEndOf="@id/cover_img"
                 android:layout_below="@id/word_tag"
-                android:layout_marginStart="35dp"
+                android:layout_marginStart="32dp"
                 />
 
         </RelativeLayout>
@@ -63,6 +64,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="18:50"
+        android:textSize="10sp"
         android:layout_marginTop="10dp"
         android:layout_marginStart="10dp"
         android:textColor="@color/colorTextHint"
@@ -72,8 +74,8 @@
 
     <ImageView
         android:id="@+id/delete"
-        android:layout_width="15dp"
-        android:layout_height="15dp"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
         android:src="@mipmap/ic_delete_item_gray"
         android:visibility="gone"
         android:layout_marginBottom="5dp"

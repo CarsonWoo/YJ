@@ -138,39 +138,6 @@ public class WordListAty extends AppCompatActivity {
         }
     }
 
-
-//    private void initRememAdapter() {
-////        wordCount.setText("已背单词：" + mRememList.size());
-////        rAdapter.setListener(new RememberListAdapter.OnButtonClickListener() {
-////            @Override
-////            public void onTransClick(View view, int pos) {
-////                Log.i(TAG, "onTransClick");
-////            }
-////
-////            @Override
-////            public void onPassClick(View view, int pos) {
-////                Log.i(TAG, "onPassClick");
-//////                int position = mRememList.size();
-////                HandledWordInfo.HandleWord handledWord = new HandledWordInfo.HandleWord();
-////                handledWord.setWord(mRememList.get(pos).getWord());
-////                handledWord.setMeaning(mRememList.get(pos).getMeaning());
-////                mHandleList.add(handledWord);
-////                mRememList.remove(pos);
-////                rAdapter.notifyItemRemoved(pos);
-////                view.postDelayed(new Runnable() {
-////                    @Override
-////                    public void run() {
-////                        rAdapter.notifyDataSetChanged();
-////                    }
-////                }, 1000);
-////                if (hAdapter != null) {
-////                    hAdapter.notifyDataSetChanged();
-////                }
-////                wordCount.setText("已背单词：" + mRememList.size());
-////            }
-////        });
-//    }
-
     @Override
     public void onBackPressed() {
         super.onBackPressed();

@@ -238,10 +238,12 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         });
     }
 
-    private void bindListHolder(final HomeViewHolder homeHolder, int position) {
+    private void bindListHolder(final HomeViewHolder homeHolder, final int position) {
         homeHolder.item = mList.get(position - 1);
         homeHolder.commentNum.setText(String.valueOf(homeHolder.item.getComments()));
         homeHolder.likeNum.setText(homeHolder.item.getLikes());
+        homeHolder.ivFavour.setSelected(homeHolder.item.getIs_favour().equals("1"));
+
         if (homeHolder.item.getTitle() != null) {
             homeHolder.title.setText(homeHolder.item.getTitle());
         }
@@ -273,15 +275,28 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         homeHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mListener != null) {
+                if (itemListener != null) {
                     itemSelected.clear();
                     itemSelected.add(homeHolder.item);
-                    mListener.onItemClick(itemSelected, false);
-                } else {
-                    if (itemListener != null) {
-                        itemSelected.clear();
-                        itemSelected.add(homeHolder.item);
-                        itemListener.onClick(itemSelected, false);
+                    itemListener.onClick(itemSelected, false, position - 1);
+                }
+
+            }
+        });
+        homeHolder.ivFavour.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (itemListener != null) {
+                    itemListener.onLikeClick(homeHolder.item.getId(),
+                            homeHolder.item.getIs_favour(),
+                            homeHolder.likeNum);
+                    if (homeHolder.item.getIs_favour().equals("1")) {
+                        //说明取消赞
+                        homeHolder.ivFavour.setSelected(false);
+                        homeHolder.item.setIs_favour("0");
+                    } else {
+                        homeHolder.ivFavour.setSelected(true);
+                        homeHolder.item.setIs_favour("1");
                     }
                 }
             }
@@ -289,16 +304,10 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         homeHolder.commentNum.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mListener != null) {
-                    itemSelected.clear();
-                    itemSelected.add(homeHolder.item);
-                    mListener.onItemClick(itemSelected, true);
-                } else {
-                    if (itemListener != null) {
+                if (itemListener != null) {
                         itemSelected.clear();
                         itemSelected.add(homeHolder.item);
-                        itemListener.onClick(itemSelected, true);
-                    }
+                        itemListener.onClick(itemSelected, true, position - 1);
                 }
             }
         });
@@ -330,7 +339,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         TextView title;
         TextView name;
         TextView commentNum;
-        TextView likeNum;
+        public TextView likeNum;
         FrameLayout video;
         ImageView img;
         ImageView play;
@@ -339,6 +348,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         CardView mCardView;
         CircleImageView portrait;
         View itemView;
+        public ImageView ivFavour;
 
         public HomeViewHolder(View itemView) {
             super(itemView);
@@ -353,6 +363,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
             img = itemView.findViewById(R.id.img_content);
             play = itemView.findViewById(R.id.item_video_play);
             portrait = itemView.findViewById(R.id.portrait);
+            ivFavour = itemView.findViewById(R.id.iv_favour);
         }
     }
 
@@ -421,6 +432,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
     }
 
     public interface OnItemClickListener {
-        void onClick(ArrayList item, boolean requestComment);
+        void onClick(ArrayList item, boolean requestComment, int curPos);
+        void onLikeClick(String id, String is_favour, TextView tv);
     }
 }

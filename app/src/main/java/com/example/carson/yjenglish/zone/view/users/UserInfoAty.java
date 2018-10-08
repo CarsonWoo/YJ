@@ -5,22 +5,32 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.utils.NetUtils;
+import com.example.carson.yjenglish.utils.UserConfig;
+import com.example.carson.yjenglish.zone.ZoneService;
+import com.example.carson.yjenglish.zone.model.OtherUsersPlanInfo;
+import com.example.carson.yjenglish.zone.model.OthersPlan;
+import com.example.carson.yjenglish.zone.model.forviewbinder.OtherUsersPlan;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * 点击其他用户头像时跳转至此页面
@@ -42,16 +52,68 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
     private ActiveFragment activeFragment;
     private PlanFragment planFragment;
 
+    private List<OtherUsersPlanInfo.OtherUserInfo.OtherPlanInfo> plans;
+
+    private String author_username;
+    private String portraitUrl;
+    private String author_signature;
+    private String mGender;
+    private String learned_word;
+
+    private String user_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_info);
-        activeFragment = ActiveFragment.newInstance();
-        planFragment = PlanFragment.newInstance();
-        initViews();
+        user_id = getIntent().getStringExtra("user_id");
+        executeLoadTask();
+//        activeFragment = ActiveFragment.newInstance();
+//        planFragment = PlanFragment.newInstance(plans.toString());
+        bindViews();
     }
 
-    private void initViews() {
+    private void executeLoadTask() {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(ZoneService.class).getPlans(UserConfig.getToken(this),
+                user_id).enqueue(new Callback<OtherUsersPlanInfo>() {
+            @Override
+            public void onResponse(Call<OtherUsersPlanInfo> call, Response<OtherUsersPlanInfo> response) {
+                OtherUsersPlanInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    author_username = info.getData().getAuthor_username();
+                    author_signature = info.getData().getAuthor_personality_signature();
+                    portraitUrl = info.getData().getAuthor_portrait();
+                    mGender = info.getData().getAuthor_gender();
+                    learned_word = info.getData().getLearned_word();
+
+                    plans = info.getData().getIts_plan();
+
+                    List<OthersPlan> othersPlans = new ArrayList<>();
+                    for (int i = 0; i < plans.size(); i++) {
+                        OthersPlan plan = new OthersPlan();
+                        plan.setPlan(plans.get(i).getPlan());
+                        plan.setLearned_word_number(plans.get(i).getLearned_word_number());
+                        plan.setWord_number(plans.get(i).getWord_number());
+                        othersPlans.add(plan);
+                    }
+
+                    activeFragment = ActiveFragment.newInstance();
+                    planFragment = PlanFragment.newInstance(othersPlans);
+                    initViews();
+                } else {
+                    Log.e("UserInfo", info.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<OtherUsersPlanInfo> call, Throwable t) {
+                Toast.makeText(UserInfoAty.this, "连接超时", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void bindViews() {
         back = findViewById(R.id.back);
         portrait = findViewById(R.id.portrait);
         gender = findViewById(R.id.gender);
@@ -65,6 +127,8 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
         mViewPager = findViewById(R.id.view_pager);
         bg = findViewById(R.id.img_bg);
 
+//        if ()
+
         Glide.with(this).load(R.mipmap.zone_bg_img).thumbnail(0.5f).into(bg);
 
         back.setOnClickListener(new View.OnClickListener() {
@@ -74,9 +138,23 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
             }
         });
 
+    }
+
+    private void initViews() {
         tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(mViewPager));
         mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         mViewPager.setAdapter(new MyPagerAdapter(getSupportFragmentManager()));
+
+        if (mGender.equals("1")) {
+            gender.setImageResource(R.mipmap.ic_female);
+        } else {
+            gender.setImageResource(R.drawable.ic_male);
+        }
+
+        Glide.with(this).load(portraitUrl).thumbnail(0.6f).crossFade().into(portrait);
+        username.setText(author_username);
+        signature.setText(author_signature);
+        wordCount.setText(learned_word);
 
     }
 
@@ -87,8 +165,23 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
     }
 
     @Override
-    public void onItemClick() {
-
+    public void onItemClick(int itemType) {
+        switch (itemType) {
+            case 0:
+                //home item
+                break;
+            case 1:
+                //tv item
+                break;
+            case 2:
+                //music item
+                break;
+            case 4:
+                //daily item
+                break;
+            default:
+                break;
+        }
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter{

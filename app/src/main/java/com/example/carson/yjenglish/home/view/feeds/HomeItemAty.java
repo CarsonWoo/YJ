@@ -2,10 +2,6 @@ package com.example.carson.yjenglish.home.view.feeds;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.nfc.Tag;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -14,12 +10,8 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -33,27 +25,24 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.DrawableTypeRequest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.animation.GlideAnimation;
-import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.target.Target;
 import com.example.carson.yjenglish.EmptyValue;
 import com.example.carson.yjenglish.FullScreenVideo;
-import com.example.carson.yjenglish.MyApplication;
+import com.example.carson.yjenglish.ImageShowActivity;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.ExpressionAdapter;
 import com.example.carson.yjenglish.customviews.MyVideoView;
 import com.example.carson.yjenglish.home.HomeService;
-import com.example.carson.yjenglish.home.model.HomeItem;
 import com.example.carson.yjenglish.home.model.HomeItemInfo;
 import com.example.carson.yjenglish.home.model.forviewbinder.Comment;
 import com.example.carson.yjenglish.home.model.forviewbinder.Content;
 import com.example.carson.yjenglish.home.model.forviewbinder.Recommend;
 import com.example.carson.yjenglish.home.model.forviewbinder.RecommendList;
 import com.example.carson.yjenglish.home.model.forviewbinder.Video;
+import com.example.carson.yjenglish.home.view.HomeFragment;
 import com.example.carson.yjenglish.home.viewbinder.feeds.CommentViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.feeds.EmptyViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.feeds.ContentViewBinder;
@@ -64,12 +53,12 @@ import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.ScreenUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
+import com.example.carson.yjenglish.zone.view.users.UserInfoAty;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-
-import javax.security.auth.login.LoginException;
+import java.util.Map;
 
 import me.drakeet.multitype.ClassLinker;
 import me.drakeet.multitype.ItemViewBinder;
@@ -107,8 +96,10 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
     private String portraitUrl;
     private String title;
     private String likeNum;
+    private String favourNum;
     private boolean requestComment;
     private String id;
+    private String author_id;
 
     private ImageView expression;
     private EditText editComment;
@@ -118,18 +109,23 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
     private ExpressionAdapter expressionAdapter;
 
     private boolean hasComment = false;
-    private boolean isLike;
+    private boolean isFavour, isLike;//isFavour是喜欢，isLike是点赞
 
     private List<HomeItemInfo.HomeItemData.Order> orders;
-    private SpannableStringBuilder mContent;
 
     private List<Comment> mHitComments = new ArrayList<>();
     private List<Comment> mLatestComments = new ArrayList<>();
+
+    private Map<String, Integer> mLatestIndex = new HashMap<>();
+    private Map<String, Integer> mHitIndex = new HashMap<>();
 
     private List<HomeItemInfo.HomeItemData.Comment> hitComments, newComments;
     private List<HomeItemInfo.HomeItemData.Recommendation> recommendations;
 
     private LinearLayout mContentLayout;
+
+    private String commentId;
+    private boolean isSendSubComment = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,9 +143,9 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         username = fromData.getStringExtra("username");
         portraitUrl = fromData.getStringExtra("portrait_url");
         title = fromData.getStringExtra("title");
-        likeNum = fromData.getStringExtra("like_num");
+//        likeNum = fromData.getStringExtra("like_num");
         requestComment = fromData.getBooleanExtra("request_comment", false);
-        isLike = fromData.getBooleanExtra("is_like", false);
+//        isFavour = fromData.getBooleanExtra("is_like", false);
 
         bindViews();
         executeLoadTask();
@@ -167,9 +163,22 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                     orders = info.getData().getOrder();
                     initContent();
 
+                    author_id = response.body().getData().getUser_id();
+
                     recommendations = info.getData().getRecommendations();
                     hitComments = info.getData().getHot_comment();
                     newComments = info.getData().getNew_comment();
+
+                    isFavour = info.getData().getIs_favour().equals("1");
+                    like.setSelected(isFavour);
+
+                    favourNum = info.getData().getFavours();
+
+                    isLike = info.getData().getIs_like().equals("1");
+
+                    Log.e("HomeItemAty", "isLike = " + isLike);
+
+                    likeNum = info.getData().getLikes();
 
                     if (hitComments.size() == 0 && newComments.size() == 0) {
                         hasComment = false;
@@ -193,31 +202,51 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
     private void loadCommentList(String user_id) {
         mHitComments.clear();
         mLatestComments.clear();
+
         for (int i = 0; i < hitComments.size(); i++) {
-            mHitComments.add(new Comment(hitComments.get(i).getUsername(), hitComments.get(i).getPortrait(),
+            int index = -1;
+            for (int j = 0; j < hitComments.get(i).getInner_comment().size(); j++) {
+                if (hitComments.get(i).getInner_comment().get(j).getUser_id().equals(user_id)) {
+                    index = j;
+                    break;
+                }
+            }
+            mHitComments.add(new Comment(hitComments.get(i).getUser_id(), hitComments.get(i).getUsername(), hitComments.get(i).getPortrait(),
                     hitComments.get(i).getSet_time(), hitComments.get(i).getComment(),
-                    hitComments.get(i).getInner_comment().size() == 0 ? null :
-                            hitComments.get(i).getInner_comment().get(Integer.parseInt(user_id) - 1).getComment(),
+                    (index == -1 || hitComments.get(i).getInner_comment().size() == 0) ?
+                            null : hitComments.get(i).getInner_comment().get(index).getComment(),
                     Integer.parseInt(hitComments.get(i).getLikes()),
                     hitComments.get(i).getInner_comment().size() == 0 ? null :
-                            new Comment.Reply(hitComments.get(0).getUsername(),
-                                    hitComments.get(0).getPortrait(), hitComments.get(0).getSet_time(),
-                                    hitComments.get(0).getComment(),
-                                    Integer.parseInt(hitComments.get(0).getLikes()))
-            ));
+                            new Comment.Reply(hitComments.get(i).getInner_comment().get(0).getUser_id(),
+                                    hitComments.get(i).getInner_comment().get(0).getUsername(),
+                                    hitComments.get(i).getInner_comment().get(0).getPortrait(),
+                                    hitComments.get(i).getInner_comment().get(0).getSet_time(),
+                                    hitComments.get(i).getInner_comment().get(0).getComment(),
+                                    0
+                                    /*Integer.parseInt(hitComments.get(i).getInner_comment().get(0))*/),
+                    hitComments.get(i).getId(), hitComments.get(i).getIs_like().equals("1")));
         }
         for (int i = 0; i < newComments.size(); i++) {
-            mLatestComments.add(new Comment(newComments.get(i).getUsername(), newComments.get(i).getPortrait(),
+            int index = -1;
+            for (int j = 0; j < newComments.get(i).getInner_comment().size(); j++) {
+                if (newComments.get(i).getInner_comment().get(j).getUser_id().equals(user_id)) {
+                    index = j;
+                    break;
+                }
+            }
+            mLatestComments.add(new Comment(newComments.get(i).getUser_id(), newComments.get(i).getUsername(), newComments.get(i).getPortrait(),
                     newComments.get(i).getSet_time(), newComments.get(i).getComment(),
-                    newComments.get(i).getInner_comment().size() == 0 ? null :
-                            newComments.get(i).getInner_comment().get(Integer.parseInt(user_id) - 1).getComment(),
+                    (index == -1 || newComments.get(i).getInner_comment().size() == 0) ?
+                            null : newComments.get(i).getInner_comment().get(index).getComment(),
                     Integer.parseInt(newComments.get(i).getLikes()),
                     newComments.get(i).getInner_comment().size() == 0 ? null :
-                            new Comment.Reply(newComments.get(0).getUsername(),
-                                    newComments.get(0).getPortrait(), newComments.get(0).getSet_time(),
-                                    newComments.get(0).getComment(),
-                                    Integer.parseInt(newComments.get(0).getLikes()))
-            ));
+                            new Comment.Reply(newComments.get(i).getInner_comment().get(0).getUser_id(),
+                                    newComments.get(i).getInner_comment().get(0).getUsername(),
+                                    newComments.get(i).getInner_comment().get(0).getPortrait(),
+                                    newComments.get(i).getInner_comment().get(0).getSet_time(),
+                                    newComments.get(i).getInner_comment().get(0).getComment(),
+                                    0),
+                    newComments.get(i).getId(), newComments.get(i).getIs_like().equals("1")));
         }
     }
 
@@ -257,6 +286,14 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                             }
                         })
                         .thumbnail(0.5f).into(imageView);
+                imageView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent toImg = new Intent(HomeItemAty.this, ImageShowActivity.class);
+                        toImg.putExtra("img_url", order.getPic());
+                        startActivity(toImg);
+                    }
+                });
             } else {
                 String s = order.getParagraph();
                 TextView textView = new TextView(HomeItemAty.this);
@@ -282,7 +319,14 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         send = findViewById(R.id.send);
         expressionRv = findViewById(R.id.expression_recycler);
 
-        like.setSelected(isLike);
+//        like.setSelected(isFavour);
+
+        like.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                executeFavourTask();
+            }
+        });
 
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
@@ -295,6 +339,30 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                 }
             }
         });
+    }
+
+    private void executeFavourTask() {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).postFavours(UserConfig.getToken(this), id)
+                .enqueue(new Callback<CommonInfo>() {
+                    @Override
+                    public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                        if (response.body().getStatus().equals("200")) {
+                            isFavour = !isFavour;
+                            like.setSelected(isFavour);
+                            Intent backIntent = new Intent();
+                            backIntent.putExtra("favour_change", isFavour ? "1" : "0");
+                            setResult(HomeFragment.RESULT_LIKE_CHANGE, backIntent);
+                        } else {
+                            Log.e("HomeItemAty", response.body().getMsg());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CommonInfo> call, Throwable t) {
+                        Toast.makeText(HomeItemAty.this, "连接超时", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -331,7 +399,12 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                 if (!hasComment) {
                     recyclerView.smoothScrollToPosition(mItems.size() - 1);
                 } else {
-                    recyclerView.smoothScrollToPosition(4);
+                    /**
+                     * 到时需要改 将2000改为前四个item的高度总和
+                     */
+                    if (mDistance < 2000) {
+                        recyclerView.smoothScrollToPosition(4);
+                    }
                 }
                 imm.showSoftInput(editComment, InputMethodManager.SHOW_FORCED);
             }
@@ -355,6 +428,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         if (!hasComment) {
             //将原本没有评论的emptyView去除
             mItems.remove(4);
+            hasComment = true;
         }
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         retrofit.create(HomeService.class).sendComment(UserConfig.getToken(this), id,
@@ -364,9 +438,10 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                 if (response.body().getStatus().equals("200")) {
 //                    initComment(true);
                     refreshCommentList();
+                } else {
+                    Log.e("HomeItemAty", response.body().getMsg());
                 }
             }
-
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
                 Toast.makeText(HomeItemAty.this, "连接超时", Toast.LENGTH_SHORT).show();
@@ -377,7 +452,6 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         }
         editComment.setFocusable(false);
         expressionRv.setVisibility(View.GONE);
-
     }
 
     private void refreshCommentList() {
@@ -419,6 +493,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
+                isSendSubComment = false;
                 mDistance += dy;
                 float percent = mDistance * 0.5f / maxDistance;
                 int alpha = (int) (percent * 255);
@@ -433,9 +508,6 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         });
 
         mAdapter.register(Video.class, new VideoViewBinder(this));
-        /**
-         * 需要改ContentViewBinder
-         */
         mAdapter.register(Content.class, new ContentViewBinder(this, mContentLayout));
         mAdapter.register(EmptyValue.class).to(new FieldTitleViewBinder(), new EmptyViewBinder())
                 .withClassLinker(new ClassLinker<EmptyValue>() {
@@ -451,7 +523,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         mAdapter.register(RecommendList.class, new RecommendListViewBinder());
         mAdapter.register(Comment.class, new CommentViewBinder(this));
         mItems.add(new Video("", imgUrl, videoUrl));
-        mItems.add(new Content(title, portraitUrl, username, mContent, likeNum));
+        mItems.add(new Content(author_id, title, portraitUrl, username, likeNum));
         mItems.add(new EmptyValue("热门推荐"));
 
         List<Recommend> recommendList = new ArrayList<>();
@@ -476,8 +548,6 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         mItems.add(new EmptyValue(""));
 
         mAdapter.notifyDataSetChanged();
-
-
     }
 
     private void initComment(boolean isRefresh) {
@@ -523,7 +593,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         if (mVideoView == null) {
             mVideoView = new MyVideoView(this);
         }
-        mVideoView.stop();
+        mVideoView.release();
         v = view.findViewById(R.id.item_video_play);
         if (v != null) v.setVisibility(View.INVISIBLE);
         v = view.findViewById(R.id.img);
@@ -601,7 +671,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             } else if (resultCode == FullScreenVideo.RESULT_VIDEO_NOT_FINISH) {
                 if (mVideoView != null) {
                     mVideoView.seekTo(data.getIntExtra("progress", 0));
-                    mVideoView.start();
+                    mVideoView.resume();
                 }
                 isFullClick = false;
             }
@@ -612,22 +682,55 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
      * 此方法为文章赞赏的回调
      */
     @Override
-    public void onLikeClick() {
-        //TODO post to server
+    public void onLikeClick(final TextView tv, final String likes) {
+
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        HomeService service = retrofit.create(HomeService.class);
+        service.postLikes(UserConfig.getToken(this), id).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                if (response.body().getStatus().equals("200")) {
+                    int num = Integer.parseInt(tv.getText().toString());
+                    if (isLike) {
+                        num --;
+                        tv.setText(String.valueOf(num));
+                    } else {
+                        num ++;
+                        tv.setText(String.valueOf(num));
+                    }
+                    isLike = !isLike;
+//                    if (isLike) {
+//                        num ++;
+//                        tv.setText(String.valueOf(num));
+//                    } else {
+////                        num --;
+//                        tv.setText(String.valueOf(num));
+//                    }
+                } else {
+                    Log.e("HomeItemAty", response.body().getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+                Toast.makeText(HomeItemAty.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
      * 以下三个方法为Comment的回调
      */
     @Override
-    public void onLoadMoreReply() {
+    public void onLoadMoreReply(String user_id) {
         Intent toComment = new Intent(this, CommentAty.class);
+        toComment.putExtra("user_id", user_id);
         startActivity(toComment);
         overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
     }
 
     @Override
-    public void onReply(String username, int pos) {
+    public void onReply(String username, int pos, String comment_id) {
         imm.showSoftInput(editComment, InputMethodManager.SHOW_FORCED);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
         editComment.setHint("回复@" + username + ":");
@@ -635,11 +738,64 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         editComment.setFocusableInTouchMode(true);
         editComment.requestFocus();
         editComment.findFocus();
+        commentId = comment_id;
+        isSendSubComment = true;
+    }
+
+    //评论的点赞
+    @Override
+    public void onLikeButtonClick(final TextView tv, String comment_id, boolean isReply, final boolean isLike) {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).postCommentLike(UserConfig.getToken(this),
+                comment_id).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                CommonInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    int num = Integer.parseInt(tv.getText().toString());
+                    if (isLike) {
+                        tv.setText(String.valueOf(num - 1));
+                    } else {
+                        tv.setText(String.valueOf(num + 1));
+                    }
+                } else {
+                    Log.e("HomeItemAty", info.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void sendSubComment() {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).sendSubComments(UserConfig.getToken(this),
+                commentId, editComment.getText().toString()).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                CommonInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    refreshCommentList();
+                } else {
+                    Log.e("HomeItemAty", info.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+                Toast.makeText(HomeItemAty.this, "连接超时", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
-    public void onLikeButtonClick(boolean isReply) {
-        //TODO 联网
+    public void onUserPortraitClick(String user_id) {
+        Intent toUserInfo = new Intent(this, UserInfoAty.class);
+        toUserInfo.putExtra("user_id", user_id);
+        startActivity(toUserInfo);
     }
 
     private class MyTextWatcher implements TextWatcher {
@@ -655,7 +811,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         }
 
         @Override
-        public void afterTextChanged(Editable editable) {
+        public void afterTextChanged(final Editable editable) {
             if (!TextUtils.isEmpty(editable)) {
                 send.setEnabled(true);
                 ViewGroup.LayoutParams lp = editComment.getLayoutParams();
@@ -664,7 +820,12 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                 send.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        doSendWork();
+                        if (editComment.getHint().toString().startsWith("回复@")) {
+                            Log.e("HomeItemAty", "sendSubComment");
+                            sendSubComment();
+                        } else {
+                            doSendWork();
+                        }
                     }
                 });
             } else {

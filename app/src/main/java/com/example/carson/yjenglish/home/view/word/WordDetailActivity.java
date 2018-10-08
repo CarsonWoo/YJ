@@ -24,6 +24,9 @@ import android.widget.Toast;
 import com.example.carson.yjenglish.EmptyValue;
 import com.example.carson.yjenglish.FullScreenVideo;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.VideoCaptionInfo;
+import com.example.carson.yjenglish.VideoCaptionModel;
+import com.example.carson.yjenglish.VideoService;
 import com.example.carson.yjenglish.customviews.MyVideoView;
 import com.example.carson.yjenglish.home.WordService;
 import com.example.carson.yjenglish.home.model.forviewbinder.Change;
@@ -103,6 +106,8 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
     private MediaPlayer mPlayer;
 
     private MyVideoView mVideo;
+
+    private List<VideoCaptionModel> mCaptions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -286,15 +291,16 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 if (tipsCount <= 5) {
                     showmDialog();
                 } else {
+                    //不知道是否存在问题
                     setResult(WordActivity.RESULT_WORD_PASS);
-                    onBackPressed();
+                    overridePendingTransition(R.anim.ani_left_get_into, R.anim.ani_right_sign_out);
+                    finishAfterTransition();
                 }
                 break;
             case R.id.like:
                 break;
             case R.id.next:
             case R.id.back:
-                setResult(WordActivity.RESULT_WORD_NEXT);
                 onBackPressed();
                 break;
             case R.id.close_video:
@@ -325,7 +331,9 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onConfirm() {
                 setResult(WordActivity.RESULT_WORD_PASS);
-                onBackPressed();
+                overridePendingTransition(R.anim.ani_left_get_into, R.anim.ani_right_sign_out);
+                finishAfterTransition();
+                supportFinishAfterTransition();
             }
         });
         dialogUtils.show(mDialog);
@@ -342,6 +350,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             mVideo.release();
             mVideo = null;
         }
+        setResult(WordActivity.RESULT_WORD_NEXT);
         super.onBackPressed();
         overridePendingTransition(R.anim.ani_left_get_into, R.anim.ani_right_sign_out);
     }
@@ -376,6 +385,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onSentenceSoundClick(String mAACFile) {
         //解析aac音频帧 例句
+        initPlayer(Environment.getExternalStorageDirectory().getPath() + "/YuJingRecorder/" + word + ".aac");
     }
 
     @Override
@@ -388,9 +398,35 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onVideoClick(String video_id, String videoUrl, int pos) {
-        Log.e("WordDetail", video_id);
-        Log.e("WordDetail", videoUrl);
-        showVideo(pos, videoUrl);
+//        Log.e("WordDetail", video_id);
+//        Log.e("WordDetail", videoUrl);
+        executeCaptionTask(pos, videoUrl, video_id);
+//        showVideo(pos, videoUrl);
+    }
+
+    private void executeCaptionTask(final int pos, final String videoUrl, final String video_id) {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(VideoService.class).getVideoInfo(UserConfig.getToken(this),
+                video_id).enqueue(new Callback<VideoCaptionInfo>() {
+            @Override
+            public void onResponse(Call<VideoCaptionInfo> call, Response<VideoCaptionInfo> response) {
+                VideoCaptionInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    mCaptions = info.getData();
+                    if (mVideo != null) {
+                        mVideo.setCaption(mCaptions);
+                    }
+                    showVideo(pos, videoUrl);
+                } else {
+                    Log.e("WordDetail", info.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VideoCaptionInfo> call, Throwable t) {
+                Toast.makeText(WordDetailActivity.this, "连接超时", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void showVideo(final int pos, final String path) {
@@ -402,7 +438,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             videoContainer.setVisibility(View.VISIBLE);
         }
         if (mVideo == null) {
-            mVideo = new MyVideoView(this, true, false);
+            mVideo = new MyVideoView(this, true, false, mCaptions);
         }
         videoFrame.removeAllViews();
         videoFrame.addView(mVideo, new ViewGroup.LayoutParams(-1, -1));
@@ -416,7 +452,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
 //                videoFrame.removeAllViews();
                 if (pos + 1 < mVideoList.size()) {
                     //还有下一个视频
-                    showVideo(pos + 1, mVideoList.get(pos + 1).getVideo());
+                    executeCaptionTask(pos + 1, mVideoList.get(pos + 1).getVideo(), mVideoList.get(pos + 1).getId());
                 } else {
                     //没有视频了
                     Toast.makeText(WordDetailActivity.this, "没有下一个视频咯", Toast.LENGTH_SHORT).show();
@@ -428,7 +464,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             public void onFormerClick() {
                 if (pos > 0) {
                     //存在上一个视频
-                    showVideo(pos - 1, mVideoList.get(pos - 1).getVideo());
+                    executeCaptionTask(pos - 1, mVideoList.get(pos - 1).getVideo(), mVideoList.get(pos - 1).getId());
                 } else {
                     Toast.makeText(WordDetailActivity.this, "没有上一个视频噢", Toast.LENGTH_SHORT).show();
                 }
@@ -438,7 +474,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             public void onLatterClick() {
                 if (pos + 1 < mVideoList.size()) {
                     //还有下一个视频
-                    showVideo(pos + 1, mVideoList.get(pos + 1).getVideo());
+                    executeCaptionTask(pos + 1, mVideoList.get(pos + 1).getVideo(), mVideoList.get(pos - 1).getId());
                 } else {
                     //没有视频了
                     Toast.makeText(WordDetailActivity.this, "没有下一个视频咯",
@@ -454,16 +490,23 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 toFullScreen.putExtra("progress", progress);
                 String mPathList;
                 StringBuilder sb = new StringBuilder();
+                String video_ids;
+                StringBuilder stringBuilder = new StringBuilder();
                 for (int i = 0; i < mVideoList.size(); i++) {
                     if (i != mVideoList.size() - 1) {
                         sb.append(mVideoList.get(i).getVideo()).append("；");
+                        stringBuilder.append(mVideoList.get(i).getId()).append("；");
                     } else {
                         sb.append(mVideoList.get(i).getVideo());
+                        stringBuilder.append(mVideoList.get(i).getId());
                     }
                 }
                 mPathList = sb.toString();
+                video_ids = stringBuilder.toString();
                 toFullScreen.putExtra("path", mPathList);
                 toFullScreen.putExtra("has_multi_videos", true);
+                toFullScreen.putExtra("caption_type", 1);
+                toFullScreen.putExtra("video_ids", video_ids);
                 toFullScreen.putExtra("current_position", pos);
                 startActivity(toFullScreen);
                 overridePendingTransition(R.anim.anim_top_rotate_get_into,

@@ -33,6 +33,7 @@
                 android:textSize="20sp"
                 android:textAlignment="center"
                 android:textColor="@color/colorTextWord"
+                android:layout_gravity="center_horizontal"
                 />
 
             <TextView

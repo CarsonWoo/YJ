@@ -66,11 +66,14 @@ public class CommentAty extends AppCompatActivity implements View.OnClickListene
 
     private InputMethodManager imm;
 
+    private String user_id;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_comment);
         imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        user_id = getIntent().getStringExtra("user_id");
         initViews();
     }
 
@@ -118,8 +121,8 @@ public class CommentAty extends AppCompatActivity implements View.OnClickListene
                     rvReply.setLoadMoreResource(R.drawable.ic_like_pink_fill);
                 } else {
                     for (int i = 0; i < 3; i++) {
-                        mReplies.add(new Comment("酷酷的忧郁男孩", "http://pic.qiantucdn.com/58pic/19/57/12/47B58PICxdD_1024.jpg",
-                                "今天11:00", "行吧", null, 1, null));
+                        mReplies.add(new Comment(user_id, "酷酷的忧郁男孩", "http://pic.qiantucdn.com/58pic/19/57/12/47B58PICxdD_1024.jpg",
+                                "今天11:00", "行吧", null, 1, null, "1", true));
                     }
                     commentAdapter.notifyItemRangeInserted(mLastPosition, 3);
                     mLastPosition += 3;
@@ -132,13 +135,11 @@ public class CommentAty extends AppCompatActivity implements View.OnClickListene
                     }, 1000);
                 }
 
-
-
             }
         });
         for (int i = 0; i < 3; i++) {
-            mReplies.add(new Comment("帅得惹人骂", "http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg",
-                    "今天11:08", "Fine", null, 10, null));
+            mReplies.add(new Comment(user_id, "帅得惹人骂", "http://cdn.duitang.com/uploads/item/201507/10/20150710045602_wHEBf.jpeg",
+                    "今天11:08", "Fine", null, 10, null, "1", true));
         }
         mLastPosition += 3;
         commentAdapter = new CommentAdapter(this, mReplies);

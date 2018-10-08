@@ -100,7 +100,10 @@ public class NetUtils {
             @Override
             public Response intercept(Chain chain) throws IOException {
                 Request re = chain.request();
-                re.newBuilder().addHeader("token", UserConfig.getToken(MyApplication.getContext()));
+                Log.e("Interceptor", UserConfig.getToken(MyApplication.getContext()));
+                re.newBuilder()
+                        .addHeader("token", UserConfig.getToken(MyApplication.getContext()))
+                        .build();
                 return chain.proceed(re);
             }
         };

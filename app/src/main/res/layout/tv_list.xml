@@ -2,9 +2,9 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_marginTop="10dp"
-    android:layout_marginBottom="10dp"
     android:background="@android:color/white"
+    android:layout_marginTop="5dp"
+    android:layout_marginBottom="5dp"
     android:layout_height="260dp">
 
     <FrameLayout
@@ -14,7 +14,6 @@
 
     <ImageView
         android:id="@+id/video_bg"
-        android:background="#eef"
         android:backgroundTintMode="src_over"
         android:layout_width="match_parent"
         android:layout_height="200dp" />
@@ -30,6 +29,26 @@
         app:layout_constraintBottom_toTopOf="@id/rl_click_view"
         />
 
+    <ImageView
+        android:id="@+id/iv_play_num"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@drawable/ic_play_white_solid"
+        android:layout_marginStart="5dp"
+        app:layout_constraintBottom_toBottomOf="@id/video_bg"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/tv_play_num"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="12sp"
+        android:textColor="@android:color/white"
+        app:layout_constraintStart_toEndOf="@id/iv_play_num"
+        app:layout_constraintBottom_toBottomOf="@id/video_bg"
+        />
+
     <RelativeLayout
         android:id="@+id/rl_click_view"
         android:layout_width="match_parent"
@@ -42,10 +61,10 @@
             android:id="@+id/word"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="travel[ˈtrævəl]"
+            android:text="travel"
             android:textColor="@color/colorTextWord"
             android:textSize="18sp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="6dp"
             android:layout_marginStart="10dp"
             />
 
@@ -60,6 +79,7 @@
             />
 
         <ImageView
+            android:id="@+id/iv_comment"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_centerVertical="true"
@@ -79,12 +99,13 @@
             />
 
         <ImageView
+            android:id="@+id/iv_favour"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_toLeftOf="@id/like_num"
             android:layout_marginEnd="3dp"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_like_black_stroke"
+            android:src="@drawable/selector_homepage_feeds_like"
             />
 
         <TextView
@@ -98,7 +119,5 @@
             />
 
     </RelativeLayout>
-
-
 
 </android.support.constraint.ConstraintLayout>

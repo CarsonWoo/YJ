@@ -68,7 +68,7 @@ public class WordDetailInfo {
         }
 
         public class VideoInfo {
-            private String id;
+            private String id;//视频id
             private String sentence;
             private String video_name;
             private String img;

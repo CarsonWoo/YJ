@@ -38,6 +38,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.signature.StringSignature;
 import com.example.carson.yjenglish.BuildConfig;
 import com.example.carson.yjenglish.R;
@@ -143,7 +144,8 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
         etName.setText(name);
         etSign.setText(signature);
         tvGender.setText(gender);
-        Glide.with(this).load(imgUrl).thumbnail(0.5f).into(ivPortrait);
+        Glide.with(this).load(imgUrl).thumbnail(0.5f).crossFade()
+                .into(ivPortrait);
 
         back.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -247,7 +249,8 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
         bigImg = mView.findViewById(R.id.img);
         Button mBtn = mView.findViewById(R.id.change_portrait);
         photoView.addView(mView);
-        Glide.with(InfoAty.this).load(imgUrl).thumbnail(0.5f).into(bigImg);
+        Glide.with(InfoAty.this).load(imgUrl).thumbnail(0.5f).crossFade()
+                .diskCacheStrategy(DiskCacheStrategy.SOURCE).into(bigImg);
         mBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -491,7 +494,7 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
 
         RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), photoFile);
         MultipartBody.Part part = MultipartBody.Part.createFormData("portrait", photoFile.getName(), fileBody);
-        service.changeUserPortrait(UserConfig.getToken(InfoAty.this), part).enqueue(new Callback<CommonInfo>() {
+        service.changeUserPortrait(/*UserConfig.getToken(InfoAty.this), */part).enqueue(new Callback<CommonInfo>() {
             @Override
             public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
                 CommonInfo info = response.body();
@@ -501,6 +504,8 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                     setBackIntent();
                 } else {
                     Toast.makeText(InfoAty.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+                    Log.e("InfoAty", info.getStatus());
+                    Log.e("InfoAty", info.getMsg());
                 }
             }
 

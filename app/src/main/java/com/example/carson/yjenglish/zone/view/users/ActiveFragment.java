@@ -78,7 +78,7 @@ public class ActiveFragment extends Fragment {
             mAdapter.register(String.class, new EmptyBinder());
             mItems.add("55555~暂时没有动态噢~");
         } else {
-            mAdapter.register(UserActive.class, new UserActiveBinder());
+            mAdapter.register(UserActive.class, new UserActiveBinder(mListener));
             UserActive active = new UserActive(0, 0, "Carson",
                     "http://pic.qiantucdn.com/58pic/19/57/12/47B58PICxdD_1024.jpg");
             active.setHomeFeeds(new HomeFeeds("http://pic.qiantucdn.com/58pic/19/57/12/47B58PICxdD_1024.jpg",
@@ -134,6 +134,6 @@ public class ActiveFragment extends Fragment {
     }
 
     public interface OnActiveItemListener {
-        void onItemClick();
+        void onItemClick(int type);
     }
 }
