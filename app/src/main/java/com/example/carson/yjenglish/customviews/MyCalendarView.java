@@ -8,15 +8,19 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.utils.FontUtils;
+import com.example.carson.yjenglish.utils.ScreenUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by 84594 on 2018/8/14.
@@ -41,7 +45,7 @@ public class MyCalendarView extends View {
     /** 选中的文本的颜色*/
     private int mSelectTextColor;
 
-    private float weekMarginTop = 220;
+    private float weekMarginTop = ScreenUtils.dp2px(getContext(), 55);
 
     private String pattern = "yyyy年MM月";
 
@@ -58,12 +62,13 @@ public class MyCalendarView extends View {
     private String[] MONTH_STR_TITLE = new String[]{"January", "February", "March", "April", "May",
             "June", "July", "August", "September", "October", "November", "December"};
 
-    private List<Integer> mSelectDays;
+    private Map<Integer, List<Integer>> mSelectDays;
+    private int monthInt = 0;
 
     /** 行间距*/
-    private float mLineSpac = 30;
+    private float mLineSpac = ScreenUtils.dp2px(getContext(), 10);
     /** 字体上下间距*/
-    private float mTextSpac = 30;
+    private float mTextSpac = ScreenUtils.dp2px(getContext(), 10);
 
 
     private float titleHeight, weekHeight, dayHeight, rowHeight;
@@ -80,11 +85,11 @@ public class MyCalendarView extends View {
     public MyCalendarView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.MyCalendarView, defStyleAttr, 0);
-        mTextSizeMonth = a.getDimension(R.styleable.MyCalendarView_mTextSizeMonth, 100);
+        mTextSizeMonth = a.getDimension(R.styleable.MyCalendarView_mTextSizeMonth, ScreenUtils.dp2px(getContext(), 30));
         mTextMonthColor = a.getColor(R.styleable.MyCalendarView_mTextColorMonth, getResources().getColor(R.color.colorText));
-        mTextSizeWeek = a.getDimension(R.styleable.MyCalendarView_mTextSizeWeek, 30);
+        mTextSizeWeek = a.getDimension(R.styleable.MyCalendarView_mTextSizeWeek, ScreenUtils.dp2px(getContext(), 12));
         mTextColorWeek = a.getColor(R.styleable.MyCalendarView_mTextColorWeek, getResources().getColor(R.color.colorTextWord));
-        mTextSizeDay = a.getDimension(R.styleable.MyCalendarView_mTextSizeDay, 40);
+        mTextSizeDay = a.getDimension(R.styleable.MyCalendarView_mTextSizeDay, ScreenUtils.dp2px(getContext(), 14));
         mTextColorDay = a.getColor(R.styleable.MyCalendarView_mTextColorDay, getResources().getColor(R.color.colorTextWord));
         mSelectTextColor = a.getColor(R.styleable.MyCalendarView_mTextColorSelected, Color.WHITE);
         a.recycle();
@@ -96,7 +101,7 @@ public class MyCalendarView extends View {
         bgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         mPaint.setTextSize(mTextSizeMonth);
-        titleHeight = FontUtils.getFontHeight(mPaint) + 20;
+        titleHeight = FontUtils.getFontHeight(mPaint) + ScreenUtils.dp2px(getContext(), 15);
 
         mPaint.setTextSize(mTextSizeWeek);
         weekHeight = FontUtils.getFontHeight(mPaint);
@@ -164,6 +169,18 @@ public class MyCalendarView extends View {
             lineNum ++;
             lastLineNum = shengyu;
         }
+
+//        if (monthInt == 1) {
+//            String s = getMonthStr(month).substring(5, 7);
+//            if (s.startsWith("0")) {
+//                monthInt = Integer.parseInt(s.substring(1));
+//            } else {
+//                monthInt = Integer.parseInt(s);
+//            }
+//        }
+
+
+        Log.e(TAG, "monInt = " + monthInt);
 //        Log.e(TAG, getMonthStr(month) + "一共有" + dayOfMonth + "天,第一天的索引是：" + firstIndex +
 //                "   有" + lineNum + "行，第一行"+firstLineNum + "个，最后一行" + lastLineNum + "个");
     }
@@ -269,14 +286,17 @@ public class MyCalendarView extends View {
 
             //如果day在selectdays里面
             if (mSelectDays != null) {
-                for (int mSelectDay : mSelectDays) {
-                    if (mSelectDay == day) {
-                        mPaint.setColor(mSelectTextColor);
-                        bgPaint.setColor(getResources().getColor(R.color.colorAccent));
-                        bgPaint.setStyle(Paint.Style.FILL);
-                        bgPaint.setStrokeWidth(3);
-                        canvas.drawCircle(left + columnWidth / 2, top + mLineSpac + dayHeight / 2,
-                                40, bgPaint);
+                for (int key : mSelectDays.keySet()) {
+                    for (int mSelectDay : mSelectDays.get(key)) {
+                        //应该没问题
+                        if (key == monthInt && mSelectDay == day) {
+                            mPaint.setColor(mSelectTextColor);
+                            bgPaint.setColor(getResources().getColor(R.color.colorAccent));
+                            bgPaint.setStyle(Paint.Style.FILL);
+                            bgPaint.setStrokeWidth(3);
+                            canvas.drawCircle(left + columnWidth / 2, top + mLineSpac + dayHeight / 2,
+                                    40, bgPaint);
+                        }
                     }
                 }
             }
@@ -295,14 +315,16 @@ public class MyCalendarView extends View {
 
     /**月份增减*/
     public void monthChange(int change){
+        Log.e(TAG, "change = " + change);
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(month);
         calendar.add(Calendar.MONTH, change);
+        monthInt = change;
         setMonth(getMonthStr(calendar.getTime()));
         invalidate();
     }
 
-    public void setmSelectDays(List<Integer> mList) {
+    public void setmSelectDays(Map<Integer, List<Integer>> mList) {
         mSelectDays = mList;
     }
 }

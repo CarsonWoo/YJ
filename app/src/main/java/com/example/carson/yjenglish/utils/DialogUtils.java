@@ -327,6 +327,7 @@ public class DialogUtils {
 
     public interface OnTipsListener {
         void onConfirm();
+        void onCancel();
     }
 
     public interface OnPickerListener {

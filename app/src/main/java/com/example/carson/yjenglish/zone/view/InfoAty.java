@@ -7,15 +7,17 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
@@ -27,7 +29,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -39,15 +40,14 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.signature.StringSignature;
-import com.example.carson.yjenglish.BuildConfig;
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.net.NetTask;
 import com.example.carson.yjenglish.net.NullOnEmptyConverterFactory;
 import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.DialogUtils;
+import com.example.carson.yjenglish.utils.ImageUtils;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.UserInfoContract;
 import com.example.carson.yjenglish.zone.UserInfoTask;
@@ -57,18 +57,15 @@ import com.example.carson.yjenglish.zone.presenter.UserInfoPresenter;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import cn.qqtheme.framework.picker.OptionPicker;
-import cn.qqtheme.framework.picker.WheelPicker;
 import de.hdodenhof.circleimageview.CircleImageView;
-import okhttp3.Interceptor;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -93,6 +90,7 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
     private ImageView bigImg;
 
     private FrameLayout photoView;
+    private ConstraintLayout mLayout;
 
     private String name;
     private String signature;
@@ -103,14 +101,29 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
     private File photoFile;
 
     private Dialog mDialog;
+    private Dialog uploadDialog;
     private UserInfoContract.Presenter mPresenter;
     private UserInfoPresenter infoPresenter;
+
+    private int type;
+    private Bitmap bm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.zone_user_info);
         mDialog = DialogUtils.getInstance(this).newAnimatedLoadingDialog();
+        uploadDialog = DialogUtils.getInstance(this).newCommonDialog("上传中，请稍后...",
+                R.mipmap.gif_loading_video, true);
+        uploadDialog.setCanceledOnTouchOutside(false);
 
         Intent fromData = getIntent();
         name = fromData.getStringExtra("name");
@@ -140,11 +153,15 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
         etSign = findViewById(R.id.edit_sign);
         confirm = findViewById(R.id.btn_confirm);
         photoView = findViewById(R.id.photo_view);
+        mLayout = findViewById(R.id.zone_user_info);
 
         etName.setText(name);
         etSign.setText(signature);
         tvGender.setText(gender);
-        Glide.with(this).load(imgUrl).thumbnail(0.5f).crossFade()
+        Glide.with(this)
+                .load(imgUrl)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .crossFade()
                 .into(ivPortrait);
 
         back.setOnClickListener(new View.OnClickListener() {
@@ -200,6 +217,11 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                             public void onConfirm() {
                                 mDialog.dismiss();
                             }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
                         });
                         return;
                     } else if (!etName.getText().toString().equals(name)) {
@@ -213,6 +235,9 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                         ableToPost = true;
                     }
 //                    etSign.setEnabled(false);
+                }
+                if (!tvGender.getText().toString().isEmpty()) {
+                    ableToPost = true;
                 }
                 if (ableToPost) {
                     etName.setEnabled(false);
@@ -257,7 +282,7 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                 View windowView = LayoutInflater.from(InfoAty.this).inflate(R.layout.popup_window_photo, null,
                         false);
                 final PopupWindow window = new PopupWindow(windowView, ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                        ScreenUtils.dp2px(InfoAty.this, 85));
                 window.setAnimationStyle(R.style.popup_window_photo_utils_animation);
                 TextView takePhoto = windowView.findViewById(R.id.take_photo);
                 TextView pickPhoto = windowView.findViewById(R.id.pick_photo);
@@ -277,7 +302,8 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                 });
                 window.setOutsideTouchable(true);
                 window.setBackgroundDrawable(new BitmapDrawable());
-                window.showAsDropDown(photoView, 0, -window.getHeight(), Gravity.BOTTOM);
+                window.setClippingEnabled(false);
+                window.showAsDropDown(getWindow().getDecorView(), 0, -window.getHeight(), Gravity.BOTTOM);
             }
         });
         mBack.setOnClickListener(new View.OnClickListener() {
@@ -318,9 +344,11 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
 
     private void onPickPhoto() {
         checkReadStoragePermission();
+        type = 2;
     }
 
     private void onTakePhoto() {
+        type = 1;
         if (Build.VERSION.SDK_INT >= 24) {
             photoUri = get24MediaFileUri();
         } else {
@@ -347,7 +375,7 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
 
     private Uri get24MediaFileUri() {
         String filePath = Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/语境背单词/" + System.currentTimeMillis() + ".jpg";
+                + "/背呗背单词/" + System.currentTimeMillis() + ".jpg";
         File mediaFile = new File(filePath);
         if (!mediaFile.getParentFile().exists()) {
             mediaFile.getParentFile().mkdir();
@@ -405,7 +433,44 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
         String picPath = cursor.getString(columnIndex);
         cursor.close();
-        photoFile = new File(picPath);
+//        photoFile = new File(picPath);
+
+        photoFile = new File(ImageUtils.compressImage(picPath));
+
+        Glide.with(this).load(photoFile).thumbnail(0.5f).into(bigImg);
+//        if (Build.VERSION.SDK_INT >= 24) {
+//            photoUri = FileProvider.getUriForFile(this,
+//                    "com.example.carson.yjenglish.fileprovider",
+//                    photoFile);
+//        } else {
+//            Uri.fromFile(photoFile);
+//        }
+//        cropPhoto(uri);
+    }
+
+    private void cropPhoto(Uri uri) {
+        Intent crop = new Intent("com.android.camera.action.CROP");
+        crop.setDataAndType(uri, "image/*");
+
+        if (Build.VERSION.SDK_INT >= 24) {
+            crop.putExtra("noFaceDetection", false);//去除默认的人脸识别
+            crop.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            crop.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        }
+
+        //设置裁剪
+        crop.putExtra("crop", "true");
+        //aspectX aspectY 是宽高的比例
+        crop.putExtra("aspectX", 1);
+        crop.putExtra("aspectY", 1);
+        //outputX outputY为裁剪宽高
+        crop.putExtra("outputX", 200);
+        crop.putExtra("outputY", 200);
+        //返回数据 若为false 回调收不到
+        crop.putExtra("return-data", true);
+        crop.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+
+        startActivityForResult(crop, 101);
     }
 
     @Override
@@ -465,24 +530,55 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }
+//                if (Build.VERSION.SDK_INT >= 24) {
+//                    cropPhoto(FileProvider.getUriForFile(InfoAty.this,
+//                            "com.example.carson.yjenglish.fileprovider",
+//                            photoFile));
+//                } else {
+//                    cropPhoto(Uri.fromFile(photoFile));
+//                }
                 sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" +
                         photoFile.getAbsolutePath())));
-                Glide.with(this).load(photoFile).into(bigImg);
+                photoFile = new File(ImageUtils.compressImage(photoFile.getAbsolutePath()));
+                Glide.with(this).load(photoFile).thumbnail(0.5f).into(bigImg);
+                uploadDialog.show();
 
                 executeChangePortraitTask();
             }
         } else if (requestCode == 2) {
             if (resultCode == RESULT_OK) {
                 selectPic(data);
-                Glide.with(this).load(photoFile).into(bigImg);
+
+                uploadDialog.show();
 
                 executeChangePortraitTask();
             }
+        } else if (requestCode == 101) {
+//            if (type == 1) {
+//                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.parse("file://" +
+//                        photoFile.getAbsolutePath())));
+//            }
+//            //裁剪
+//            if (data == null) {
+//                return;
+//            }
+//
+//            Bundle bundle = data.getExtras();
+//            if (bundle != null) {
+//                Bitmap bitmap = bundle.getParcelable("data");
+////                Glide.with(this).load(bitmap).into(bigImg);
+//                bigImg.setImageBitmap(bitmap);
+//            } else {
+//                Log.e("InfoAty", "null");
+//            }
+//
+//            executeChangePortraitTask();
+
         }
     }
 
     private void executeChangePortraitTask() {
-        OkHttpClient client = NetUtils.getInstance().getTokenClientInstance();
+        OkHttpClient client = NetUtils.getInstance().getPhotoClientInstance();
 
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(UserConfig.HOST).addConverterFactory(new NullOnEmptyConverterFactory())
@@ -492,11 +588,18 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                 .build();
         ZoneService service = retrofit.create(ZoneService.class);
 
+//        Bitmap bm = BitmapFactory.decodeFile(photoFile.getAbsolutePath());
+//        File file = new File(ImageUtils.bitmapToFileWhithCompress(this, bm, 150));
+
         RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), photoFile);
-        MultipartBody.Part part = MultipartBody.Part.createFormData("portrait", photoFile.getName(), fileBody);
-        service.changeUserPortrait(/*UserConfig.getToken(InfoAty.this), */part).enqueue(new Callback<CommonInfo>() {
+        MultipartBody.Builder builder = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM);
+        builder.addFormDataPart("portrait", photoFile.getName(), fileBody);
+        List<MultipartBody.Part> part = builder.build().parts();
+        service.changeUserPortrait(UserConfig.getToken(InfoAty.this), part).enqueue(new Callback<CommonInfo>() {
             @Override
             public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                uploadDialog.dismiss();
                 CommonInfo info = response.body();
                 if (info.getStatus().equals("200")) {
                     imgUrl = info.getData();
@@ -506,12 +609,15 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                     Toast.makeText(InfoAty.this, info.getMsg(), Toast.LENGTH_SHORT).show();
                     Log.e("InfoAty", info.getStatus());
                     Log.e("InfoAty", info.getMsg());
+                    Log.e("InfoAty", getSharedPreferences("cookies_prefs", MODE_PRIVATE)
+                    .getString("123.207.85.37", "null"));
                 }
             }
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e("InfoAty", t.getMessage());
+                uploadDialog.dismiss();
+                Toast.makeText(InfoAty.this, "连接超时", Toast.LENGTH_SHORT).show();
             }
         });
     }

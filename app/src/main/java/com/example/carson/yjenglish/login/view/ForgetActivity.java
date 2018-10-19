@@ -3,6 +3,7 @@ package com.example.carson.yjenglish.login.view;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -26,6 +27,7 @@ import com.example.carson.yjenglish.login.presenter.ForgetPresenter;
 import com.example.carson.yjenglish.utils.AddCookiesInterceptor;
 import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.SaveCookiesInterceptor;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.google.gson.Gson;
 
@@ -69,6 +71,14 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_forget);
 
         initViews();
@@ -232,7 +242,8 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
             if (data != null) {
                 data.putExtra("phone", phone.getText().toString());
                 setResult(RESULT_FORGET_OK, data);
-                onBackPressed();
+                finishAfterTransition();
+                overridePendingTransition(R.anim.ani_left_get_into, R.anim.ani_right_sign_out);
             }
 
         }

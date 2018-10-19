@@ -5,12 +5,14 @@ package com.example.carson.yjenglish.zone.model.forviewbinder;
  */
 
 public class WordItem {
+    private String id;
     private String word;
     private String soundMark;
     private String time;
     private String imgUrl;
 
-    public WordItem(String word, String soundMark, String time, String imgUrl) {
+    public WordItem(String id, String word, String soundMark, String time, String imgUrl) {
+        this.id = id;
         this.word = word;
         this.soundMark = soundMark;
         this.time = time;
@@ -32,5 +34,9 @@ public class WordItem {
 
     public String getImgUrl() {
         return imgUrl;
+    }
+
+    public String getId() {
+        return id;
     }
 }

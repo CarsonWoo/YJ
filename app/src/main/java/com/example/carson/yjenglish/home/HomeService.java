@@ -1,6 +1,8 @@
 package com.example.carson.yjenglish.home;
 
 import com.example.carson.yjenglish.home.model.AuthorInfo;
+import com.example.carson.yjenglish.home.model.CalendarInfo;
+import com.example.carson.yjenglish.home.model.CommentDetailInfo;
 import com.example.carson.yjenglish.home.model.HomeInfo;
 import com.example.carson.yjenglish.home.model.HomeItemInfo;
 import com.example.carson.yjenglish.utils.CommonInfo;
@@ -99,4 +101,31 @@ public interface HomeService {
     Call<CommonInfo> deleteComment(@Header("token") String token,
                                    @Field("id") String id);
 
+    @POST("home/favour_dictionary.do")
+    @FormUrlEncoded
+    Call<CommonInfo> postWordFavours(@Header("token") String token,
+                                     @Field("id") String id);
+
+    @POST("home/comment_detail.do")
+    @FormUrlEncoded
+    Call<CommentDetailInfo> getCommentDetail(@Header("token") String token,
+                                             @Field("id") String id);
+
+    @POST("home/clock_in.do")
+    Call<CommonInfo> doSignTask(@Header("token") String token);
+
+    @POST("home/error_correction.do")
+    @FormUrlEncoded
+    Call<CommonInfo> sendError(@Header("token") String token,
+                               @Field("type") String type,
+                               @Field("text") String text,
+                               @Field("word_id") String word_id);
+
+    @POST("home/clock_history.do")
+    Call<CalendarInfo> getHistory(@Header("token") String token);
+
+    @POST("home/like_feeds_reply_comment.do")
+    @FormUrlEncoded
+    Call<CommonInfo> postSubCommentLike(@Header("token") String token,
+                                        @Field("id") String id);
 }

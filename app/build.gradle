@@ -1,18 +1,41 @@
 apply plugin: 'com.android.application'
 
+/*apply from: 'tinker-support.gradle'*/
+
 android {
+
+    signingConfigs {
+        release {
+            try {
+                storeFile file("D:\\andoridstudio\\yujingbeidanci_apk.jks")
+                storePassword "yujingbeidanci123"
+                keyAlias "yujingbeidanci"
+                keyPassword "yujingbeidanci123"
+            } catch (ex) {
+                throw new InvalidUserDataException(ex.toString())
+            }
+        }
+    }
+
     compileSdkVersion 27
+/*    aaptOptions.cruncherEnabled = false
+    aaptOptions.useNewCruncher = false*/
     defaultConfig {
         applicationId "com.example.carson.yjenglish"
-        minSdkVersion 24
+        minSdkVersion 22
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            /*abiFilters 'armeabi'*/
+        }
     }
     buildTypes {
         release {
             minifyEnabled false
+            /*signingConfig signingConfigs.release*/
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
@@ -57,4 +80,13 @@ dependencies {
     implementation 'me.wcy:lrcview:2.0.1'
     implementation files('libs/open_sdk_r6008_lite.jar')
     compile 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:1.0.2'
+    compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
+
+/*    compile "com.android.support:multidex:1.0.1" // 多dex配置*/
+    //注释掉原有bugly的仓库
+//compile 'com.tencent.bugly:crashreport:latest.release'//其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.3.2
+    /*compile 'com.tencent.bugly:crashreport:latest.release'
+    compile 'com.tencent.bugly:nativecrashreport:latest.release'*/ //其中latest.release指代最新版本号，也可以指定明确的版本号，例如2.2.0
 }
+
+

@@ -4,9 +4,11 @@ package com.example.carson.yjenglish.zone.view;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,8 +19,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.carson.yjenglish.BaseActivity;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.ZoneTask;
 import com.example.carson.yjenglish.zone.model.ZoneInfo;
@@ -29,10 +34,17 @@ import com.example.carson.yjenglish.zone.view.like.MyLikeAty;
 import com.example.carson.yjenglish.zone.view.plan.PlanActivity;
 import com.example.carson.yjenglish.zone.viewbinder.ZoneContract;
 
+import org.litepal.crud.DataSupport;
+
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -132,7 +144,14 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
     private void initViews() {
         username.setText(nameStr);
         signature.setText(mSignature);
-        Glide.with(this).load(imgUrl).thumbnail(0.5f).crossFade().into(portrait);
+
+        Glide.with(this)
+                .load(imgUrl)
+                .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                .crossFade()
+                .into(portrait);
+
+
     }
 
     private void initDownload() {
@@ -226,7 +245,9 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
             imgUrl = data.getStringExtra("portrait_url");
             nameStr = data.getStringExtra("username");
             mSignature = data.getStringExtra("signature");
-            Glide.with(getContext()).load(imgUrl).thumbnail(0.5f).crossFade().into(portrait);
+            Glide.with(getContext())
+                    .load(imgUrl)
+                    .crossFade().into(portrait);
             username.setText(nameStr);
             signature.setText(mSignature);
         }
@@ -256,10 +277,20 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
             gender = mInfo.getGender();
             nameStr = mInfo.getUsername();
             mSignature = mInfo.getPersonality_signature();
+            signDays.setText(mInfo.getInsist_day());
+            remember.setText(mInfo.getLearned_word());
+            countDown.setText(mInfo.getRemaining_words());
+            UserConfig.cacheUsername(getContext(), nameStr);
             initViews();
         } else {
-            Toast.makeText(getContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
             if (info.getStatus().equals("400") && info.getMsg().equals("身份认证错误！")) {
+                UserConfig.clearUserInfo(getContext());
+                SharedPreferences.Editor editor = MyApplication.getContext().
+                        getSharedPreferences("word_favours", MODE_PRIVATE).edit();
+                editor.clear();
+                editor.apply();
+                DataSupport.deleteAll(LoadHeader.class);
                 BaseActivity.tokenOutOfDate(getActivity());
             }
         }
@@ -267,7 +298,13 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
 
     @Override
     public void onFailed(String msg) {
-        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                executeTask();
+            }
+        }, 5000);
     }
 
     public interface OnZoneEventListener {

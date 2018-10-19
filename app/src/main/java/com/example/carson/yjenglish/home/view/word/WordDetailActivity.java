@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,7 @@ import com.example.carson.yjenglish.VideoCaptionInfo;
 import com.example.carson.yjenglish.VideoCaptionModel;
 import com.example.carson.yjenglish.VideoService;
 import com.example.carson.yjenglish.customviews.MyVideoView;
+import com.example.carson.yjenglish.home.HomeService;
 import com.example.carson.yjenglish.home.WordService;
 import com.example.carson.yjenglish.home.model.forviewbinder.Change;
 import com.example.carson.yjenglish.home.model.forviewbinder.Header;
@@ -41,18 +43,22 @@ import com.example.carson.yjenglish.home.viewbinder.word.FieldTitleViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.HeaderViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.HorizontalViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.MiniSizeTextViewBinder;
+import com.example.carson.yjenglish.home.viewbinder.word.PostWrongBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.SentenceSoundViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.SentenceViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.SituationViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.TextDrawableViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.TextViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.VideoViewBinder;
+import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.ReadAACFileThread;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +75,7 @@ import retrofit2.Retrofit;
 public class WordDetailActivity extends AppCompatActivity implements View.OnClickListener,
         TextDrawableViewBinder.OnEditSelectListener, HeaderViewBinder.HeaderSoundListener,
         SituationViewBinder.SituationListener, VideoViewBinder.OnVideoClickListener,
-        SentenceSoundViewBinder.OnSentenceSoundListener {
+        SentenceSoundViewBinder.OnSentenceSoundListener, PostWrongBinder.OnErrorPostListener {
 
     private RecyclerView recyclerView;
     private ImageView back;
@@ -109,12 +115,28 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
 
     private List<VideoCaptionModel> mCaptions;
 
+    private SharedPreferences sp;
+
+    private int fromIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_word_detail);
+
+        sp = getSharedPreferences("word_favours", MODE_PRIVATE);
+
         mPlayer = new MediaPlayer();
         tipsCount = getSharedPreferences("YJEnglish", MODE_PRIVATE).getInt("tips_count", 0);
+        Log.e("WordDetail", "tipsCount = " + tipsCount);
         initData();
         executeWordTask();
         bindViews();
@@ -131,6 +153,41 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                     stem_affix = info.getData().getStem_affix();
                     word_similar_form = info.getData().getWord_of_similar_form();
                     mVideoList = info.getData().getVideo_info();
+                    if (soundMark == null || soundMark.isEmpty()) {
+                        soundMark = info.getData().getPhonetic_symbol_us();
+                    }
+                    if (trans == null || trans.isEmpty()) {
+                        trans = info.getData().getMeaning();
+                    }
+                    basicTrans = trans.trim().split("；")[0];
+                    if (paraphrase == null || paraphrase.isEmpty()) {
+                        paraphrase = info.getData().getParaphrase();
+                    }
+                    if (sentence == null || sentence.isEmpty()) {
+                        sentence = info.getData().getSentence();
+                    }
+                    if (sentenceTrans == null || sentenceTrans.isEmpty()) {
+                        sentenceTrans = info.getData().getSentence_cn();
+                    }
+                    if (imgUrl == null || imgUrl.isEmpty()) {
+                        imgUrl = info.getData().getPic();
+                    }
+                    if (pronunciation == null || pronunciation.isEmpty()) {
+                        pronunciation = info.getData().getPronunciation_us();
+                    }
+                    if (synonym == null || synonym.isEmpty()) {
+                        synonym = info.getData().getSynonym();
+                    }
+                    if (sentence_audio == null || sentence_audio.isEmpty()) {
+                        sentence_audio = info.getData().getSentence_audio();
+                    }
+                    if (phrase == null || phrase.isEmpty()) {
+                        phrase = info.getData().getPhrase();
+                    }
+
+                    if (word == null || word.isEmpty()) {
+                        word = info.getData().getWord();
+                    }
                     initRecycler();
                 } else {
                     Toast.makeText(WordDetailActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
@@ -161,16 +218,32 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         pass.setOnClickListener(this);
         next.setOnClickListener(this);
 
+        boolean isFavour = getIntent().getBooleanExtra("is_favour", false);
+
+        if (isFavour || sp.getBoolean(word, false)) {
+            like.setSelected(true);
+        }
+
+        if (fromIntent != 0) {
+            next.setVisibility(View.GONE);
+            pass.setVisibility(View.GONE);
+        }
+
 //        initRecycler();
     }
 
     private void initData() {
         Intent mIntent = getIntent();
+
+        fromIntent = mIntent.getIntExtra("from_intent", 0);
+
         wordTag = mIntent.getStringExtra("tag");
         word = wordTag;
         soundMark = mIntent.getStringExtra("soundMark");
         trans = mIntent.getStringExtra("trans");
-        basicTrans = trans.trim().split("；")[0];
+        if (trans != null && !trans.isEmpty()) {
+            basicTrans = trans.trim().split("；")[0];
+        }
         paraphrase = mIntent.getStringExtra("paraphrase");
         sentence = mIntent.getStringExtra("sentence");
         sentenceTrans = mIntent.getStringExtra("sentenceTrans");
@@ -214,6 +287,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                         return SentenceViewBinder.class;
                     }
                 });
+        adapter.register(String.class, new PostWrongBinder(this));
 
         items = new Items();
         //头部
@@ -241,13 +315,14 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         items.add(new VideoList(mVideoItems));
         //词形变化
 
-        items.add(new EmptyValue("词形变化"));
-//        for (int i = 0; i < 5; i++) {
-//            items.add(new Change("过去式:", word));
-//        }
-        items.add(new Change("过去式:", word + "ed"));
-        items.add(new Change("复数:", word + "s"));
-        items.add(new Change("现在分词:", word + "ing"));
+
+//        items.add(new EmptyValue("词形变化"));
+////        for (int i = 0; i < 5; i++) {
+////            items.add(new Change("过去式:", word));
+////        }
+//        items.add(new Change("过去式:", word + "ed"));
+//        items.add(new Change("复数:", word + "s"));
+//        items.add(new Change("现在分词:", word + "ing"));
         //短语
         if (phrase != null && !phrase.isEmpty()) {
             items.add(new EmptyValue("短语"));
@@ -279,6 +354,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         items.add(new EmptyValue("单词笔记"));
         //需要记录
         items.add(new Text("添加单词笔记", true));
+        items.add("");
 
         adapter.setItems(items);
         adapter.notifyDataSetChanged();
@@ -288,7 +364,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.pass:
-                if (tipsCount <= 5) {
+                if (tipsCount < 5) {
                     showmDialog();
                 } else {
                     //不知道是否存在问题
@@ -298,6 +374,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 }
                 break;
             case R.id.like:
+                executeFavourTask();
                 break;
             case R.id.next:
             case R.id.back:
@@ -321,6 +398,32 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         }
     }
 
+    private void executeFavourTask() {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).postWordFavours(UserConfig.getToken(this), word_id)
+                .enqueue(new Callback<CommonInfo>() {
+                    @Override
+                    public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                        CommonInfo info = response.body();
+                        if (info.getStatus().equals("200")) {
+                            if (sp.getBoolean(word, false)) {
+                                //证明点了就变成false了
+                                sp.edit().putBoolean(word, false).apply();
+                                like.setSelected(false);
+                            } else {
+                                sp.edit().putBoolean(word, true).apply();
+                                like.setSelected(true);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CommonInfo> call, Throwable t) {
+                        Toast.makeText(WordDetailActivity.this, "连接超时了哦~请重试", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     private void showmDialog() {
         SharedPreferences.Editor editor = getSharedPreferences("YJEnglish", MODE_PRIVATE).edit();
         editor.putInt("tips_count", tipsCount + 1).apply();
@@ -334,6 +437,11 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 overridePendingTransition(R.anim.ani_left_get_into, R.anim.ani_right_sign_out);
                 finishAfterTransition();
                 supportFinishAfterTransition();
+            }
+
+            @Override
+            public void onCancel() {
+
             }
         });
         dialogUtils.show(mDialog);
@@ -384,8 +492,14 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onSentenceSoundClick(String mAACFile) {
-        //解析aac音频帧 例句
-        initPlayer(Environment.getExternalStorageDirectory().getPath() + "/YuJingRecorder/" + word + ".aac");
+        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/背呗背单词/BeibeiRecorder/" + word + ".aac");
+        if (file.exists()) {
+            //解析aac音频帧 例句
+            initPlayer(file.getPath());
+        } else {
+            Toast.makeText(this, "请先学习该单词噢~", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
     @Override
@@ -474,7 +588,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             public void onLatterClick() {
                 if (pos + 1 < mVideoList.size()) {
                     //还有下一个视频
-                    executeCaptionTask(pos + 1, mVideoList.get(pos + 1).getVideo(), mVideoList.get(pos - 1).getId());
+                    executeCaptionTask(pos + 1, mVideoList.get(pos + 1).getVideo(), mVideoList.get(pos + 1).getId());
                 } else {
                     //没有视频了
                     Toast.makeText(WordDetailActivity.this, "没有下一个视频咯",
@@ -523,5 +637,38 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
     public void onVideoSentenceSoundClick(String soundUrl) {
         //其他例句
         initPlayer(soundUrl);
+    }
+
+    @Override
+    public void onPostError(String type, String text) {
+        String typeInt;
+        if (type.equals("英文释义")) {
+            typeInt = "0";
+        } else if (type.equals("中文释义")) {
+            typeInt = "1";
+        } else if (type.equals("语境句子")) {
+            typeInt = "2";
+        } else if (type.equals("其它例句")) {
+            typeInt = "3";
+        } else {
+            typeInt = "4";
+        }
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).sendError(UserConfig.getToken(this),
+                typeInt, text, word_id).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                CommonInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    Toast.makeText(WordDetailActivity.this,
+                            "您的修改意见大队长已经呈交给领队~请耐心等候反馈~", Toast.LENGTH_SHORT).show();
+                    //可以send一个广播通知系统消息 并存入数据库
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+            }
+        });
     }
 }

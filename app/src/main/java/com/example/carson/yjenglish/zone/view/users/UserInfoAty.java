@@ -1,5 +1,6 @@
 package com.example.carson.yjenglish.zone.view.users;
 
+import android.os.Build;
 import android.support.design.widget.TabItem;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -17,10 +18,12 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.utils.NetUtils;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.ZoneService;
 import com.example.carson.yjenglish.zone.model.OtherUsersPlanInfo;
 import com.example.carson.yjenglish.zone.model.OthersPlan;
+import com.example.carson.yjenglish.zone.model.UserActiveInfo;
 import com.example.carson.yjenglish.zone.model.forviewbinder.OtherUsersPlan;
 
 import java.util.ArrayList;
@@ -65,12 +68,20 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_user_info);
         user_id = getIntent().getStringExtra("user_id");
+        bindViews();
         executeLoadTask();
 //        activeFragment = ActiveFragment.newInstance();
 //        planFragment = PlanFragment.newInstance(plans.toString());
-        bindViews();
     }
 
     private void executeLoadTask() {
@@ -98,7 +109,15 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
                         othersPlans.add(plan);
                     }
 
-                    activeFragment = ActiveFragment.newInstance();
+                    if (mGender.equals("1")) {
+                        tabLayout.getTabAt(0).setText("她的动态");
+                        tabLayout.getTabAt(1).setText("她的计划");
+                    } else {
+                        tabLayout.getTabAt(0).setText("他的动态");
+                        tabLayout.getTabAt(1).setText("他的计划");
+                    }
+
+                    activeFragment = ActiveFragment.newInstance(user_id);
                     planFragment = PlanFragment.newInstance(othersPlans);
                     initViews();
                 } else {
@@ -122,10 +141,13 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
         signDay = findViewById(R.id.sign_day);
         wordCount = findViewById(R.id.word_count);
         tabLayout = findViewById(R.id.tab_layout);
-        itemDynamic = findViewById(R.id.tab_item_active);
-        itemPlan = findViewById(R.id.tab_item_plan);
+//        itemDynamic = findViewById(R.id.tab_item_active);
+//        itemPlan = findViewById(R.id.tab_item_plan);
         mViewPager = findViewById(R.id.view_pager);
         bg = findViewById(R.id.img_bg);
+
+        tabLayout.addTab(tabLayout.newTab().setText("他的动态"));
+        tabLayout.addTab(tabLayout.newTab().setText("他的计划"));
 
 //        if ()
 
@@ -165,23 +187,8 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
     }
 
     @Override
-    public void onItemClick(int itemType) {
-        switch (itemType) {
-            case 0:
-                //home item
-                break;
-            case 1:
-                //tv item
-                break;
-            case 2:
-                //music item
-                break;
-            case 4:
-                //daily item
-                break;
-            default:
-                break;
-        }
+    public void onChange(String insist_day) {
+        signDay.setText(insist_day);
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter{

@@ -12,8 +12,8 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/portrait"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="41dp"
+        android:layout_height="41dp"
         android:src="@color/colorTextHint"
         />
 
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@color/colorTextWord"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:layout_marginStart="15dp"
         app:layout_constraintStart_toEndOf="@id/portrait"
         />
@@ -46,7 +46,7 @@
         android:id="@+id/date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="12sp"
+        android:textSize="11sp"
         android:textColor="@color/colorTextHint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

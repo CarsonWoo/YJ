@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/ic_info"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:src="@drawable/ic_info"
+        android:layout_margin="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <com.example.carson.yjenglish.customviews.BaselineTextView
+        android:id="@+id/tv_report"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="修改/上传"
+        android:textSize="11sp"
+        app:baseline_color="@color/colorTextHint"
+        android:layout_marginStart="5dp"
+        app:layout_constraintStart_toEndOf="@id/ic_info"
+        app:layout_constraintTop_toTopOf="@id/ic_info"
+        app:layout_constraintBottom_toBottomOf="@id/ic_info"
+        />
+</android.support.constraint.ConstraintLayout>

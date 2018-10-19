@@ -9,12 +9,11 @@
 
     <ImageView
         android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:src="@drawable/ic_arrow_left"
         android:layout_marginStart="10dp"
         android:layout_marginTop="30dp"
-        android:paddingBottom="10dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
@@ -24,7 +23,7 @@
         android:layout_height="wrap_content"
         android:text="设置"
         android:textColor="@color/colorTextWord"
-        android:textSize="17sp"
+        android:textSize="16sp"
         android:paddingTop="30dp"
         android:paddingBottom="10dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -117,6 +116,7 @@
                     android:textSize="15sp"
                     android:textColor="@color/colorTextWord"
                     android:paddingEnd="5dp"
+                    android:visibility="gone"
                     android:paddingStart="10dp"
                     android:paddingTop="15dp"
                     android:paddingBottom="15dp"
@@ -131,6 +131,7 @@
                     android:track="@drawable/switch_track"
                     android:thumb="@drawable/switch_thumb"
                     android:layout_marginEnd="10dp"
+                    android:visibility="gone"
                     app:layout_constraintTop_toTopOf="@id/notify_lock_screen"
                     app:layout_constraintBottom_toBottomOf="@id/notify_lock_screen"
                     app:layout_constraintEnd_toEndOf="@id/notify_lock_screen"
@@ -149,7 +150,7 @@
                     android:paddingTop="15dp"
                     android:paddingBottom="15dp"
                     android:layout_marginTop="1dp"
-                    app:layout_constraintTop_toBottomOf="@id/notify_lock_screen"
+                    app:layout_constraintTop_toBottomOf="@id/notify_sound"
                     />
 
                 <Switch
@@ -306,8 +307,8 @@
 
             <ImageView
                 android:id="@+id/phone_bind"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:src="@drawable/selector_bind_phone"
                 android:layout_marginEnd="5dp"
                 app:layout_constraintEnd_toStartOf="@id/wechat_bind"
@@ -317,8 +318,8 @@
 
             <ImageView
                 android:id="@+id/wechat_bind"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:src="@drawable/selector_bind_wechat"
                 android:layout_marginEnd="5dp"
                 app:layout_constraintEnd_toStartOf="@id/qq_bind"
@@ -328,8 +329,8 @@
 
             <ImageView
                 android:id="@+id/qq_bind"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
                 android:src="@drawable/selector_bind_qq"
                 android:layout_marginEnd="20dp"
                 app:layout_constraintTop_toTopOf="@id/account_manage"

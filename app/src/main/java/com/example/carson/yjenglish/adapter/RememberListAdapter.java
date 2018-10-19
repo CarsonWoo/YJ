@@ -39,15 +39,15 @@ public class RememberListAdapter extends RecyclerView.Adapter<RememberListAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ListViewHolder holder, final int position) {
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
-        holder.trans.setText(holder.item.getMeaning());
+        holder.trans.setText(holder.item.getReal_Meaning());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    listener.onTransClick(view, position);
+                    listener.onTransClick(holder.item.getId(), position);
                 }
             }
         });
@@ -55,7 +55,7 @@ public class RememberListAdapter extends RecyclerView.Adapter<RememberListAdapte
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    listener.onPassClick(view, position);
+                    listener.onPassClick(holder.item.getId(), position);
                 }
             }
         });
@@ -88,7 +88,7 @@ public class RememberListAdapter extends RecyclerView.Adapter<RememberListAdapte
     }
 
     public interface OnButtonClickListener {
-        void onTransClick(View view, int pos);
-        void onPassClick(View view, int pos);
+        void onTransClick(String id, int pos);
+        void onPassClick(String id, int pos);
     }
 }

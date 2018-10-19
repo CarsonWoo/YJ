@@ -11,6 +11,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.utils.ScreenUtils;
 
 import java.awt.font.TextAttribute;
 
@@ -56,20 +57,20 @@ public class MyProgressView extends View {
         mProgressPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mProgressPaint.setColor(mPaintColorRes);
         mProgressPaint.setStyle(Paint.Style.STROKE);
-        mProgressPaint.setStrokeWidth(15);
+        mProgressPaint.setStrokeWidth(ScreenUtils.dp2px(getContext(), 5));
         mProgressPaint.setStrokeCap(Paint.Cap.ROUND);
 
         mTrackPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         mTrackPaint.setColor(mTrackColorRes);
         mTrackPaint.setStyle(Paint.Style.STROKE);
-        mTrackPaint.setStrokeWidth((float) 4);
+        mTrackPaint.setStrokeWidth(ScreenUtils.dp2px(getContext(), 1));
 
         mBgPaint = new Paint();
         mBgPaint.setStyle(Paint.Style.STROKE);
         mBgPaint.setColor(mBgColorRes);
         mBgPaint.setStrokeCap(Paint.Cap.ROUND);
         mBgPaint.setStrokeJoin(Paint.Join.ROUND);
-        mBgPaint.setStrokeWidth((float) 4);
+        mBgPaint.setStrokeWidth(ScreenUtils.dp2px(getContext(), 1));
 
     }
 
@@ -108,7 +109,13 @@ public class MyProgressView extends View {
                 height - 20 + paddingTop, -238, 296, false, mTrackPaint);
         canvas.drawArc(40 + paddingLeft, 40 + paddingTop, width - 40 + paddingLeft,
                 height - 40 + paddingTop, -240, 300, false, mBgPaint);
-
+//        Path path = new Path();
+//        path.moveTo(paddingLeft + (float) ((double) height / (2 * Math.sqrt(3))) - 15, height + 5);
+//        path.quadTo((float) (paddingLeft + (float) ((double) height / (2 * Math.sqrt(3))) + 20 * Math.sqrt(2)),
+//                height,
+//                (float) (paddingLeft + (float) ((double) height / (2 * Math.sqrt(3))) + 20 * Math.sqrt(2) - 18),
+//                (float) (height - 20 * Math.sqrt(2)) + 10);
+//        canvas.drawPath(path, mBgPaint);
         canvas.drawArc(20 + paddingLeft, 20 + paddingTop, width - 20 + paddingLeft,
                 height - 20 + paddingTop, -237, 295 * (progress / 100), false, mProgressPaint);
     }

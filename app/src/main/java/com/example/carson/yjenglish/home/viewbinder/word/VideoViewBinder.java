@@ -39,8 +39,8 @@ public class VideoViewBinder extends ItemViewBinder<Video, VideoViewBinder.ViewH
         holder.videoBg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(holder.videoBg.getContext(), "position = " + holder.getAdapterPosition(),
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(holder.videoBg.getContext(), "position = " + holder.getAdapterPosition(),
+//                        Toast.LENGTH_SHORT).show();
                 if (videoClickListener != null) {
                     videoClickListener.onVideoClick(item.getVideo_id(), item.getVideoUrl(),
                             holder.getAdapterPosition());

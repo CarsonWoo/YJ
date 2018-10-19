@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish.home.viewbinder.word;
 
 import android.support.annotation.NonNull;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.BaseViewHolder;
 import com.example.carson.yjenglish.home.model.forviewbinder.Text;
+import com.example.carson.yjenglish.utils.ScreenUtils;
 
 import me.drakeet.multitype.ItemViewBinder;
 
@@ -33,7 +35,7 @@ public class TextDrawableViewBinder extends ItemViewBinder<Text, TextDrawableVie
 
     @Override
     protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull Text item) {
-        holder.text.setTextSize(16);
+        holder.text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         holder.text.setText(item.getText());
         holder.text.setOnClickListener(new View.OnClickListener() {
             @Override

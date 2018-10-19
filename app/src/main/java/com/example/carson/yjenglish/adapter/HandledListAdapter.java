@@ -38,16 +38,15 @@ public class HandledListAdapter extends RecyclerView.Adapter<HandledListAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ListViewHolder holder, final int position) {
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
-        holder.trans.setText(holder.item.getMeaning());
+        holder.trans.setText(holder.item.getReal_meaning());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    //TODO 可能还需要一些参数
-                    listener.onTransClick(view);
+                    listener.onTransClick(holder.item.getId());
                 }
             }
         });
@@ -55,7 +54,7 @@ public class HandledListAdapter extends RecyclerView.Adapter<HandledListAdapter.
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    listener.onRecoverClick(view);
+                    listener.onRecoverClick(holder.item.getId(), position, holder.item.getWord());
                 }
             }
         });
@@ -88,7 +87,7 @@ public class HandledListAdapter extends RecyclerView.Adapter<HandledListAdapter.
     }
 
     public interface onButtonClickListener {
-        void onRecoverClick(View view);
-        void onTransClick(View view);
+        void onRecoverClick(String id, int pos, String word);
+        void onTransClick(String id);
     }
 }

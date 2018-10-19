@@ -56,4 +56,12 @@ public class TVComment {
     public String getLikes() {
         return likes;
     }
+
+    public void setIs_like(String is_like) {
+        this.is_like = is_like;
+    }
+
+    public void setLikes(String likes) {
+        this.likes = likes;
+    }
 }

@@ -1,7 +1,10 @@
 package com.example.carson.yjenglish.zone.viewbinder;
 
+import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
+import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +15,11 @@ import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.BaseViewHolder;
 import com.example.carson.yjenglish.customviews.RoundRectImageView;
+import com.example.carson.yjenglish.utils.ScreenUtils;
 import com.example.carson.yjenglish.zone.model.forviewbinder.UserActive;
 import com.example.carson.yjenglish.zone.view.users.ActiveFragment;
+
+import org.w3c.dom.Text;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import me.drakeet.multitype.ItemViewBinder;
@@ -26,8 +32,7 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
 
     private ActiveFragment.OnActiveItemListener mListener;
 
-    public UserActiveBinder(ActiveFragment.OnActiveItemListener listener) {
-        this.mListener = listener;
+    public UserActiveBinder() {
     }
 
     @NonNull
@@ -41,6 +46,7 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
     protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull UserActive item) {
         Glide.with(holder.portrait.getContext()).load(item.getPortrait_url()).thumbnail(0.5f).into(holder.portrait);
         holder.username.setText(item.getUsername());
+        holder.mContainer.removeAllViews();
         if (item.getType() == 0) {
             holder.activeType.setText("喜欢：");
             holder.text.setVisibility(View.GONE);
@@ -48,6 +54,19 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
             holder.activeType.setText("评论：");
             holder.text.setVisibility(View.VISIBLE);
             holder.text.setText(item.getText());
+            TextView textView = new TextView(holder.mContainer.getContext());
+            textView.setText(item.getText());
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+            textView.setSingleLine(true);
+            textView.setEllipsize(TextUtils.TruncateAt.END);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(ScreenUtils.dp2px(holder.mContainer.getContext(), 5),
+                    ScreenUtils.dp2px(holder.mContainer.getContext(), 5),
+                    ScreenUtils.dp2px(holder.mContainer.getContext(), 10),
+                    ScreenUtils.dp2px(holder.mContainer.getContext(), 5));
+            textView.setLayoutParams(lp);
+            holder.mContainer.addView(textView);
         } else {
             holder.activeType.setText("回复" + item.getOther_username() + " 的评论：");
             holder.text.setVisibility(View.VISIBLE);
@@ -68,11 +87,6 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
             case 1:
                 childView = inflater.inflate(R.layout.zone_like_tv_feeds, layout, false);
                 initTVView(childView, item);
-                layout.addView(childView);
-                break;
-            case 2:
-                childView = inflater.inflate(R.layout.zone_like_music, layout, false);
-                initMusicView(childView, item);
                 layout.addView(childView);
                 break;
             case 3:
@@ -99,9 +113,7 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onItemClick(item.getItemType());
-                }
+
             }
         });
     }
@@ -131,9 +143,7 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         mMusicView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onItemClick(item.getItemType());
-                }
+
             }
         });
     }
@@ -154,9 +164,7 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         mTVView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onItemClick(item.getItemType());
-                }
+
             }
         });
     }
@@ -179,9 +187,7 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         mHomeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onItemClick(item.getItemType());
-                }
+
             }
         });
     }

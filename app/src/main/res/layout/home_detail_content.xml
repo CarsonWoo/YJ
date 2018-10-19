@@ -10,11 +10,13 @@
         android:layout_height="wrap_content"
         android:paddingStart="15dp"
         android:paddingEnd="15dp"
-        android:textSize="22sp"
+        android:textSize="25sp"
         android:textColor="@color/colorTextWord"
         android:text="在现实的深渊，你还是你么Kraft的谬论世界"
         android:layout_marginTop="20dp"
+        android:layout_marginEnd="30dp"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         />
 
     <de.hdodenhof.circleimageview.CircleImageView
@@ -61,8 +63,8 @@
         app:layout_constraintEnd_toEndOf="@id/content">
         <Button
             android:id="@+id/fab_like"
-            android:layout_width="74dp"
-            android:layout_height="74dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:background="@drawable/bg_fab_shadow_main"
             />
     </android.support.constraint.ConstraintLayout>

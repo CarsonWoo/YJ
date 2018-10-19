@@ -5,6 +5,8 @@
     android:layout_height="wrap_content"
     android:paddingTop="6dp"
     android:paddingBottom="6dp"
+    android:paddingEnd="30dp"
+    android:paddingStart="0dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView

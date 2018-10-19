@@ -3,6 +3,7 @@ package com.example.carson.yjenglish.zone.view.setting;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -19,6 +20,7 @@ import com.example.carson.yjenglish.net.NetTask;
 import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.zone.AdviceContract;
 import com.example.carson.yjenglish.zone.AdviceTask;
 import com.example.carson.yjenglish.zone.model.AdviceModel;
@@ -42,6 +44,14 @@ public class AdviceAty extends AppCompatActivity implements View.OnClickListener
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.layout_advice);
 
         mDialog = DialogUtils.getInstance(this).newAnimatedLoadingDialog();

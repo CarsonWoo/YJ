@@ -22,15 +22,40 @@ import retrofit2.Response;
 
 public class FileUtils {
 
-    public static File createFile(Context context, String fileName){
+    public static File createRecorderFile(Context context, String fileName){
 
         File file = null;
         String state = Environment.getExternalStorageState();
 
         if(state.equals(Environment.MEDIA_MOUNTED)){
-            file = new File(Environment.getExternalStorageDirectory().getPath()+"/YuJingRecorder/" + fileName);
+            file = new File(Environment.getExternalStorageDirectory().getPath()+"/背呗背单词/BeibeiRecorder/" + fileName);
         }else {
-            file = new File(context.getCacheDir().getPath()+"/YuJingRecorder/" + fileName);
+            file = new File(context.getCacheDir().getPath()+"/背呗背单词/BeibeiRecorder/" + fileName);
+        }
+
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
+        }
+
+        Log.e("vivi","file "+file.getPath());
+
+        return file;
+
+    }
+
+    public static File createImageFile(Context context, String fileName, String dirName){
+
+        File file = null;
+        String state = Environment.getExternalStorageState();
+
+        if(state.equals(Environment.MEDIA_MOUNTED)){
+            file = new File(Environment.getExternalStorageDirectory().getPath()+"/背呗背单词/" + dirName + "/" + fileName);
+        }else {
+            file = new File(context.getCacheDir().getPath() + "/背呗背单词/" + dirName + "/" + fileName);
+        }
+
+        if (!file.exists()) {
+            file.getParentFile().mkdirs();
         }
 
         Log.e("vivi","file "+file.getPath());
@@ -46,46 +71,48 @@ public class FileUtils {
 
         ResponseBody body = response.body();
 
-        InputStream is = body.byteStream();
-        long totalLength = body.contentLength();
+        if (body != null) {
+            InputStream is = body.byteStream();
+            long totalLength = body.contentLength();
+            try {
 
-        try {
+                os = new FileOutputStream(file);
 
-            os = new FileOutputStream(file);
+                int len ;
 
-            int len ;
+                byte [] buff = new byte[1024];
 
-            byte [] buff = new byte[1024];
+                while((len=is.read(buff))!=-1){
 
-            while((len=is.read(buff))!=-1){
-
-                os.write(buff,0,len);
-                currentLength+=len;
-                Log.e("vivi","当前进度:"+currentLength);
+                    os.write(buff,0,len);
+                    currentLength+=len;
+                    Log.e("vivi","当前进度:"+currentLength);
 //                httpCallBack.onLoading(currentLength,totalLength);
-            }
-            // httpCallBack.onLoading(currentLength,totalLength,true);
-
-        } catch(FileNotFoundException e) {
-            e.printStackTrace();
-        } catch(IOException e) {
-            e.printStackTrace();
-        } finally {
-            if(os!=null){
-                try {
-                    os.close();
-                } catch(IOException e) {
-                    e.printStackTrace();
                 }
-            }
-            if(is!=null){
-                try {
-                    is.close();
-                } catch(IOException e) {
-                    e.printStackTrace();
+                // httpCallBack.onLoading(currentLength,totalLength,true);
+
+            } catch(FileNotFoundException e) {
+                e.printStackTrace();
+            } catch(IOException e) {
+                e.printStackTrace();
+            } finally {
+                if(os!=null){
+                    try {
+                        os.close();
+                    } catch(IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                if(is!=null){
+                    try {
+                        is.close();
+                    } catch(IOException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
+
 
     }
 

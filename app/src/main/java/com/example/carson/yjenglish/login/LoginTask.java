@@ -30,8 +30,6 @@ import rx.schedulers.Schedulers;
 
 public class LoginTask implements NetTask<LoginModule> {
     private static LoginTask INSTANCE = null;
-
-    private static final String HOST = UserConfig.HOST;
     private Retrofit retrofit;
 
     private LoginTask() {
@@ -46,13 +44,7 @@ public class LoginTask implements NetTask<LoginModule> {
     }
 
     private void createRetrofit() {
-        retrofit = new Retrofit.Builder()
-                .baseUrl(HOST)
-                .client(NetUtils.getInstance().getClientInstance())
-                .addConverterFactory(new NullOnEmptyConverterFactory())
-                .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .build();
+        retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
     }
 
     @Override
@@ -75,7 +67,9 @@ public class LoginTask implements NetTask<LoginModule> {
 
                     @Override
                     public void onError(Throwable e) {
-                        callback.onFailed(e.getMessage());
+                        if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+                            callback.onFailed(e.getMessage());
+                        }
                     }
 
                     @Override

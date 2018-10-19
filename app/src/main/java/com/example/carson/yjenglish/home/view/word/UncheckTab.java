@@ -1,5 +1,6 @@
 package com.example.carson.yjenglish.home.view.word;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -38,7 +39,10 @@ import retrofit2.Retrofit;
  * Created by 84594 on 2018/9/2.
  */
 
-public class UncheckTab extends Fragment {
+/**
+ * 需要去将pulltorefreshRecylerView改为recyclerview
+ */
+public class UncheckTab extends Fragment implements UncheckListAdapter.OnButtonClickListener {
 
     private PullToRefreshRecyclerView recyclerView;
     private UncheckListAdapter adapter;
@@ -146,6 +150,8 @@ public class UncheckTab extends Fragment {
 
         recyclerView.setEmptyView(emptyView);
 
+        adapter.setListener(this);
+
     }
 
     public int getWordCount() {
@@ -153,4 +159,20 @@ public class UncheckTab extends Fragment {
     }
 
 
+    @Override
+    public void onTransClick(String id) {
+        Log.e("Uncheck", "click id = " + id);
+        Intent intent = new Intent(getContext(), WordDetailActivity.class);
+        intent.putExtra("from_intent", 1);
+        intent.putExtra("word_id", id);
+        startActivity(intent);
+        if (getActivity() != null) {
+            getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+        }
+    }
+
+    @Override
+    public void onPassClick(String id, int pos) {
+
+    }
 }

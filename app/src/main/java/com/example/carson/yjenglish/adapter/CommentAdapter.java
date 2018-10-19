@@ -1,6 +1,9 @@
 package com.example.carson.yjenglish.adapter;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
@@ -21,7 +24,9 @@ import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.home.model.forviewbinder.Comment;
+import com.example.carson.yjenglish.msg.view.ReportActivity;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.zone.view.users.UserInfoAty;
 
 import java.util.List;
 
@@ -90,7 +95,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onLikeButtonClick(false);
+                    holder.item.setLike(!holder.item.isLike());
+                    holder.btnLike.setSelected(holder.item.isLike());
+                    mListener.onLikeButtonClick(holder.item.getComment_id(), holder.likeNum, holder.item.isLike());
+                    ObjectAnimator animatorX = ObjectAnimator.ofFloat(holder.btnLike,
+                            "scaleX", 1.3f, 1.0f);
+                    ObjectAnimator animatorY = ObjectAnimator.ofFloat(holder.btnLike,
+                            "scaleY", 1.3f, 1.0f);
+                    AnimatorSet set = new AnimatorSet();
+                    set.play(animatorX).with(animatorY);
+                    set.setDuration(400).start();
                 }
             }
         });
@@ -105,7 +119,15 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         holder.menuMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initWindow(holder.menuMore);
+                initWindow(holder.menuMore, holder.item);
+            }
+        });
+        holder.portrait.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(holder.portrait.getContext(), UserInfoAty.class);
+                intent.putExtra("user_id", holder.item.getUser_id());
+                holder.portrait.getContext().startActivity(intent);
             }
         });
     }
@@ -119,7 +141,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         this.mListener = mListener;
     }
 
-    private void initChildView(View childView, Comment item) {
+    private void initChildView(View childView, final Comment item) {
         ImageView portrait = childView.findViewById(R.id.portrait);
         TextView username = childView.findViewById(R.id.username);
         TextView reply = childView.findViewById(R.id.comment);
@@ -149,30 +171,23 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
                 }
             }
         });
-        btnLike.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mListener != null) {
-                    mListener.onLikeButtonClick(true);
-                }
-            }
-        });
         menuMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initWindow(menuMore);
+                initWindow(menuMore, item);
             }
         });
+
     }
 
-    private void initWindow(final View anchorView) {
+    private void initWindow(final View anchorView, final Comment item) {
         View windowView = LayoutInflater.from(anchorView.getContext())
                 .inflate(R.layout.layout_common_dialog, null, false);
         ImageView img = windowView.findViewById(R.id.common_img);
         TextView text = windowView.findViewById(R.id.common_text);
         CardView card = windowView.findViewById(R.id.card_view);
         img.setVisibility(View.GONE);
-        text.setTextSize(16);
+        text.setTextSize(13);
         text.setTextColor(Color.parseColor("#eb000000"));
         text.setText("举报评论");
         card.setRadius(6f);
@@ -184,7 +199,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(anchorView.getContext(), "举报成功", Toast.LENGTH_SHORT).show();
+                Intent toReport = new Intent(anchorView.getContext(), ReportActivity.class);
+                toReport.putExtra("comment_id", item.getComment_id());
+                anchorView.getContext().startActivity(toReport);
                 window.dismiss();
             }
         });
@@ -224,6 +241,6 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     public interface OnSelectItemListener {
         void onLoadMoreReply();
         void onReply(String username, int pos);
-        void onLikeButtonClick(boolean isReply);
+        void onLikeButtonClick(String comment_id, TextView textView, boolean is_like);
     }
 }

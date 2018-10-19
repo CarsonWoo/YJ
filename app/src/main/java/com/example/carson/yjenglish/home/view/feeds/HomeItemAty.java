@@ -1,7 +1,10 @@
 package com.example.carson.yjenglish.home.view.feeds;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -13,9 +16,11 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -50,8 +55,10 @@ import com.example.carson.yjenglish.home.viewbinder.feeds.RecommendListViewBinde
 import com.example.carson.yjenglish.home.viewbinder.feeds.VideoViewBinder;
 import com.example.carson.yjenglish.home.viewbinder.word.FieldTitleViewBinder;
 import com.example.carson.yjenglish.utils.CommonInfo;
+import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.view.users.UserInfoAty;
 
@@ -127,9 +134,19 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
     private String commentId;
     private boolean isSendSubComment = false;
 
+    private Dialog commentDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_home_item);
 
         mContentLayout = new LinearLayout(this);
@@ -146,6 +163,10 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
 //        likeNum = fromData.getStringExtra("like_num");
         requestComment = fromData.getBooleanExtra("request_comment", false);
 //        isFavour = fromData.getBooleanExtra("is_like", false);
+
+        commentDialog = DialogUtils.getInstance(this).newCommonDialog("正在上传评论中,请稍候...",
+                R.mipmap.gif_loading_video, true);
+        commentDialog.setCanceledOnTouchOutside(false);
 
         bindViews();
         executeLoadTask();
@@ -186,6 +207,26 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                         hasComment = true;
                     }
 
+                    if (videoUrl == null || videoUrl.isEmpty()) {
+                        videoUrl = info.getData().getVideo();
+                    }
+
+                    if (imgUrl == null || imgUrl.isEmpty()) {
+                        imgUrl = info.getData().getPic();
+                    }
+
+                    if (username == null || username.isEmpty()) {
+                        username = info.getData().getAuthor_username();
+                    }
+
+                    if (portraitUrl == null || portraitUrl.isEmpty()) {
+                        portraitUrl = info.getData().getAuthor_portrait();
+                    }
+
+                    if (title == null || title.isEmpty()) {
+                        title = info.getData().getTitle();
+                    }
+
                     loadCommentList(info.getData().getUser_id());
 
                     initViews();
@@ -195,6 +236,13 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             @Override
             public void onFailure(Call<HomeItemInfo> call, Throwable t) {
                 Log.e("HomeItemAty", "连接超时");
+                Toast.makeText(getApplicationContext(), "网络开小差了,正在努力重试~", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        executeLoadTask();
+                    }
+                }, 5000);
             }
         });
     }
@@ -206,7 +254,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         for (int i = 0; i < hitComments.size(); i++) {
             int index = -1;
             for (int j = 0; j < hitComments.get(i).getInner_comment().size(); j++) {
-                if (hitComments.get(i).getInner_comment().get(j).getUser_id().equals(user_id)) {
+                if (hitComments.get(i).getInner_comment().get(j).getUser_id().equals(author_id)) {
                     index = j;
                     break;
                 }
@@ -222,8 +270,10 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                                     hitComments.get(i).getInner_comment().get(0).getPortrait(),
                                     hitComments.get(i).getInner_comment().get(0).getSet_time(),
                                     hitComments.get(i).getInner_comment().get(0).getComment(),
-                                    0
-                                    /*Integer.parseInt(hitComments.get(i).getInner_comment().get(0))*/),
+                                    Integer.parseInt(hitComments.get(i).getInner_comment().get(0).getLikes()),
+                                    /*Integer.parseInt(hitComments.get(i).getInner_comment().get(0))*/
+                                    hitComments.get(i).getInner_comment().get(0).getId(),
+                                    hitComments.get(i).getInner_comment().get(0).getIs_like().equals("1")),
                     hitComments.get(i).getId(), hitComments.get(i).getIs_like().equals("1")));
         }
         for (int i = 0; i < newComments.size(); i++) {
@@ -245,7 +295,9 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                                     newComments.get(i).getInner_comment().get(0).getPortrait(),
                                     newComments.get(i).getInner_comment().get(0).getSet_time(),
                                     newComments.get(i).getInner_comment().get(0).getComment(),
-                                    0),
+                                    Integer.parseInt(newComments.get(i).getInner_comment().get(0).getLikes()),
+                                    newComments.get(i).getInner_comment().get(i).getId(),
+                                    newComments.get(i).getInner_comment().get(0).getIs_like().equals("1")),
                     newComments.get(i).getId(), newComments.get(i).getIs_like().equals("1")));
         }
     }
@@ -297,11 +349,14 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             } else {
                 String s = order.getParagraph();
                 TextView textView = new TextView(HomeItemAty.this);
-                textView.setText(s + "\n");
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
+                textView.setText(s);
                 mContentLayout.addView(textView);
-                ViewGroup.LayoutParams params = textView.getLayoutParams();
-                params.width = ViewGroup.LayoutParams.MATCH_PARENT;
-                params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT);
+                params.setMargins(0, ScreenUtils.dp2px(this, 15),
+                        0, ScreenUtils.dp2px(this, 15));
+                textView.setLayoutParams(params);
             }
         }
     }
@@ -430,6 +485,12 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             mItems.remove(4);
             hasComment = true;
         }
+        commentDialog.show();
+        WindowManager.LayoutParams lp = commentDialog.getWindow().getAttributes();
+        lp.width = ScreenUtils.dp2px(this, 260);
+        lp.height = ScreenUtils.dp2px(this, 240);
+        lp.gravity = Gravity.CENTER;
+        commentDialog.getWindow().setAttributes(lp);
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         retrofit.create(HomeService.class).sendComment(UserConfig.getToken(this), id,
                 editComment.getText().toString()).enqueue(new Callback<CommonInfo>() {
@@ -470,6 +531,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                             loadCommentList(info.getData().getUser_id());
 
                             editComment.setText("");
+                            commentDialog.dismiss();
                             initComment(true);
                         }
                     }
@@ -524,19 +586,24 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         mAdapter.register(Comment.class, new CommentViewBinder(this));
         mItems.add(new Video("", imgUrl, videoUrl));
         mItems.add(new Content(author_id, title, portraitUrl, username, likeNum));
-        mItems.add(new EmptyValue("热门推荐"));
 
-        List<Recommend> recommendList = new ArrayList<>();
-        for (int i = 0; i < recommendations.size(); i++) {
-            if (recommendations.get(i).getKind() == null) {
-                recommendations.get(i).setKind("");
+        if (recommendations.size() > 0) {
+            mItems.add(new EmptyValue("热门推荐"));
+            List<Recommend> recommendList = new ArrayList<>();
+            for (int i = 0; i < recommendations.size(); i++) {
+                if (recommendations.get(i).getKind() == null) {
+                    recommendations.get(i).setKind("");
+                }
+                Recommend recommend = new Recommend(recommendations.get(i).getId(),
+                        recommendations.get(i).getTitle(), recommendations.get(i).getPic(),
+                        recommendations.get(i).getVideo(),
+                        recommendations.get(i).getLikes(),
+                        recommendations.get(i).getAuthor_portrait(), recommendations.get(i).getAuthor_username(),
+                        "#" + recommendations.get(i).getKind());
+                recommendList.add(recommend);
             }
-            Recommend recommend = new Recommend(recommendations.get(i).getTitle(), recommendations.get(i).getPic(),
-                    recommendations.get(i).getAuthor_portrait(), recommendations.get(i).getAuthor_username(),
-                    "#" + recommendations.get(i).getKind());
-            recommendList.add(recommend);
+            mItems.add(new RecommendList(recommendList));
         }
-        mItems.add(new RecommendList(recommendList));
 
         if (hasComment) {
             initComment(false);
@@ -690,22 +757,24 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             @Override
             public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
                 if (response.body().getStatus().equals("200")) {
-                    int num = Integer.parseInt(tv.getText().toString());
+                    int num;
+                    if (tv.getText().toString().equals("") || tv.getText().toString().isEmpty()) {
+                        num = 0;
+                    } else {
+                        num = Integer.parseInt(tv.getText().toString());
+                    }
                     if (isLike) {
                         num --;
-                        tv.setText(String.valueOf(num));
+                        if (num == 0) {
+                            tv.setText("");
+                        } else {
+                            tv.setText(String.valueOf(num));
+                        }
                     } else {
                         num ++;
                         tv.setText(String.valueOf(num));
                     }
                     isLike = !isLike;
-//                    if (isLike) {
-//                        num ++;
-//                        tv.setText(String.valueOf(num));
-//                    } else {
-////                        num --;
-//                        tv.setText(String.valueOf(num));
-//                    }
                 } else {
                     Log.e("HomeItemAty", response.body().getMsg());
                 }
@@ -722,9 +791,11 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
      * 以下三个方法为Comment的回调
      */
     @Override
-    public void onLoadMoreReply(String user_id) {
+    public void onLoadMoreReply(String user_id, String comment_id) {
         Intent toComment = new Intent(this, CommentAty.class);
+        toComment.putExtra("id", id);
         toComment.putExtra("user_id", user_id);
+        toComment.putExtra("comment_id", comment_id);
         startActivity(toComment);
         overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
     }
@@ -752,12 +823,39 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
                 CommonInfo info = response.body();
                 if (info.getStatus().equals("200")) {
-                    int num = Integer.parseInt(tv.getText().toString());
-                    if (isLike) {
-                        tv.setText(String.valueOf(num - 1));
+                    int num;
+                    if (tv.getText().toString().equals("") || tv.getText().toString().isEmpty()) {
+                        num = 0;
                     } else {
-                        tv.setText(String.valueOf(num + 1));
+                        if (tv.getText().toString().endsWith("+")) {
+                            num = 10000;
+                        } else {
+                            num = Integer.parseInt(tv.getText().toString());
+                        }
                     }
+                    if (num < 1000) {
+                        if (isLike) {
+                            if (num - 1 == 0) {
+                                tv.setText("");
+                            } else {
+                                tv.setText(String.valueOf(num - 1));
+                            }
+                        } else {
+                            if (num + 1 == 1000) {
+                                tv.setText("1k+");
+                            } else {
+                                tv.setText(String.valueOf(num + 1));
+                            }
+                        }
+                    } /*else {
+                        if (num > 10000) {
+                            String s = String.valueOf(num % 10000) + "w+";
+                            tv.setText(s);
+                        } else {
+                            String s = String.valueOf(num % 1000) + "k+";
+                            tv.setText(s);
+                        }
+                    }*/
                 } else {
                     Log.e("HomeItemAty", info.getMsg());
                 }
@@ -765,7 +863,61 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
+                Toast.makeText(HomeItemAty.this, "连接超时, 请重试", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
+    @Override
+    public void onSubLikeButtonClick(final TextView tv, String comment_id, boolean isReply, final boolean isLike) {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).postSubCommentLike(UserConfig.getToken(this),
+                comment_id).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                CommonInfo info = response.body();
+                if (info.getStatus().equals("200")) {
+                    int num;
+                    if (tv.getText().toString().equals("") || tv.getText().toString().isEmpty()) {
+                        num = 0;
+                    } else {
+                        if (tv.getText().toString().endsWith("+")) {
+                            num = 10000;
+                        } else {
+                            num = Integer.parseInt(tv.getText().toString());
+                        }
+                    }
+                    if (num < 1000) {
+                        if (isLike) {
+                            if (num - 1 == 0) {
+                                tv.setText("");
+                            } else {
+                                tv.setText(String.valueOf(num - 1));
+                            }
+                        } else {
+                            if (num + 1 == 1000) {
+                                tv.setText("1k+");
+                            } else {
+                                tv.setText(String.valueOf(num + 1));
+                            }
+                        }
+                    } /*else {
+                        if (num > 10000) {
+                            String s = String.valueOf(num % 10000) + "w+";
+                            tv.setText(s);
+                        } else {
+                            String s = String.valueOf(num % 1000) + "k+";
+                            tv.setText(s);
+                        }
+                    }*/
+                } else {
+                    Log.e("HomeItemAty", info.getMsg());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+                Toast.makeText(HomeItemAty.this, "连接超时, 请重试", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -834,6 +986,22 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                 lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
                 editComment.setLayoutParams(lp);
             }
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mVideoView != null) {
+            mVideoView.pause();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mVideoView != null) {
+            mVideoView.release();
         }
     }
 }

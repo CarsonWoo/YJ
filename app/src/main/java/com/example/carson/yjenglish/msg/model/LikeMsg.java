@@ -5,10 +5,11 @@ package com.example.carson.yjenglish.msg.model;
  */
 
 public class LikeMsg {
+    private String user_id;
     private String username;
     private String content;
-    private String portraitUrl;
-    private String date;
+    private String portrait;
+    private String set_time;
 
     public String getUsername() {
         return username;
@@ -26,19 +27,27 @@ public class LikeMsg {
         this.content = content;
     }
 
-    public String getPortraitUrl() {
-        return portraitUrl;
+    public String getPortrait() {
+        return portrait;
     }
 
-    public void setPortraitUrl(String portraitUrl) {
-        this.portraitUrl = portraitUrl;
+    public void setPortrait(String portrait) {
+        this.portrait = portrait;
     }
 
-    public String getDate() {
-        return date;
+    public String getSet_time() {
+        return set_time;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setSet_time(String set_time) {
+        this.set_time = set_time;
+    }
+
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
     }
 }

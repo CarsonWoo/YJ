@@ -103,14 +103,18 @@ public class Comment {
         private String reply;
         private int likeNum;
         private String time;
+        private String sub_comment_id;
+        private boolean isLike;
 
-        public Reply(String user_id, String username, String portraitUrl, String time, String reply, int likeNum) {
+        public Reply(String user_id, String username, String portraitUrl, String time, String reply, int likeNum, String sub_comment_id, boolean isLike) {
             this.user_id = user_id;
             this.username = username;
             this.portraitUrl = portraitUrl;
             this.reply = reply;
             this.likeNum = likeNum;
             this.time = time;
+            this.sub_comment_id = sub_comment_id;
+            this.isLike = isLike;
         }
 
         public String getUsername() {
@@ -151,6 +155,18 @@ public class Comment {
 
         public String getUser_id() {
             return user_id;
+        }
+
+        public String getSub_comment_id() {
+            return sub_comment_id;
+        }
+
+        public boolean isLike() {
+            return isLike;
+        }
+
+        public void setLike(boolean like) {
+            isLike = like;
         }
     }
 

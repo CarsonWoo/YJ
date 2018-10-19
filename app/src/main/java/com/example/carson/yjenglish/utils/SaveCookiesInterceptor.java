@@ -33,7 +33,7 @@ public class SaveCookiesInterceptor implements Interceptor {
         if (!response.headers("Set-Cookie").isEmpty()) {
             List<String> cookies = response.headers("Set-Cookie");
             String cookie = encodeCookie(cookies);
-            Log.e("SaveCookie", cookie);
+//            Log.e("SaveCookie", cookie);
             saveCookie(request.url().toString(), request.url().host(), cookie);
         }
         return response;

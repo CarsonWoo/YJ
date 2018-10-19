@@ -23,6 +23,13 @@ import me.drakeet.multitype.ItemViewBinder;
  */
 
 public class HomeFeedsBinder extends ItemViewBinder<HomeFeeds, HomeFeedsBinder.ViewHolder> {
+
+    private OnHomeFeedItemClickListener listener;
+
+    public HomeFeedsBinder(OnHomeFeedItemClickListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     protected ViewHolder onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent) {
@@ -30,7 +37,7 @@ public class HomeFeedsBinder extends ItemViewBinder<HomeFeeds, HomeFeedsBinder.V
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull HomeFeeds item) {
+    protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull final HomeFeeds item) {
         Glide.with(holder.portrait.getContext()).load(item.getPortraitUrl()).crossFade().thumbnail(0.3f).into(holder.portrait);
         Glide.with(holder.coverImg.getContext()).load(item.getImgUrl()).thumbnail(0.3f).into(holder.coverImg);
         holder.title.setText(item.getTitle());
@@ -39,14 +46,18 @@ public class HomeFeedsBinder extends ItemViewBinder<HomeFeeds, HomeFeedsBinder.V
         holder.mCardView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(holder.mCardView.getContext(), "click", Toast.LENGTH_SHORT).show();
+                if (listener != null) {
+                    listener.onHomeFeedClick(item.getId());
+                }
             }
         });
         holder.delete.setVisibility(View.VISIBLE);
         holder.delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //do something
+                if (listener != null) {
+                    listener.onHomeFeedDelete(item.getId(), holder.getAdapterPosition());
+                }
             }
         });
     }
@@ -70,5 +81,10 @@ public class HomeFeedsBinder extends ItemViewBinder<HomeFeeds, HomeFeedsBinder.V
             time = itemView.findViewById(R.id.like_time);
             delete = itemView.findViewById(R.id.delete);
         }
+    }
+
+    public interface OnHomeFeedItemClickListener {
+        void onHomeFeedDelete(String id, int position);
+        void onHomeFeedClick(String id);
     }
 }

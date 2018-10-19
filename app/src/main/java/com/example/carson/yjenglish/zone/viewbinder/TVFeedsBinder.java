@@ -21,6 +21,13 @@ import me.drakeet.multitype.ItemViewBinder;
  */
 
 public class TVFeedsBinder extends ItemViewBinder<TVFeeds, TVFeedsBinder.ViewHolder> {
+
+    private OnTVFeedsClickListener listener;
+
+    public TVFeedsBinder(OnTVFeedsClickListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     protected ViewHolder onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent) {
@@ -29,13 +36,31 @@ public class TVFeedsBinder extends ItemViewBinder<TVFeeds, TVFeedsBinder.ViewHol
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull TVFeeds item) {
+    protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull final TVFeeds item) {
         holder.tag.setText(item.getTag());
         holder.viewNum.setText(item.getViewNum());
         holder.time.setText(item.getTime());
         holder.soundMark.setText(item.getSoundMark());
         Glide.with(holder.coverImg.getContext()).load(item.getImgUrl()).thumbnail(0.5f).into(holder.coverImg);
         holder.delete.setVisibility(View.VISIBLE);
+
+        holder.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onVideoItemClick(item.getId());
+                }
+            }
+        });
+
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onVideoDelete(item.getId(), holder.getAdapterPosition());
+                }
+            }
+        });
     }
 
     static class ViewHolder extends BaseViewHolder {
@@ -54,7 +79,12 @@ public class TVFeedsBinder extends ItemViewBinder<TVFeeds, TVFeedsBinder.ViewHol
             viewNum = itemView.findViewById(R.id.view_num);
             time = itemView.findViewById(R.id.like_time);
             delete = itemView.findViewById(R.id.delete);
-            mCardView = itemView.findViewById(R.id.card_view);
+            mCardView = itemView.findViewById(R.id.my_card_view);
         }
+    }
+
+    public interface OnTVFeedsClickListener {
+        void onVideoItemClick(String video_id);
+        void onVideoDelete(String video_id, int pos);
     }
 }

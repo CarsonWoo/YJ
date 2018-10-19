@@ -41,6 +41,7 @@ public class HomeInfo {
         private String insist_days;
         private String rest_days;
         private String my_plan;
+        private String level;//0代表今日计划未完成，1代表今日计划已完成未打卡，2代表已打卡，3代表完成双倍
         private String plan_number;
         private String study_people;
         private List<Feed> feeds;
@@ -116,6 +117,14 @@ public class HomeInfo {
 
         public void setHead_user_portrait(List<String> head_user_portrait) {
             this.head_user_portrait = head_user_portrait;
+        }
+
+        public String getLevel() {
+            return level;
+        }
+
+        public void setLevel(String level) {
+            this.level = level;
         }
 
         public class Feed {

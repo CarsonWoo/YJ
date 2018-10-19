@@ -18,9 +18,6 @@ public class CommentModel {
 
     private HomeFeeds homeFeeds;
     private TVFeeds tvFeeds;
-    private MusicItem musicItem;
-    private WordItem wordItem;
-    private DailyCardItem dailyCardItem;
 
     //只评论
     public CommentModel(String comment, int itemType) {
@@ -84,27 +81,4 @@ public class CommentModel {
         this.tvFeeds = tvFeeds;
     }
 
-    public MusicItem getMusicItem() {
-        return musicItem;
-    }
-
-    public void setMusicItem(MusicItem musicItem) {
-        this.musicItem = musicItem;
-    }
-
-    public WordItem getWordItem() {
-        return wordItem;
-    }
-
-    public void setWordItem(WordItem wordItem) {
-        this.wordItem = wordItem;
-    }
-
-    public DailyCardItem getDailyCardItem() {
-        return dailyCardItem;
-    }
-
-    public void setDailyCardItem(DailyCardItem dailyCardItem) {
-        this.dailyCardItem = dailyCardItem;
-    }
 }

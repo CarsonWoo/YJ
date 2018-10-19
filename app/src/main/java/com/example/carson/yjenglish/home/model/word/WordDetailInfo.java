@@ -39,8 +39,19 @@ public class WordDetailInfo {
         /**
          * 其他参数可由前一接口获取
          */
+        private String sentence;
+        private String sentence_audio;
+        private String sentence_cn;
+        private String phonetic_symbol_us;
+        private String pronunciation_us;
+        private String pic;
+        private String synonym;
+        private String phrase;
+        private String meaning;
+        private String paraphrase;
         private String word_of_similar_form;//形近词
         private String stem_affix;//词根词缀
+        private String word;
         private List<VideoInfo> video_info;
 
         public String getWord_of_similar_form() {
@@ -65,6 +76,94 @@ public class WordDetailInfo {
 
         public void setVideo_info(List<VideoInfo> video_info) {
             this.video_info = video_info;
+        }
+
+        public String getSentence() {
+            return sentence;
+        }
+
+        public void setSentence(String sentence) {
+            this.sentence = sentence;
+        }
+
+        public String getSentence_audio() {
+            return sentence_audio;
+        }
+
+        public void setSentence_audio(String sentence_audio) {
+            this.sentence_audio = sentence_audio;
+        }
+
+        public String getSentence_cn() {
+            return sentence_cn;
+        }
+
+        public void setSentence_cn(String sentence_cn) {
+            this.sentence_cn = sentence_cn;
+        }
+
+        public String getPhonetic_symbol_us() {
+            return phonetic_symbol_us;
+        }
+
+        public void setPhonetic_symbol_us(String phonetic_symbol_us) {
+            this.phonetic_symbol_us = phonetic_symbol_us;
+        }
+
+        public String getPronunciation_us() {
+            return pronunciation_us;
+        }
+
+        public void setPronunciation_us(String pronunciation_us) {
+            this.pronunciation_us = pronunciation_us;
+        }
+
+        public String getPic() {
+            return pic;
+        }
+
+        public void setPic(String pic) {
+            this.pic = pic;
+        }
+
+        public String getSynonym() {
+            return synonym;
+        }
+
+        public void setSynonym(String synonym) {
+            this.synonym = synonym;
+        }
+
+        public String getPhrase() {
+            return phrase;
+        }
+
+        public void setPhrase(String phrase) {
+            this.phrase = phrase;
+        }
+
+        public String getMeaning() {
+            return meaning;
+        }
+
+        public void setMeaning(String meaning) {
+            this.meaning = meaning;
+        }
+
+        public String getParaphrase() {
+            return paraphrase;
+        }
+
+        public void setParaphrase(String paraphrase) {
+            this.paraphrase = paraphrase;
+        }
+
+        public String getWord() {
+            return word;
+        }
+
+        public void setWord(String word) {
+            this.word = word;
         }
 
         public class VideoInfo {

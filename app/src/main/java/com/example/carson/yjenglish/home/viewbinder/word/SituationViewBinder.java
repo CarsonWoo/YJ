@@ -38,7 +38,12 @@ public class SituationViewBinder extends ItemViewBinder<WordSituation, Situation
     protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull final WordSituation item) {
         holder.sentence.setText(item.getText());
         holder.sentenceTrans.setText(item.getTrans());
-        Glide.with(holder.img.getContext()).load(item.getImgUrl()).thumbnail(0.2f).into(holder.img);
+        Glide.with(holder.img.getContext())
+                .load(item.getImgUrl())
+                .placeholder(R.mipmap.word_placeholder)
+                .dontAnimate()
+                .thumbnail(0.2f)
+                .into(holder.img);
         holder.sound.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

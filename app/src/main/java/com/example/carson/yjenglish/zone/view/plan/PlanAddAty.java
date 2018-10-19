@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish.zone.view.plan;
 
 import android.content.Intent;
+import android.os.Build;
 import android.support.v4.app.FragmentTransaction;
 import android.graphics.Color;
 import android.support.v4.app.FragmentManager;
@@ -11,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.zone.GetPlanTask;
 import com.example.carson.yjenglish.zone.presenter.GetPlanPresenter;
 
@@ -44,6 +46,14 @@ public class PlanAddAty extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_plan_add);
 
         fromIntent = getIntent().getIntExtra("from_intent", INTENT_FROM_PLAN);

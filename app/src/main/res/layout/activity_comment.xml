@@ -6,16 +6,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#f7f7f7"
+    android:clipToPadding="true"
+    android:fitsSystemWindows="true"
     tools:context="com.example.carson.yjenglish.home.view.feeds.CommentAty">
 
     <ImageView
         android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:paddingTop="30dp"
-        android:paddingStart="10dp"
-        android:paddingBottom="5dp"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:src="@drawable/ic_arrow_left"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         />
 
     <TextView
@@ -24,9 +26,9 @@
         android:layout_height="wrap_content"
         android:text="3条回复"
         android:paddingBottom="10dp"
-        android:textSize="17sp"
+        android:textSize="16sp"
         android:textAlignment="center"
-        android:paddingTop="30dp"
+        android:paddingTop="10dp"
         />
 
     <android.support.constraint.ConstraintLayout
@@ -39,8 +41,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/portrait"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:src="@color/colorAccent"
             android:layout_marginTop="5dp"
             android:layout_marginStart="10dp"
@@ -50,9 +52,9 @@
 
         <ImageView
             android:id="@+id/like_btn"
-            android:layout_width="18dp"
-            android:layout_height="18dp"
-            android:src="@mipmap/ic_like_button"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:src="@drawable/selector_comment_like"
             android:layout_marginEnd="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             />
@@ -62,7 +64,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="266"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:layout_marginEnd="5dp"
             app:layout_constraintEnd_toStartOf="@id/like_btn"
             app:layout_constraintBottom_toBottomOf="@id/like_btn"
@@ -72,7 +74,7 @@
             android:id="@+id/username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:text="白酒配茶"
             android:textColor="@color/colorTextWord"
             android:layout_marginStart="8dp"
@@ -87,7 +89,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="刚刚"
-            android:textSize="12sp"
+            android:textSize="11sp"
             android:layout_marginTop="3dp"
             app:layout_constraintTop_toBottomOf="@id/username"
             app:layout_constraintStart_toStartOf="@id/username"
@@ -98,7 +100,7 @@
             android:layout_width="260dp"
             android:layout_height="wrap_content"
             android:textColor="#f7292929"
-            android:textSize="15sp"
+            android:textSize="14sp"
             android:lineSpacingExtra="2dp"
             android:layout_marginTop="10dp"
             app:layout_constraintTop_toBottomOf="@id/time"
@@ -120,7 +122,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="按时间"
-            android:textSize="13sp"
+            android:textSize="12sp"
             android:textColor="@color/colorAccent"
             android:textAlignment="viewEnd"
             android:drawablePadding="5dp"
@@ -170,7 +172,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/stroke_round_rect_edit_white"
             android:hint="回复评论"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:paddingStart="12dp"
             android:paddingTop="6dp"
             android:paddingBottom="6dp"
@@ -183,6 +185,7 @@
             android:layout_height="24dp"
             android:src="@mipmap/ic_face"
             android:layout_marginEnd="8dp"
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="@id/edit_comment"
             app:layout_constraintTop_toTopOf="@id/edit_comment"
             app:layout_constraintBottom_toBottomOf="@id/edit_comment"

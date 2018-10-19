@@ -39,6 +39,9 @@ public class ZoneInfo {
         private String portrait;
         private String user_id;
         private String username;
+        private String insist_day;
+        private String learned_word;
+        private String remaining_words;
 
         public String getGender() {
             return gender;
@@ -78,6 +81,30 @@ public class ZoneInfo {
 
         public void setUsername(String username) {
             this.username = username;
+        }
+
+        public String getInsist_day() {
+            return insist_day;
+        }
+
+        public void setInsist_day(String insist_day) {
+            this.insist_day = insist_day;
+        }
+
+        public String getLearned_word() {
+            return learned_word;
+        }
+
+        public void setLearned_word(String learned_word) {
+            this.learned_word = learned_word;
+        }
+
+        public String getRemaining_words() {
+            return remaining_words;
+        }
+
+        public void setRemaining_words(String remaining_words) {
+            this.remaining_words = remaining_words;
         }
     }
 }

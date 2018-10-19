@@ -2,6 +2,7 @@ package com.example.carson.yjenglish.home.view.feeds;
 
 import android.app.Dialog;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import com.example.carson.yjenglish.home.model.HomeInfo;
 import com.example.carson.yjenglish.home.presenter.AuthorInfoPresenter;
 import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +68,14 @@ public class AuthorAty extends AppCompatActivity implements HomeListAdapter.OnVi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_author);
         portraitUrl = getIntent().getStringExtra("portrait_url");
         usernameStr = getIntent().getStringExtra("username");

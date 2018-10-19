@@ -3,14 +3,18 @@ package com.example.carson.yjenglish.tv.view;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,13 +24,16 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.example.carson.yjenglish.BaseActivity;
 import com.example.carson.yjenglish.FullScreenVideo;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.VideoCaptionInfo;
 import com.example.carson.yjenglish.VideoCaptionModel;
 import com.example.carson.yjenglish.VideoService;
 import com.example.carson.yjenglish.adapter.TVListAdapter;
 import com.example.carson.yjenglish.customviews.MyVideoView;
+import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.tv.TVInfoContract;
 import com.example.carson.yjenglish.tv.TVService;
 import com.example.carson.yjenglish.tv.TvInfoTask;
@@ -41,6 +48,8 @@ import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.ScreenUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
 
+import org.litepal.crud.DataSupport;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -50,6 +59,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -177,7 +188,6 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
                 }
             }
         });
-
     }
 
     private void executeLoadMoreTask() {
@@ -219,7 +229,29 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
 
             @Override
             public void onFailure(Call<TVMoreInfo> call, Throwable t) {
-                Toast.makeText(getContext(), "连接超时", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getContext(), "连接超时", Toast.LENGTH_SHORT).show();
+                DialogUtils utils = DialogUtils.getInstance(getContext());
+                Dialog dialog = utils.newTipsDialog("网络加载出现问题了噢...要重试吗", View.TEXT_ALIGNMENT_CENTER);
+                dialog.show();
+
+                WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                lp.height = ScreenUtils.dp2px(getContext(), 240);
+                lp.width = ScreenUtils.dp2px(getContext(), 260);
+                lp.y = ScreenUtils.getScreenHeight(getContext()) / 2;
+                lp.gravity = Gravity.CENTER;
+                dialog.getWindow().setAttributes(lp);
+
+                utils.setTipsListener(new DialogUtils.OnTipsListener() {
+                    @Override
+                    public void onConfirm() {
+                        executeLoadMoreTask();
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
             }
         });
     }
@@ -472,11 +504,25 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
                 TVListAdapter.TVHolder tvHolder = (TVListAdapter.TVHolder) holder;
                 tvHolder.ivFavour.setSelected(mItemList.get(clickFeedsPos).isFavour());
                 int num = Integer.parseInt(tvHolder.likeNum.getText().toString());
-                if (mItemList.get(clickFeedsPos).isFavour()) {
-                    tvHolder.likeNum.setText(String.valueOf(num + 1));
+                if (num < 1000) {
+                    if (mItemList.get(clickFeedsPos).isFavour()) {
+                        if (num + 1 == 1000) {
+                            tvHolder.likeNum.setText("1k+");
+                        } else {
+                            tvHolder.likeNum.setText(String.valueOf(num + 1));
+                        }
+                    } else {
+                        tvHolder.likeNum.setText(String.valueOf(num - 1));
+                    }
                 } else {
-                    tvHolder.likeNum.setText(String.valueOf(num - 1));
+                    if (num > 10000) {
+                        tvHolder.likeNum.setText("1w+");
+                    } else {
+                        String s = String.valueOf(num % 1000) + "k+";
+                        tvHolder.likeNum.setText(s);
+                    }
                 }
+
             }
         }
     }
@@ -624,6 +670,11 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
     @Override
     public void showLoading() {
         mDialog.show();
+        WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
+        lp.width = ScreenUtils.dp2px(getContext(), 260);
+        lp.height = ScreenUtils.dp2px(getContext(), 240);
+        lp.y = ScreenUtils.getScreenHeight(getContext()) / 2 - ScreenUtils.dp2px(getContext(), 260);
+        mDialog.getWindow().setAttributes(lp);
     }
 
     @Override
@@ -633,8 +684,15 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
 
     @Override
     public void showError(String msg) {
-        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
         Log.e(TAG, msg);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                executeLoadTask();
+            }
+        }, 5000);
     }
 
     @Override
@@ -670,6 +728,15 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
             initViews(view);
         } else {
             Log.e(TAG, info.getMsg());
+            if (info.getStatus().equals("400") && info.getMsg().equals("身份认证错误！")) {
+                UserConfig.clearUserInfo(getContext());
+                SharedPreferences.Editor editor = MyApplication.getContext().
+                        getSharedPreferences("word_favours", MODE_PRIVATE).edit();
+                editor.clear();
+                editor.apply();
+                DataSupport.deleteAll(LoadHeader.class);
+                BaseActivity.tokenOutOfDate(getActivity());
+            }
         }
     }
 

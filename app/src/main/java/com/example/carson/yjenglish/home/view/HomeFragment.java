@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish.home.view;
 
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
@@ -9,11 +10,17 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,15 +34,18 @@ import android.widget.Toast;
 
 import com.example.carson.yjenglish.BaseActivity;
 import com.example.carson.yjenglish.FullScreenVideo;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.VideoCaptionModel;
 import com.example.carson.yjenglish.adapter.HomeListAdapter;
 import com.example.carson.yjenglish.customviews.MyVideoView;
 import com.example.carson.yjenglish.home.HomeInfoContract;
+import com.example.carson.yjenglish.home.HomeInfoTask;
 import com.example.carson.yjenglish.home.HomeService;
 import com.example.carson.yjenglish.home.model.HomeInfo;
 import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.home.model.PicHeader;
+import com.example.carson.yjenglish.home.presenter.HomeInfoPresenter;
 import com.example.carson.yjenglish.home.view.feeds.HomeItemAty;
 import com.example.carson.yjenglish.home.view.word.SignAty;
 import com.example.carson.yjenglish.home.view.word.SignInAty;
@@ -61,6 +71,8 @@ import retrofit2.Retrofit;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -287,24 +299,71 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                         getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                     }
                 } else {
-                    Intent toWord = new Intent(getContext(), WordActivity.class);
-                    toWord.putExtra("type", REQUEST_WORD_CODE);
-                    startActivityForResult(toWord, REQUEST_WORD_CODE);
-                    if (getActivity() != null) {
-                        getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    if (Build.VERSION.SDK_INT >= 23) {
+                        if (ContextCompat.checkSelfPermission(MyApplication.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                            //2、申请权限: 参数二：权限的数组；参数三：请求码
+                            ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+                        } else {
+                            Intent toWord = new Intent(getContext(), WordActivity.class);
+                            toWord.putExtra("type", REQUEST_WORD_CODE);
+                            startActivityForResult(toWord, REQUEST_WORD_CODE);
+                            if (getActivity() != null) {
+                                getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                            }
+                        }
+                    } else {
+                        Intent toWord = new Intent(getContext(), WordActivity.class);
+                        toWord.putExtra("type", REQUEST_WORD_CODE);
+                        startActivityForResult(toWord, REQUEST_WORD_CODE);
+                        if (getActivity() != null) {
+                            getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                        }
                     }
+//                    Intent toSign = new Intent(getContext(), SignAty.class);
+//                    toSign.putExtra("username", UserConfig.getUsername(getContext()))
+//                            .putExtra("insist_day", mLoadData.getInsistCount())
+//                            .putExtra("learned_word", mLoadData.getWordsCount());
+//                    startActivity(toSign);
+
                 }
             }
         });
         mAdapter.setLoadListener(new HomeListAdapter.OnLoadHeaderListener() {
             @Override
             public void onSignClick(View view) {
-                Intent toSignIn = new Intent(getContext(), SignInAty.class);
-                startActivityForResult(toSignIn, REQUEST_SIGN_CODE);
-                startActivity(new Intent(getContext(), SignAty.class));
-                if (getActivity() != null) {
-                    getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+//                Intent toSignIn = new Intent(getContext(), SignInAty.class);
+//                startActivityForResult(toSignIn, REQUEST_SIGN_CODE);
+                if (Build.VERSION.SDK_INT >= 23) {
+                    if (ContextCompat.checkSelfPermission(MyApplication.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+                        //2、申请权限: 参数二：权限的数组；参数三：请求码
+                        ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
+                    } else {
+                        if (UserConfig.getUsername(getContext()).isEmpty()) {
+                            UserConfig.cacheUsername(getContext(), "独角鲸");
+                        }
+                        Intent toSign = new Intent(getContext(), SignAty.class);
+                        toSign.putExtra("username", UserConfig.getUsername(getContext()))
+                                .putExtra("insist_day", mLoadData.getInsistCount())
+                                .putExtra("learned_word", mLoadData.getWordsCount());
+                        startActivityForResult(toSign, REQUEST_SIGN_CODE);
+                        if (getActivity() != null) {
+                            getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                        }
+                    }
+                } else {
+                    if (UserConfig.getUsername(getContext()).isEmpty()) {
+                        UserConfig.cacheUsername(getContext(), "独角鲸");
+                    }
+                    Intent toSign = new Intent(getContext(), SignAty.class);
+                    toSign.putExtra("username", UserConfig.getUsername(getContext()))
+                            .putExtra("insist_day", mLoadData.getInsistCount())
+                            .putExtra("learned_word", mLoadData.getWordsCount());
+                    startActivityForResult(toSign, REQUEST_SIGN_CODE);
+                    if (getActivity() != null) {
+                        getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    }
                 }
+
             }
 
             @Override
@@ -410,12 +469,33 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             mLoadData.setTodayFinish(true);
             mLoadData.save();
             mAdapter.notifyItemChanged(0);
+            Intent toSign = new Intent(getContext(), SignAty.class);
+            toSign.putExtra("username", UserConfig.getUsername(getContext()))
+                    .putExtra("insist_day", mLoadData.getInsistCount())
+                    .putExtra("learned_word", mLoadData.getWordsCount());
+            startActivityForResult(toSign, REQUEST_SIGN_CODE);
+            if (getActivity() != null) {
+                getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+            }
         } else if (requestCode == REQUEST_SIGN_CODE && resultCode == RESULT_SIGN_OK) {
-//            mLoadData.setSignClick(true);
-//            mLoadData.save();
-//            mAdapter.notifyItemChanged(0);
+            mLoadData.setSignClick(true);
+            mLoadData.save();
+            mAdapter.notifyItemChanged(0);
         } else if (requestCode == REQUEST_MORE_CODE && resultCode == Activity.RESULT_OK) {
-            Log.e(TAG, "progress finish");
+//            Log.e(TAG, "progress finish");
+            if (data != null) {
+                String learned_word = data.getStringExtra("learned_word");
+                if (learned_word != null) {
+                    mLoadData.setWordsCount(mLoadData.getWordsCount() +
+                            Integer.parseInt(learned_word));
+                }
+            }
+            float progress = ((float) mLoadData.getWordsCount() * 100 /
+                    mLoadData.getTargetCount());
+            mLoadData.setProgress(progress);
+            mLoadData.setDailyFinish(true);
+            mLoadData.save();
+            mAdapter.notifyItemChanged(0);
         } else if (requestCode == REQUEST_ADD_PLAN_CODE && resultCode == RESULT_ADD_PLAN_OK) {
             loadPlanFromDB();
             mHeaderStyle = 3;
@@ -449,16 +529,57 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             RecyclerView.ViewHolder holder = recyclerView.findViewHolderForAdapterPosition(clickFeedPos + 1);
             if (holder != null && holder instanceof HomeListAdapter.HomeViewHolder) {
 //                Log.e(TAG, "onActivityResult(2)");
-                ((HomeListAdapter.HomeViewHolder) holder).ivFavour.setSelected(
-                        mListData.get(clickFeedPos).getIs_favour().equals("1"));
-                int num = Integer.parseInt(((HomeListAdapter.HomeViewHolder) holder).likeNum.getText().toString());
-                if (mListData.get(clickFeedPos).getIs_favour().equals("1")) {
-                    ((HomeListAdapter.HomeViewHolder) holder).likeNum.setText(String.valueOf(num + 1));
-                } else {
-                    ((HomeListAdapter.HomeViewHolder) holder).likeNum.setText(String.valueOf(num - 1));
-                }
+                HomeListAdapter.HomeViewHolder homeHolder = (HomeListAdapter.HomeViewHolder) holder;
+                homeHolder.ivFavour.setSelected(mListData.get(clickFeedPos).getIs_favour().equals("1"));
+                int num = Integer.parseInt(homeHolder.likeNum.getText().toString());
+                if (num < 1000) {
+                    if (mListData.get(clickFeedPos).getIs_favour().equals("1")) {
+                        if (num + 1 == 1000) {
+                            homeHolder.likeNum.setText("1k+");
+                        } else {
+                            homeHolder.likeNum.setText(String.valueOf(num + 1));
+                        }
+                    } else {
+                        homeHolder.likeNum.setText(String.valueOf(num - 1));
+                    }
+                } /*else {
+                    if (num > 10000) {
+                        String s = String.valueOf(num % 10000) + "w+";
+                        homeHolder.likeNum.setText(s);
+                    } else {
+                        String s = String.valueOf(num % 1000) + "k+";
+                        homeHolder.likeNum.setText(s);
+                    }
+                }*/
             }
 //            mAdapter.notifyItemChanged(clickFeedPos + 1);//跳过头部
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Intent toWord = new Intent(getContext(), WordActivity.class);
+            toWord.putExtra("type", REQUEST_WORD_CODE);
+            startActivityForResult(toWord, REQUEST_WORD_CODE);
+            if (getActivity() != null) {
+                getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+            }
+        }  else if (requestCode == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            if (UserConfig.getUsername(getContext()).isEmpty()) {
+                UserConfig.cacheUsername(getContext(), "独角鲸");
+            }
+            Intent toSign = new Intent(getContext(), SignAty.class);
+            toSign.putExtra("username", UserConfig.getUsername(getContext()))
+                    .putExtra("insist_day", mLoadData.getInsistCount())
+                    .putExtra("learned_word", mLoadData.getWordsCount());
+            startActivityForResult(toSign, REQUEST_SIGN_CODE);
+            if (getActivity() != null) {
+                getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+            }
+        } else {
+            Toast.makeText(getContext(), "小呗可能无法正常播放音频和进行分享噢，请在设置中开放权限吧~", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -540,8 +661,9 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     @Override
     public void showError(String msg) {
         Log.e(TAG, msg);
-        DialogUtils.getInstance(getContext()).newCommonDialog("没有网络噢...", R.mipmap.ic_no_network, false)
-                .show();
+//        DialogUtils.getInstance(getContext()).newCommonDialog("没有网络噢...", R.mipmap.ic_no_network, false)
+//                .show();
+
         if (UserConfig.HasPlan(getContext())) {
             loadPlanFromDB();
             initViews(view);
@@ -549,6 +671,16 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             loadDataFromDB();
             initViews(view);
         }
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                HomeInfoTask task = HomeInfoTask.getInstance();
+                HomeInfoPresenter infoPresenter = new HomeInfoPresenter(task, HomeFragment.this);
+                setPresenter(infoPresenter);
+                mPresenter.getInfo(UserConfig.getToken(getContext()));
+            }
+        }, 5000);
     }
 
     @Override
@@ -558,6 +690,9 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         if (info.getStatus().equals("200")) {
             if (info.getData() != null) {
                 HomeInfo.Data data = info.getData();
+                UserConfig.cacheMyPlan(getContext(), data.getMy_plan());
+                Log.e(TAG, data.getMy_plan());
+                Log.e(TAG, UserConfig.getMyPlan(getContext()));
                 if (data.getFlag().equals("0") && mHeaderStyle != 2) {
                     //即没有计划
                     initPicItem(data);
@@ -570,6 +705,12 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         } else {
             Toast.makeText(getContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
             if (info.getStatus().equals("400") && info.getMsg().equals("身份认证错误！")) {
+                UserConfig.clearUserInfo(getContext());
+                SharedPreferences.Editor editor = MyApplication.getContext().
+                        getSharedPreferences("word_favours", MODE_PRIVATE).edit();
+                editor.clear();
+                editor.apply();
+                DataSupport.deleteAll(LoadHeader.class);
                 BaseActivity.tokenOutOfDate(getActivity());
             }
         }
@@ -589,27 +730,34 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             mLoadData.setHeader_id(1);
             mLoadData.setTodayFinish(false);
             mLoadData.setSignClick(false);
+            mLoadData.setDailyFinish(false);
         }
         mLoadData.setCountDown(Integer.parseInt(data.getRest_days()));
         mLoadData.setInsistCount(Integer.parseInt(data.getInsist_days()));
         mLoadData.setTargetCount(Integer.parseInt(data.getPlan_number()));
         mLoadData.setWordsCount(Integer.parseInt(data.getLearned_word()));
-        float progress = ((float) Integer.parseInt(data.getLearned_word()) /
-                Integer.parseInt(data.getPlan_number())) * 100;
+        float progress = ((float) Integer.parseInt(data.getLearned_word()) * 100 /
+                Integer.parseInt(data.getPlan_number()));
         mLoadData.setProgress(progress);
 
-        mLoadData.save();
-        Date mDate = new Date();
-        @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");
-        String dateStr = df.format(mDate);
-        Log.e(TAG, "mCurDate = " + mCurDate);
-        Log.e(TAG, "dateStr = " + dateStr);
+        String level = data.getLevel();
+        int levelInt = Integer.parseInt(level);
+        mLoadData.setTodayFinish(levelInt > 0);
+        mLoadData.setSignClick(levelInt > 1);
+        mLoadData.setDailyFinish(levelInt > 2);
 
-        if (!dateStr.equals(mCurDate)) {
-            mLoadData.setSignClick(false);
-            mLoadData.setTodayFinish(false);
-            mLoadData.save();
-        }
+        mLoadData.save();
+//        Date mDate = new Date();
+//        @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日");
+//        String dateStr = df.format(mDate);
+//        Log.e(TAG, "mCurDate = " + mCurDate);
+//        Log.e(TAG, "dateStr = " + dateStr);
+//
+//        if (!dateStr.equals(mCurDate)) {
+//            mLoadData.setSignClick(false);
+//            mLoadData.setTodayFinish(false);
+//            mLoadData.save();
+//        }
     }
 
     private void initPicItem(HomeInfo.Data data) {

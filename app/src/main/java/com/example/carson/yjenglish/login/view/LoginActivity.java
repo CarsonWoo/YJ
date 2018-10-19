@@ -33,6 +33,7 @@ import com.example.carson.yjenglish.login.model.LoginModule;
 import com.example.carson.yjenglish.login.presenter.LoginPresenter;
 import com.example.carson.yjenglish.register.view.RegisterActivity;
 import com.example.carson.yjenglish.utils.AES;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.tencent.connect.UserInfo;
 import com.tencent.connect.auth.QQToken;
@@ -54,7 +55,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         View.OnClickListener {
 
     private final String TAG = "Login";
-    private static final String QQ_APP_ID = "1107820868";
+    private static final String QQ_APP_ID = UserConfig.QQ_APP_ID;
     private Tencent mTencent;
     private QQUIListener mQQListener;
     private UserInfo mQQUserInfo;
@@ -82,6 +83,14 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_login);
         mTencent = Tencent.createInstance(QQ_APP_ID, MyApplication.getContext());
         iniViews();
@@ -110,18 +119,22 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         phone.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16)}); //最大输入长度
         password.getText().setFilters(new InputFilter[]{new InputFilter.LengthFilter(16)}); //最大密码输入长度
 
+        testUse.setVisibility(View.GONE);
+
         checkShowPassword();
 
+        //注册的提示框
         mDialog = new ProgressDialog(this);
         mDialog.setTitle("正在登录中");
         login.setOnClickListener(this);
         register.setOnClickListener(this);
         forget.setOnClickListener(this);
-        testUse.setOnClickListener(this);
+//        testUse.setOnClickListener(this);
         btnQQ.setOnClickListener(this);
         btnWechat.setOnClickListener(this);
     }
 
+    //判断密码框是否显示
     private void checkShowPassword() {
         password.setShowClickListener(new View.OnClickListener() {
             @Override
@@ -157,10 +170,11 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
             String status = info.getStatus();
             String msg = info.getMsg();
             String data = info.getData();
-            Log.e(TAG, status);
-            Log.e(TAG, msg);
+//            Log.e(TAG, status);
+//            Log.e(TAG, msg);
             if (status.equals("200")) {
-                Log.e(TAG, data);
+//                Log.e(TAG, data);
+                //缓存token并进行跳转主页
                 UserConfig.cacheToken(this, data);
                 UserConfig.cachePhone(this, phone.getText().toString());
                 UserConfig.cacheIsFirstTimeUser(this, false);
@@ -168,6 +182,8 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
                 startActivity(toHome);
                 overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                 finishAfterTransition();
+            } else {
+                Toast.makeText(LoginActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
             }
         }
 //        login.setClickable(true);
@@ -187,6 +203,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 
     @Override
     public void showError(String msg) {
+//        Log.e(TAG, msg);
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
@@ -199,6 +216,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
                     return;
                 }
                 //mvp模块拼装
+                //网络访问登录接口
                 LoginTask loginTask = LoginTask.getInstance();
                 loginPresenter = new LoginPresenter(LoginActivity.this, loginTask);
                 this.setPresenter(loginPresenter);
@@ -224,10 +242,10 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
                 overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                 break;
             case R.id.test_use:
-                Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
+/*                Intent toHome = new Intent(LoginActivity.this, HomeActivity.class);
                 startActivity(toHome);
                 overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
-                finish();
+                finish();*/
                 break;
             case R.id.btn_qq:
                 executeQQLogin();
@@ -281,6 +299,7 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         }
     }
 
+    //QQ访问API
     private class QQUIListener implements IUiListener {
 
         @Override

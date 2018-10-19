@@ -190,10 +190,13 @@ public class JuniorTab extends Fragment implements WordTagViewBinder.OnTagClickL
                         if (!UserConfig.HasPlan(getContext())) {
                             UserConfig.cacheHasPlan(getContext(), true);
                         }
+                        UserConfig.cacheDailyWord(getContext(), String.valueOf(count));
                         if (PlanAddAty.fromIntent == PlanAddAty.INTENT_FROM_PLAN) {
                             getActivity().setResult(Activity.RESULT_OK);
+                            getActivity().onBackPressed();
                         } else {
                             setHomeResult(day, word_number);
+
                         }
                     }
                 } else {
@@ -217,6 +220,7 @@ public class JuniorTab extends Fragment implements WordTagViewBinder.OnTagClickL
         backIntent.putExtra("plan_number", word_number);
         if (getActivity() != null) {
             getActivity().setResult(HomeFragment.RESULT_ADD_PLAN_OK);
+            getActivity().onBackPressed();
         }
     }
 }

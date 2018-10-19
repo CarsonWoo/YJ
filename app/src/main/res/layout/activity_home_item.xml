@@ -20,20 +20,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="30dp"
-        android:paddingBottom="3dp"
+        android:paddingBottom="5dp"
         android:background="@android:color/white"
         app:layout_constraintTop_toTopOf="parent">
         <ImageView
             android:id="@+id/back"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/ic_arrow_left"
             android:layout_marginStart="10dp" />
 
         <ImageView
             android:id="@+id/like"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/selector_feeds_like"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="70dp"
@@ -41,8 +41,8 @@
 
         <ImageView
             android:id="@+id/share"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/ic_share_gray"
             android:layout_marginEnd="15dp"
             android:layout_alignParentEnd="true"
@@ -77,7 +77,7 @@
             android:layout_height="match_parent"
             android:background="@drawable/stroke_round_rect_edit_white"
             android:hint="发表评论"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:paddingStart="12dp"
             android:paddingTop="6dp"
             android:paddingBottom="6dp"
@@ -89,6 +89,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@mipmap/ic_face"
+            android:visibility="gone"
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="@id/edit_comment"
             app:layout_constraintTop_toTopOf="@id/edit_comment"

@@ -14,8 +14,8 @@
 
     <ImageView
         android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:src="@drawable/ic_arrow_left"
         android:layout_marginTop="30dp"
         android:layout_marginStart="10dp"
@@ -54,19 +54,19 @@
 
     <ImageButton
         android:id="@+id/btn_wechat_friend"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:background="@mipmap/ic_wechat_friend"
         android:layout_marginBottom="45dp"
-        android:layout_marginStart="34dp"
+        android:layout_marginStart="45dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         />
 
     <ImageButton
         android:id="@+id/btn_wechat"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:background="@mipmap/ic_wechat_green"
         android:layout_marginBottom="45dp"
         android:layout_marginStart="25dp"
@@ -76,8 +76,8 @@
 
     <ImageButton
         android:id="@+id/btn_qq"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:background="@mipmap/ic_qq_blue"
         android:layout_marginBottom="45dp"
         android:layout_marginStart="25dp"
@@ -87,8 +87,8 @@
 
     <ImageButton
         android:id="@+id/btn_qq_zone"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:background="@mipmap/ic_qq_zone"
         android:layout_marginBottom="45dp"
         android:layout_marginStart="25dp"

@@ -5,13 +5,15 @@ package com.example.carson.yjenglish.zone.model.forviewbinder;
  */
 
 public class TVFeeds {
+    private String id;
     private String imgUrl;
     private String viewNum;
     private String tag;
     private String soundMark;
     private String time;
 
-    public TVFeeds(String imgUrl, String viewNum, String tag, String soundMark, String time) {
+    public TVFeeds(String id, String imgUrl, String viewNum, String tag, String soundMark, String time) {
+        this.id = id;
         this.imgUrl = imgUrl;
         this.viewNum = viewNum;
         this.tag = tag;
@@ -38,5 +40,9 @@ public class TVFeeds {
 
     public String getTime() {
         return time;
+    }
+
+    public String getId() {
+        return id;
     }
 }

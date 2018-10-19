@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -15,6 +16,7 @@ import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.msg.model.CommentMsg;
 import com.example.carson.yjenglish.msg.model.LikeMsg;
 import com.example.carson.yjenglish.msg.model.NoticeMsg;
+import com.example.carson.yjenglish.zone.view.users.UserInfoAty;
 
 import java.util.List;
 
@@ -111,12 +113,21 @@ public class MsgAdapters {
         }
 
         @Override
-        public void onBindViewHolder(@NonNull LikeHolder holder, int position) {
+        public void onBindViewHolder(@NonNull final LikeHolder holder, int position) {
             holder.item = mLikes.get(position);
             holder.username.setText(holder.item.getUsername());
             holder.content.setText(holder.item.getContent());
-            holder.date.setText(holder.item.getDate());
-            Glide.with(ctx).load(holder.item.getPortraitUrl()).asBitmap().into(holder.portrait);
+            holder.date.setText(holder.item.getSet_time());
+            Glide.with(ctx).load(holder.item.getPortrait()).asBitmap().into(holder.portrait);
+
+            holder.portrait.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent toInfo = new Intent(holder.portrait.getContext(), UserInfoAty.class);
+                    toInfo.putExtra("user_id", holder.item.getUser_id());
+                    holder.portrait.getContext().startActivity(toInfo);
+                }
+            });
         }
 
         @Override

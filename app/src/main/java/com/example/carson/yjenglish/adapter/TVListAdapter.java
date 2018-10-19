@@ -124,7 +124,8 @@ public class TVListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
                 }
             }
         });
-        Glide.with(ctx).load(holder.item.getCoverImg()).crossFade().listener(new RequestListener<String, GlideDrawable>() {
+        Glide.with(ctx).load(holder.item.getCoverImg()).error(R.mipmap.video_place_holder_error)
+                .dontAnimate().listener(new RequestListener<String, GlideDrawable>() {
             @Override
             public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
                 return false;
@@ -159,7 +160,7 @@ public class TVListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
         if (mHeaderList.size() > 4) {
             TVHeader fifthItem = mHeaderList.get(4);
             Glide.with(ctx).load(fifthItem.getImgUrl())
-                    .thumbnail(0.5f).error(R.mipmap.bg_plan_box).into(holder.fifth);
+                    .thumbnail(0.5f).error(R.mipmap.video_place_holder_error).into(holder.fifth);
             holder.viewNumFifth.setText(fifthItem.getPlayNum());
             holder.wordFifth.setText(fifthItem.getWord());
             holder.fifth.setOnClickListener(new View.OnClickListener() {
@@ -172,10 +173,10 @@ public class TVListAdapter extends RecyclerView.Adapter<BaseViewHolder> {
             });
         }
 
-        Glide.with(ctx).load(firstItem.getImgUrl()).thumbnail(0.5f).error(R.mipmap.bg_plan_box).into(holder.first);
-        Glide.with(ctx).load(secondItem.getImgUrl()).thumbnail(0.5f).error(R.mipmap.bg_plan_box).into(holder.second);
-        Glide.with(ctx).load(thirdItem.getImgUrl()).thumbnail(0.5f).error(R.mipmap.bg_plan_box).into(holder.third);
-        Glide.with(ctx).load(fourthItem.getImgUrl()).thumbnail(0.5f).error(R.mipmap.bg_plan_box).into(holder.fourth);
+        Glide.with(ctx).load(firstItem.getImgUrl()).thumbnail(0.5f).error(R.mipmap.video_place_holder_error).dontAnimate().into(holder.first);
+        Glide.with(ctx).load(secondItem.getImgUrl()).thumbnail(0.5f).error(R.mipmap.video_place_holder_error).dontAnimate().into(holder.second);
+        Glide.with(ctx).load(thirdItem.getImgUrl()).thumbnail(0.5f).error(R.mipmap.video_place_holder_error).dontAnimate().into(holder.third);
+        Glide.with(ctx).load(fourthItem.getImgUrl()).thumbnail(0.5f).error(R.mipmap.video_place_holder_error).dontAnimate().into(holder.fourth);
 
 
         holder.viewNumFirst.setText(firstItem.getPlayNum());

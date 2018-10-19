@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:src="@drawable/ic_arrow_left"
         android:layout_margin="10dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,11 +23,11 @@
         android:layout_height="wrap_content"
         android:text="@string/my_plan"
         android:textColor="@color/colorTextWord"
-        android:textSize="17sp"
-        android:layout_marginTop="2dp"
+        android:textSize="16sp"
+        android:layout_marginTop="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/back"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <TextView
@@ -36,7 +36,9 @@
         android:layout_height="wrap_content"
         android:text="编辑"
         android:textColor="@color/colorAccent"
-        android:textSize="15sp"
+        android:textSize="14sp"
+        android:paddingStart="5dp"
+        android:paddingEnd="5dp"
         android:visibility="invisible"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="3dp"

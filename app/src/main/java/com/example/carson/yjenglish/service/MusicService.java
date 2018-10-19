@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -43,7 +44,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             mPlayer.reset();
         }
         try {
-            mPlayer.setDataSource(getResources().openRawResourceFd(res));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mPlayer.setDataSource(getResources().openRawResourceFd(res));
+            } else {
+
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.nfc.Tag;
+import android.os.Build;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -39,6 +40,7 @@ import com.example.carson.yjenglish.utils.AddCookiesInterceptor;
 import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.SaveCookiesInterceptor;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.franmontiel.persistentcookiejar.ClearableCookieJar;
 import com.franmontiel.persistentcookiejar.PersistentCookieJar;
@@ -95,6 +97,14 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_code);
 
         initViews();
@@ -137,9 +147,11 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
     }
 
     private void initContent() {
-        if (checkSelfPermission(Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_SMS},
-                    1);
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (checkSelfPermission(Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_SMS},
+                        1);
+            }
         }
         doReadAction();
     }
@@ -289,12 +301,15 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.e("Code", "intent type = " + mIntentType);
         if (mIntentType == INTENT_TYPE_FORGET) {
+            Log.e("Code", "requestCode = " + requestCode + " resultCode = " + resultCode);
             if (requestCode == 1 && resultCode == RESULT_OK) {
+                Log.e("Code", "in");
                 if (data != null) {
                     setResult(RESULT_OK, data);
-                    onBackPressed();
                 }
+                finishAfterTransition();
             }
         } else {
             if (requestCode == 2 && resultCode == RESULT_OK) {

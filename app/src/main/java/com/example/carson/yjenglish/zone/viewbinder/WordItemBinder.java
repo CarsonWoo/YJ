@@ -21,6 +21,13 @@ import me.drakeet.multitype.ItemViewBinder;
  */
 
 public class WordItemBinder extends ItemViewBinder<WordItem, WordItemBinder.ViewHolder> {
+
+    private OnWordItemClickListener listener;
+
+    public WordItemBinder(OnWordItemClickListener listener) {
+        this.listener = listener;
+    }
+
     @NonNull
     @Override
     protected ViewHolder onCreateViewHolder(@NonNull LayoutInflater inflater, @NonNull ViewGroup parent) {
@@ -29,12 +36,34 @@ public class WordItemBinder extends ItemViewBinder<WordItem, WordItemBinder.View
     }
 
     @Override
-    protected void onBindViewHolder(@NonNull ViewHolder holder, @NonNull WordItem item) {
+    protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull final WordItem item) {
         holder.time.setText(item.getTime());
         holder.word.setText(item.getWord());
         holder.soundMark.setText(item.getSoundMark());
-        Glide.with(holder.coverImg.getContext()).load(item.getImgUrl()).thumbnail(0.5f).into(holder.coverImg);
+        Glide.with(holder.coverImg.getContext())
+                .load(item.getImgUrl())
+                .placeholder(R.mipmap.word_placeholder)
+                .thumbnail(0.5f)
+                .into(holder.coverImg);
         holder.delete.setVisibility(View.VISIBLE);
+
+        holder.mCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onWordClick(item.getId());
+                }
+            }
+        });
+
+        holder.delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onWordDelete(item.getId(), holder.getAdapterPosition());
+                }
+            }
+        });
     }
 
     static class ViewHolder extends BaseViewHolder {
@@ -55,5 +84,10 @@ public class WordItemBinder extends ItemViewBinder<WordItem, WordItemBinder.View
             mCardView = itemView.findViewById(R.id.my_card_view);
             delete = itemView.findViewById(R.id.delete);
         }
+    }
+
+    public interface OnWordItemClickListener {
+        void onWordClick(String id);
+        void onWordDelete(String id, int pos);
     }
 }

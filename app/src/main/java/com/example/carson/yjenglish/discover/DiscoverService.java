@@ -2,6 +2,7 @@ package com.example.carson.yjenglish.discover;
 
 import com.example.carson.yjenglish.discover.model.DailyCardInfo;
 import com.example.carson.yjenglish.discover.model.DiscoverInfo;
+import com.example.carson.yjenglish.utils.CommonInfo;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
@@ -22,4 +23,9 @@ public interface DiscoverService {
     @FormUrlEncoded
     Call<DailyCardInfo> getMorePics(@Header("token") String token, @Field("page") String page,
                                     @Field("size") String size);
+
+    @POST("various/favour_daily_pic.do")
+    @FormUrlEncoded
+    Call<CommonInfo> postDailyCardFavours(@Header("token") String token,
+                                          @Field("id") String id);
 }

@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,8 +12,10 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,6 +32,8 @@ import com.example.carson.yjenglish.utils.CalculateUtils;
 import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.NetUtils;
+import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.PlanService;
 import com.example.carson.yjenglish.zone.model.MyLearningPlanInfo;
@@ -87,6 +92,14 @@ public class PlanActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_plan);
         executeGetMyPlanTask();
 //        initViews();
@@ -242,14 +255,48 @@ public class PlanActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "重置了" + tag,
                                 Toast.LENGTH_SHORT).show();
                     }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
                 });
                 dialog.show();
+
+                WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                lp.width = ScreenUtils.dp2px(PlanActivity.this, 260);
+                lp.height = ScreenUtils.dp2px(PlanActivity.this, 240);
+                lp.gravity = Gravity.CENTER;
+                dialog.getWindow().setAttributes(lp);
 
             }
 
             @Override
-            public void onDeleteClick(View view, String tag, int pos) {
-                executeDeleteTask(tag, pos);
+            public void onDeleteClick(View view, final String tag, final int pos) {
+                DialogUtils utils = DialogUtils.getInstance(PlanActivity.this);
+                Dialog dialog = utils.newTipsDialog("确定删除" + tag + "吗",
+                        View.TEXT_ALIGNMENT_CENTER);
+
+                dialog.show();
+
+                utils.setTipsListener(new DialogUtils.OnTipsListener() {
+                    @Override
+                    public void onConfirm() {
+                        executeDeleteTask(tag, pos);
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                });
+
+                WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
+                lp.width = ScreenUtils.dp2px(PlanActivity.this, 260);
+                lp.height = ScreenUtils.dp2px(PlanActivity.this, 240);
+                lp.gravity = Gravity.CENTER;
+                dialog.getWindow().setAttributes(lp);
+
             }
         });
 
@@ -328,6 +375,7 @@ public class PlanActivity extends AppCompatActivity {
                 CommonInfo info = response.body();
                 if (info.getStatus().equals("200")) {
                     edit.setText("编辑");
+                    UserConfig.cacheDailyWord(PlanActivity.this, mWordPiker.getText().replace("单词", ""));
                     sendBroadcast(new Intent("HEADER_CHANGE"));
                     Toast.makeText(PlanActivity.this, "更改计划成功", Toast.LENGTH_SHORT).show();
                     for (MyLearningPlanInfo.Data.WordInfo data : mPlans) {
@@ -412,6 +460,7 @@ public class PlanActivity extends AppCompatActivity {
                         @Override
                         public void run() {
                             mAdapter.notifyDataSetChanged();
+                            mTag = mPlans.get(0).getPlan();
                         }
                     }, 500);
                 } else {

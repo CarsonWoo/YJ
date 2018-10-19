@@ -1,5 +1,6 @@
 package com.example.carson.yjenglish.home.view.word;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -38,7 +39,7 @@ import retrofit2.Retrofit;
  * Created by 84594 on 2018/9/2.
  */
 
-public class HandleTab extends Fragment {
+public class HandleTab extends Fragment implements HandledListAdapter.onButtonClickListener {
 
     private PullToRefreshRecyclerView recyclerView;
     private HandledListAdapter adapter;
@@ -145,9 +146,7 @@ public class HandleTab extends Fragment {
 
         recyclerView.setEmptyView(emptyView);
 
-        /**
-         * 还需添加按钮的响应 如按下了pass后
-         */
+        adapter.setListener(this);
 
     }
 
@@ -155,4 +154,19 @@ public class HandleTab extends Fragment {
         return mList.size();
     }
 
+    @Override
+    public void onRecoverClick(String id, int pos, String word) {
+
+    }
+
+    @Override
+    public void onTransClick(String id) {
+        Intent intent = new Intent(getContext(), WordDetailActivity.class);
+        intent.putExtra("word_id", id);
+        intent.putExtra("from_intent", 1);
+        startActivity(intent);
+        if (getActivity() != null) {
+            getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+        }
+    }
 }

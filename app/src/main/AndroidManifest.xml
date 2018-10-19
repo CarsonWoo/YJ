@@ -3,11 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.carson.yjenglish">
 
-    <uses-sdk
-        android:minSdkVersion="20"
-        android:targetSdkVersion="27"
-        tools:ignore="GradleOverrides" />
-
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_SMS" />
     <uses-permission android:name="android.permission.RECEIVE_SMS" />
@@ -25,11 +20,12 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_yj_launcher"
+        android:icon="@mipmap/logo_1"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_yj_launcher_round"
+        android:roundIcon="@mipmap/logo_1"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:replace="android:allowBackup,icon,theme,label">
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.example.carson.yjenglish.fileprovider"
@@ -161,6 +157,14 @@
         <service
             android:name=".service.MusicService"
             android:exported="false" />
+        
+        <service android:name=".service.AlarmService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="TIMER_ACTION" />
+            </intent-filter>
+        </service>
 
         <activity
             android:name=".music.LockScreenAty"
@@ -234,7 +238,12 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden" />
-        <activity android:name=".ImageShowActivity"></activity>
+        <activity android:name=".ImageShowActivity" />
+        <activity
+            android:name=".msg.view.ReportActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
     </application>
 
 </manifest>

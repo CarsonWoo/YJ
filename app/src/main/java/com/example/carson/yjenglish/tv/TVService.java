@@ -1,5 +1,6 @@
 package com.example.carson.yjenglish.tv;
 
+import com.example.carson.yjenglish.tv.model.LoadCommentInfo;
 import com.example.carson.yjenglish.tv.model.TVInfo;
 import com.example.carson.yjenglish.tv.model.TVItemInfo;
 import com.example.carson.yjenglish.tv.model.TVMoreInfo;
@@ -40,5 +41,16 @@ public interface TVService {
     @POST("environment/favour_yj.do")
     @FormUrlEncoded
     Call<CommonInfo> postFavours(@Header("token") String token, @Field("id") String id);
+
+    @POST("environment/single_yu_new_comment.do")
+    @FormUrlEncoded
+    Call<LoadCommentInfo> loadMoreComment(@Header("token") String token,
+                                          @Field("video_id") String video_id,
+                                          @Field("page") String page);
+
+    @POST("environment/like_video_comment.do")
+    @FormUrlEncoded
+    Call<CommonInfo> postCommentFavours(@Header("token") String token,
+                                        @Field("id") String id);
 
 }

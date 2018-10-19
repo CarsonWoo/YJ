@@ -2,6 +2,7 @@ package com.example.carson.yjenglish.zone.view.download;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -48,6 +49,9 @@ public class DownloadWordsAty extends AppCompatActivity implements WordTagViewBi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+        }
         setContentView(R.layout.activity_download_words);
         loadFromFile();
         initViews();
@@ -129,6 +133,11 @@ public class DownloadWordsAty extends AppCompatActivity implements WordTagViewBi
                 size--;
                 count.setText("单词包：" + size);
                 mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancel() {
+
             }
         });
         WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();

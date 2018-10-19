@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -25,6 +26,7 @@ import com.example.carson.yjenglish.register.model.RegisterInfo;
 import com.example.carson.yjenglish.register.model.RegisterModel;
 import com.example.carson.yjenglish.register.presenter.RegisterPresenter;
 import com.example.carson.yjenglish.utils.AES;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 
 import java.util.List;
 
@@ -46,6 +48,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_register);
         initViews();
     }
@@ -55,6 +65,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         phone = findViewById(R.id.edit_phone);
         confirm = findViewById(R.id.btn_confirm);
 
+        //注册的提示框
         mDialog = new ProgressDialog(this);
         mDialog.setTitle("正在注册中");
 
@@ -88,6 +99,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     Toast.makeText(getApplicationContext(), "请先输入您的注册信息", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                //网络访问注册接口
                 RegisterTask task = RegisterTask.getInstance();
                 registerPresenter = new RegisterPresenter(task, this);
                 this.setPresenter(registerPresenter);
@@ -169,8 +181,10 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 data.putExtra("phone", phone.getText().toString());
                 if (isExistLoginActivity(LoginActivity.class)) {
                     setResult(100, data);
-                    onBackPressed();
+//                    onBackPressed();
+                    finishAfterTransition();
                 } else {
+                    //跳转到登录页面并自动填写账号和密码
                     Intent toLogin = new Intent(RegisterActivity.this, LoginActivity.class);
                     toLogin.putExtra("phone", phone.getText().toString());
                     toLogin.putExtra("password", data.getStringExtra("password"));

@@ -1,10 +1,14 @@
 package com.example.carson.yjenglish.zone;
 
 import com.example.carson.yjenglish.utils.CommonInfo;
+import com.example.carson.yjenglish.zone.model.MyCommentInfo;
+import com.example.carson.yjenglish.zone.model.MyFavourInfo;
 import com.example.carson.yjenglish.zone.model.OtherUsersPlanInfo;
+import com.example.carson.yjenglish.zone.model.UserActiveInfo;
 import com.example.carson.yjenglish.zone.model.ZoneInfo;
 
 import java.io.File;
+import java.util.List;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
@@ -33,8 +37,8 @@ public interface ZoneService {
 
     @Multipart
     @POST("user/edit_portrait.do")
-    Call<CommonInfo> changeUserPortrait(/*@Header("token") String token,*/
-                                        @Part MultipartBody.Part img);
+    Call<CommonInfo> changeUserPortrait(@Header("token") String token,
+                                        @Part List<MultipartBody.Part> img);
 
     @POST("various/advice.do")
     @FormUrlEncoded
@@ -46,4 +50,24 @@ public interface ZoneService {
     @FormUrlEncoded
     Call<OtherUsersPlanInfo> getPlans(@Header("token") String token,
                                       @Field("user_id") String user_id);
+
+    @POST("user/my_comment.do")
+    Observable<MyCommentInfo> getMyComments(@Header("token") String token);
+
+    @POST("home/delete_comment.do")
+    @FormUrlEncoded
+    Call<CommonInfo> deleteComment(@Header("token") String token,
+                                   @Field("id") String id);
+
+    @POST("user/my_favorite.do")
+    Observable<MyFavourInfo> getMyFavours(@Header("token") String token);
+
+    @POST("user/change_open_status.do")
+    Call<CommonInfo> setActiveIsOpen(@Header("token") String token);
+
+    @POST("user/its_dynamic.do")
+    @FormUrlEncoded
+    Call<UserActiveInfo> getActiveInfo(@Header("token") String token,
+                                       @Field("id") String id);
+
 }

@@ -26,12 +26,11 @@ public class AddCookiesInterceptor implements Interceptor {
         Request request = chain.request();
         Request.Builder builder = request.newBuilder();
         String cookie = getCookie(request.url().toString(), request.url().host());
-        Log.e("AddCookie", cookie);
+//        Log.e("AddCookie", cookie);
         if (!TextUtils.isEmpty(cookie)) {
             builder.addHeader("Cookie", cookie);
 //            Log.e("AddCookie", "cookie = " + cookie);
         }
-
         return chain.proceed(builder.build());
     }
 
@@ -42,6 +41,7 @@ public class AddCookiesInterceptor implements Interceptor {
         }
         if (!TextUtils.isEmpty(domain) && sp.contains(domain) &&
                 !TextUtils.isEmpty(sp.getString(domain, ""))) {
+//            Log.e("AddCookie", "domain = " + domain);
             return sp.getString(domain, "");
         }
         return null;

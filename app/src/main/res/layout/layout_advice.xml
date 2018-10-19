@@ -13,8 +13,8 @@
 
     <ImageView
         android:id="@+id/back"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
         android:src="@drawable/ic_arrow_left_white"
         android:layout_marginTop="35dp"
         android:layout_marginStart="10dp"
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:text="意见反馈"
         android:textAlignment="center"
-        android:textSize="17sp"
+        android:textSize="16sp"
         android:textColor="@android:color/white"
         android:layout_marginTop="35dp"
         app:layout_constraintTop_toTopOf="parent"
@@ -36,7 +36,7 @@
     <TextView
         android:layout_width="230dp"
         android:layout_height="wrap_content"
-        android:textSize="20sp"
+        android:textSize="19sp"
         android:textAlignment="center"
         android:text="您愿意将语境背单词推荐给好友使用吗？"
         android:textColor="@android:color/white"
@@ -56,7 +56,7 @@
         android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:hint="请输入意见或建议"
-        android:textSize="15sp"
+        android:textSize="14sp"
         android:inputType="textMultiLine"
         android:lines="3"
         android:minLines="1"
@@ -98,7 +98,7 @@
             android:text="1分"
             android:textColor="#858585"
             android:gravity="center_vertical"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:drawablePadding="2dp"
             android:textAlignment="gravity"
             />
@@ -112,7 +112,7 @@
             android:text="3分"
             android:textColor="#858585"
             android:gravity="center_vertical"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:drawablePadding="2dp"
             android:textAlignment="gravity"
             />
@@ -126,7 +126,7 @@
             android:text="6分"
             android:textColor="#858585"
             android:gravity="center_vertical"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:drawablePadding="2dp"
             android:textAlignment="gravity"
             />
@@ -140,7 +140,7 @@
             android:text="10分"
             android:textColor="#858585"
             android:gravity="center_vertical"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:drawablePadding="2dp"
             android:textAlignment="gravity"
             />
@@ -152,7 +152,7 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:text="提交"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:textColor="@android:color/white"
         android:background="@drawable/solid_round_rect_btn_main"
         android:layout_marginStart="10dp"

@@ -32,7 +32,7 @@ public class MyApplication extends Application {
     }
 
     private void regist2WX() {
-        mWXApi = WXAPIFactory.createWXAPI(this, UserConfig.WECHAT_APP_ID, false);
+        mWXApi = WXAPIFactory.createWXAPI(this, UserConfig.WECHAT_APP_ID, true);
         //将app注册到微信
         mWXApi.registerApp(UserConfig.WECHAT_APP_ID);
     }

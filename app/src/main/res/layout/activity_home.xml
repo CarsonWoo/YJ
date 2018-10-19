@@ -27,35 +27,35 @@
         app:tabSelectedTextColor="@color/colorSelected"
         android:layout_alignParentBottom="true">
 
-        <android.support.design.widget.TabItem
-            android:icon="@drawable/selector_home"
-            android:text="首页"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <!--<android.support.design.widget.TabItem-->
+            <!--android:icon="@drawable/selector_home"-->
+            <!--android:text="首页"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
 
-        <android.support.design.widget.TabItem
-            android:icon="@drawable/selector_tv"
-            android:text="语境"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <!--<android.support.design.widget.TabItem-->
+            <!--android:icon="@drawable/selector_tv"-->
+            <!--android:text="语境"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
 
-        <android.support.design.widget.TabItem
-            android:icon="@drawable/selector_discover"
-            android:text="发现"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <!--<android.support.design.widget.TabItem-->
+            <!--android:icon="@drawable/selector_discover"-->
+            <!--android:text="发现"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
 
-        <android.support.design.widget.TabItem
-            android:icon="@drawable/selector_msg"
-            android:text="消息"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <!--<android.support.design.widget.TabItem-->
+            <!--android:icon="@drawable/selector_msg"-->
+            <!--android:text="消息"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
 
-        <android.support.design.widget.TabItem
-            android:icon="@drawable/selector_zone"
-            android:text="我的"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+        <!--<android.support.design.widget.TabItem-->
+            <!--android:icon="@drawable/selector_zone"-->
+            <!--android:text="我的"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content" />-->
 
     </android.support.design.widget.TabLayout>
 

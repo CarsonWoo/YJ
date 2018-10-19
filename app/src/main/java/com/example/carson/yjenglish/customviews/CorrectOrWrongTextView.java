@@ -41,6 +41,12 @@ public class CorrectOrWrongTextView extends RelativeLayout {
         img = findViewById(R.id.check_img);
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        
+    }
+
     public void setText(String str) {
         text.setText(str);
     }

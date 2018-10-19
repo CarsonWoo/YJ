@@ -36,8 +36,10 @@ public class TVItemInfo {
     }
 
     public class TVItemDetail {
+        private String is_favour;
         private TopVideo top_video;
         private List<HotComment> hot_comment;
+        private List<HotComment> new_comment;
         private List<RecommendVideo> recommend_video;
 
         public TopVideo getTop_video() {
@@ -62,6 +64,22 @@ public class TVItemInfo {
 
         public void setRecommend_video(List<RecommendVideo> recommend_video) {
             this.recommend_video = recommend_video;
+        }
+
+        public List<HotComment> getNew_comment() {
+            return new_comment;
+        }
+
+        public void setNew_comment(List<HotComment> new_comment) {
+            this.new_comment = new_comment;
+        }
+
+        public String getIs_favour() {
+            return is_favour;
+        }
+
+        public void setIs_favour(String is_favour) {
+            this.is_favour = is_favour;
         }
 
         public class RecommendVideo {
@@ -129,6 +147,7 @@ public class TVItemInfo {
             private String id;
             private String portrait;
             private String username;
+            private String likes;
 
             public String getSet_time() {
                 return set_time;
@@ -184,6 +203,14 @@ public class TVItemInfo {
 
             public void setUsername(String username) {
                 this.username = username;
+            }
+
+            public String getLikes() {
+                return likes;
+            }
+
+            public void setLikes(String likes) {
+                this.likes = likes;
             }
         }
 

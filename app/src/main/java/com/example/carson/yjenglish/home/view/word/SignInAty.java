@@ -1,25 +1,44 @@
 package com.example.carson.yjenglish.home.view.word;
 
 import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.customviews.CanotSlidingViewPager;
 import com.example.carson.yjenglish.customviews.MyCalendarView;
+import com.example.carson.yjenglish.home.HomeService;
+import com.example.carson.yjenglish.home.model.CalendarInfo;
+import com.example.carson.yjenglish.utils.DialogUtils;
+import com.example.carson.yjenglish.utils.NetUtils;
+import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
+import com.example.carson.yjenglish.utils.UserConfig;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /** 打卡成功才显示的页面 */
 public class SignInAty extends AppCompatActivity {
@@ -29,14 +48,66 @@ public class SignInAty extends AppCompatActivity {
     private ImageView back;
     private CanotSlidingViewPager vp;
     private int mCurMonth = 11;
-    private List<Integer> mSelectDays;
+    private Map<Integer, List<Integer>> mSelectDays;
+
+    private Dialog mDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            setTheme(R.style.AppThemeWithoutTranslucent);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+        }
         setContentView(R.layout.activity_sign_in);
+//        mSelectDays = new HashMap<>();
+//        for (int i = 0; i >= -11; i--) {
+//            List<Integer> list = new ArrayList<>();
+//            list.add(-i + 1);
+//            mSelectDays.put(i, list);
+//        }
+        executeTask();
+//        initViews();
+    }
 
-        initViews();
+    private void executeTask() {
+        mDialog = DialogUtils.getInstance(this).newCommonDialog("获取打卡信息中",
+                R.mipmap.gif_loading_video, true);
+        mDialog.show();
+
+        WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
+        lp.width = ScreenUtils.dp2px(this, 260);
+        lp.height = ScreenUtils.dp2px(this, 240);
+        lp.gravity = Gravity.CENTER;
+        mDialog.getWindow().setAttributes(lp);
+
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).getHistory(UserConfig.getToken(this))
+                .enqueue(new Callback<CalendarInfo>() {
+                    @Override
+                    public void onResponse(Call<CalendarInfo> call, Response<CalendarInfo> response) {
+                        CalendarInfo info = response.body();
+                        if (info.getStatus().equals("200")) {
+                            Map<String, List<Integer>> map = info.getData();
+                            mSelectDays = new HashMap<>();
+                            for (String key : map.keySet()) {
+                                mSelectDays.put(Integer.parseInt(key), map.get(key));
+                            }
+                            mDialog.dismiss();
+                            initViews();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CalendarInfo> call, Throwable t) {
+
+                    }
+                });
     }
 
     @SuppressLint("UseSparseArrays")
@@ -56,17 +127,11 @@ public class SignInAty extends AppCompatActivity {
         SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月");
         String dateStr = df.format(date);
 
-        mSelectDays = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
-            mSelectDays.add(i + 3);
-        }
-
         vp.setAdapter(new MyPagerAdapter());
         vp.setCurrentItem(mCurMonth);
         vp.setOffscreenPageLimit(2);
         vp.setPageMargin(70);
         vp.setPageTransformer(false, new AlphaTransformer());
-
     }
 
     @Override
@@ -81,6 +146,7 @@ public class SignInAty extends AppCompatActivity {
         public Object instantiateItem(@NonNull ViewGroup container, int position) {
             View itemView = LayoutInflater.from(SignInAty.this).inflate(R.layout.layout_calendar, null, false);
             MyCalendarView cal = itemView.findViewById(R.id.calendar);
+            Log.e("SignInAty", "position = " + position);
             cal.monthChange(position - mCurMonth);
             cal.setmSelectDays(mSelectDays);
             container.addView(itemView);

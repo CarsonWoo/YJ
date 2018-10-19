@@ -24,6 +24,8 @@ public class LoadHeader extends DataSupport {
     @Column(defaultValue = "false")
     private boolean isSignClick;
     private float progress;
+    @Column(defaultValue = "false")
+    private boolean isDailyFinish;
 
     public int getWordsCount() {
         return wordsCount;
@@ -87,5 +89,13 @@ public class LoadHeader extends DataSupport {
 
     public void setHeader_id(int header_id) {
         this.header_id = header_id;
+    }
+
+    public boolean isDailyFinish() {
+        return isDailyFinish;
+    }
+
+    public void setDailyFinish(boolean dailyFinish) {
+        isDailyFinish = dailyFinish;
     }
 }

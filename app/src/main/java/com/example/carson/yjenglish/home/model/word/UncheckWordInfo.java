@@ -40,7 +40,7 @@ public class UncheckWordInfo {
 
         private String id;
         private String word;
-        private String meaning;
+        private String real_meaning;
 
         public String getWord() {
             return word;
@@ -50,12 +50,12 @@ public class UncheckWordInfo {
             this.word = word;
         }
 
-        public String getMeaning() {
-            return meaning;
+        public String getReal_Meaning() {
+            return real_meaning;
         }
 
-        public void setMeaning(String meaning) {
-            this.meaning = meaning;
+        public void setReal_Meaning(String real_meaning) {
+            this.real_meaning = real_meaning;
         }
 
         public String getId() {

@@ -38,15 +38,15 @@ public class UncheckListAdapter extends RecyclerView.Adapter<UncheckListAdapter.
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ListViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ListViewHolder holder, final int position) {
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
-        holder.trans.setText(holder.item.getMeaning());
+        holder.trans.setText(holder.item.getReal_Meaning());
         holder.pass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    listener.onPassClick(view);
+                    listener.onPassClick(holder.item.getId(), position);
                 }
             }
         });
@@ -54,7 +54,7 @@ public class UncheckListAdapter extends RecyclerView.Adapter<UncheckListAdapter.
             @Override
             public void onClick(View view) {
                 if (listener != null) {
-                    listener.onTransClick(view);
+                    listener.onTransClick(holder.item.getId());
                 }
             }
         });
@@ -63,6 +63,10 @@ public class UncheckListAdapter extends RecyclerView.Adapter<UncheckListAdapter.
     @Override
     public int getItemCount() {
         return mList.size();
+    }
+
+    public void setListener(OnButtonClickListener listener) {
+        this.listener = listener;
     }
 
     public class ListViewHolder extends BaseViewHolder {
@@ -81,7 +85,7 @@ public class UncheckListAdapter extends RecyclerView.Adapter<UncheckListAdapter.
     }
 
     public interface OnButtonClickListener {
-        void onTransClick(View view);
-        void onPassClick(View view);
+        void onTransClick(String id);
+        void onPassClick(String id, int pos);
     }
 }

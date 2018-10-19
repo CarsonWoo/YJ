@@ -21,3 +21,6 @@
 #-renamesourcefileattribute SourceFile
 -keep class com.pili.pldroid.player.** { *; }
 -keep class com.qiniu.qplayer.mediaEngine.MediaPlayer{*;}
+
+-keepattributes EnclosingMethod
+-keepattributes InnerClasses

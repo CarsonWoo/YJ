@@ -55,13 +55,13 @@ public class SysNoticeFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_view);
 
         mNotices = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            NoticeMsg notice = new NoticeMsg();
-            notice.setUsername("系统君");
-            notice.setContent("恭喜您完成了打卡任务");
-            notice.setDate("刚刚");
-            mNotices.add(notice);
-        }
+//        for (int i = 0; i < 10; i++) {
+//            NoticeMsg notice = new NoticeMsg();
+//            notice.setUsername("系统君");
+//            notice.setContent("恭喜您完成了打卡任务");
+//            notice.setDate("刚刚");
+//            mNotices.add(notice);
+//        }
 
         mAdapter = new MsgAdapters.SysAdapter(getContext(), mNotices);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -69,9 +69,9 @@ public class SysNoticeFragment extends Fragment {
 
         View emptyView = View.inflate(getContext(), R.layout.layout_error, null);
         TextView errorMsg = emptyView.findViewById(R.id.error_text);
-        errorMsg.setText("暂时没有数据噢...");
+        errorMsg.setText("暂时没有系统通知噢...");
         ImageView errorImg = emptyView.findViewById(R.id.error_img);
-        errorImg.setImageResource(R.drawable.ic_warning);
+        errorImg.setImageResource(R.mipmap.bg_plan_box);
         emptyView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         recyclerView.setEmptyView(emptyView);

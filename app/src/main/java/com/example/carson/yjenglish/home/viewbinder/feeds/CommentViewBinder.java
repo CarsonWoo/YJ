@@ -1,11 +1,15 @@
 package com.example.carson.yjenglish.home.viewbinder.feeds;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +25,7 @@ import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.BaseViewHolder;
 import com.example.carson.yjenglish.home.model.forviewbinder.Comment;
+import com.example.carson.yjenglish.msg.view.ReportActivity;
 import com.example.carson.yjenglish.utils.ScreenUtils;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -49,6 +54,7 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
     protected void onBindViewHolder(@NonNull final ViewHolder holder, @NonNull final Comment item) {
         Log.e("BindHolder", "holder position = " + holder.getAdapterPosition());
         holder.itemView.setVisibility(View.VISIBLE);
+//        holder.content.removeAllViews();
         if (item.isAuthorReplied()) {
             Log.e("CommentHolder", "author replied");
             holder.content.setVisibility(View.VISIBLE);
@@ -60,16 +66,24 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
             lp.topToBottom = holder.menuMore.getId();
             lp.startToStart = holder.time.getId();
             holder.content.setLayoutParams(lp);
+//            TextView textView = new TextView(holder.itemView.getContext());
+//            textView.setText("作者回复" + item.getUsername() + "：" + item.getContent());
+//            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+//            textView.setTextColor(Color.parseColor("#656565"));
+//            holder.content.addView(textView);
         } else {
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) holder.content.getLayoutParams();
             lp.width = 0;
             lp.height = 0;
+//            lp.topToTop = holder.portrait.getId();
             holder.content.setLayoutParams(lp);
             Log.e("CommentHolder", "author not replied");
         }
         if (item.isHasReply()) {
             Log.e("CommentHolder", "has sub comment");
             holder.replyComment.setVisibility(View.VISIBLE);
+            //需先remove
+            holder.replyComment.removeAllViews();
             View childView = LayoutInflater.from(holder.replyComment.getContext()).inflate(R.layout.home_detail_comment,
                     null, false);
             initChildView(childView, item);
@@ -81,6 +95,8 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
             if (item.isAuthorReplied()) {
                 lp.setMargins(0, ScreenUtils.dp2px(holder.itemView.getContext(), 30),
                         0, 0);
+            } else {
+                lp.setMargins(0, 0, 0, 0);
             }
             holder.replyComment.setLayoutParams(lp);
         } else {
@@ -92,18 +108,27 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         holder.username.setText(item.getUsername());
         holder.time.setText(item.getTime());
         holder.comment.setText(item.getComment());
+        holder.btnLike.setSelected(item.isLike());
         if (item.getLikeNum() == 0) {
             holder.likeNum.setText("");
         } else {
             holder.likeNum.setText(String.valueOf(item.getLikeNum()));
         }
-        holder.btnLike.setOnClickListener(new View.OnClickListener() {
+        holder.container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
                     mListener.onLikeButtonClick(holder.likeNum, item.getComment_id(), false,
                             item.isLike());
                     item.setLike(!item.isLike());
+                    holder.btnLike.setSelected(item.isLike());
+                    ObjectAnimator animatorX = ObjectAnimator.ofFloat(holder.btnLike,
+                            "scaleX", 1.3f, 1.0f);
+                    ObjectAnimator animatorY = ObjectAnimator.ofFloat(holder.btnLike,
+                            "scaleY", 1.3f, 1.0f);
+                    AnimatorSet set = new AnimatorSet();
+                    set.play(animatorX).with(animatorY);
+                    set.setDuration(400).start();
                 }
             }
         });
@@ -119,7 +144,7 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         holder.menuMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initWindow(holder.menuMore);
+                initWindow(holder.menuMore, item.getComment_id());
             }
         });
         holder.itemView.measure(holder.itemView.getMeasuredWidth(), holder.itemView.getMeasuredHeight());
@@ -134,14 +159,14 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         });
     }
 
-    private void initWindow(final View anchorView) {
+    private void initWindow(final View anchorView, final String comment_id) {
         View windowView = LayoutInflater.from(anchorView.getContext())
                 .inflate(R.layout.layout_common_dialog, null, false);
         ImageView img = windowView.findViewById(R.id.common_img);
         TextView text = windowView.findViewById(R.id.common_text);
         CardView card = windowView.findViewById(R.id.card_view);
         img.setVisibility(View.GONE);
-        text.setTextSize(16);
+        text.setTextSize(13);
         text.setTextColor(Color.parseColor("#eb000000"));
         text.setText("举报评论");
         card.setRadius(6f);
@@ -153,24 +178,36 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         text.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(anchorView.getContext(), "举报成功", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(anchorView.getContext(), "举报成功", Toast.LENGTH_SHORT).show();
+                Intent toReport = new Intent(anchorView.getContext(), ReportActivity.class);
+                toReport.putExtra("comment_id", comment_id);
+                anchorView.getContext().startActivity(toReport);
                 window.dismiss();
             }
         });
     }
 
-    private void initChildView(View childView, final Comment item) {
+    private void initChildView(final View childView, final Comment item) {
         ImageView portrait = childView.findViewById(R.id.portrait);
         TextView username = childView.findViewById(R.id.username);
         TextView reply = childView.findViewById(R.id.comment);
-        ImageView btnLike = childView.findViewById(R.id.like_btn);
+        final ImageView btnLike = childView.findViewById(R.id.like_btn);
         final TextView likeNum = childView.findViewById(R.id.like_num);
         final ImageView menuMore = childView.findViewById(R.id.menu_more);
+        ConstraintLayout container = childView.findViewById(R.id.like_container);
+        btnLike.setSelected(item.getReply().isLike());
         TextView time = childView.findViewById(R.id.time);
+//        ConstraintLayout content = childView.findViewById(R.id.fit_content);
         TextView content = childView.findViewById(R.id.fit_content);
+//        content.removeAllViews();
         content.setVisibility(View.VISIBLE);
-        content.setTextColor(Color.parseColor("#5ee1c9"));
         content.setText("查看更多回复");
+        content.setTextColor(Color.parseColor("#5ee1c9"));
+//        TextView textView = new TextView(childView.getContext());
+//        textView.setTextColor(Color.parseColor("#5ee1c9"));
+//        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+//        textView.setText("查看更多回复");
+//        content.addView(textView);
         Glide.with(portrait.getContext()).load(item.getReply().getPortraitUrl()).thumbnail(0.5f)
                 .into(portrait);
         username.setText(item.getReply().getUsername());
@@ -180,29 +217,38 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         } else {
             likeNum.setText(String.valueOf(item.getReply().getLikeNum()));
         }
-        time.setText(item.getReply().getTime());
+        time.setText(item.getTime());
         content.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onLoadMoreReply(item.getUser_id());
+                    mListener.onLoadMoreReply(item.getUser_id(), item.getComment_id());
                 }
             }
         });
-        btnLike.setOnClickListener(new View.OnClickListener() {
+        container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                Toast.makeText(childView.getContext(), "副评论的点赞暂时没开放噢~", Toast.LENGTH_SHORT).show();
                 if (mListener != null) {
-                    mListener.onLikeButtonClick(likeNum, item.getComment_id(), true,
-                            item.isLike());
-                    item.setLike(!item.isLike());
+                    mListener.onSubLikeButtonClick(likeNum, item.getReply().getSub_comment_id(), true,
+                            item.getReply().isLike());
+                    item.setLike(!item.getReply().isLike());
+                    btnLike.setSelected(item.getReply().isLike());
+                    ObjectAnimator animatorX = ObjectAnimator.ofFloat(btnLike,
+                            "scaleX", 1.3f, 1.0f);
+                    ObjectAnimator animatorY = ObjectAnimator.ofFloat(btnLike,
+                            "scaleY", 1.3f, 1.0f);
+                    AnimatorSet set = new AnimatorSet();
+                    set.play(animatorX).with(animatorY);
+                    set.setDuration(400).start();
                 }
             }
         });
         menuMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                initWindow(menuMore);
+                initWindow(menuMore, item.getReply().getSub_comment_id());
             }
         });
         portrait.setOnClickListener(new View.OnClickListener() {
@@ -223,9 +269,11 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         private ImageView btnLike;
         private TextView likeNum;
         private ImageView menuMore;
+//        private ConstraintLayout content;
         private TextView content;
         private FrameLayout replyComment;
         private TextView time;
+        private ConstraintLayout container;
         View itemView;
         View divider;
 
@@ -242,13 +290,15 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
             replyComment = itemView.findViewById(R.id.reply_comment);
             time = itemView.findViewById(R.id.time);
             divider = itemView.findViewById(R.id.divider);
+            container = itemView.findViewById(R.id.like_container);
         }
     }
 
     public interface OnItemSelectListener {
-        void onLoadMoreReply(String user_id);
+        void onLoadMoreReply(String user_id, String comment_id);
         void onReply(String username, int pos, String comment_id);
         void onLikeButtonClick(TextView tv, String comment_id, boolean isReply, boolean isLike);
+        void onSubLikeButtonClick(TextView tv, String comment_id, boolean isReply, boolean isLike);
         void onUserPortraitClick(String user_id);
     }
 }

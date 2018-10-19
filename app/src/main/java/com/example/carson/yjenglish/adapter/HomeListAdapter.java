@@ -7,6 +7,7 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,6 +27,7 @@ import com.example.carson.yjenglish.home.model.HomeItem;
 import com.example.carson.yjenglish.home.model.LoadHeader;
 import com.example.carson.yjenglish.home.model.PicHeader;
 import com.example.carson.yjenglish.home.view.HomeFragment;
+import com.example.carson.yjenglish.utils.UserConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -173,6 +175,13 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         loadHolder.remember.setText(String.valueOf(loadItem.getWordsCount()));
         String s = "目标" + loadItem.getTargetCount() + "个";
         loadHolder.target.setText(s);
+        loadHolder.more.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+        if (UserConfig.getDailyWord(loadHolder.remember.getContext()).isEmpty()) {
+            loadHolder.more.setText("再来20个");
+        } else {
+            loadHolder.more.setText("再来" + UserConfig.getDailyWord(loadHolder.remember.getContext()) +
+            "个");
+        }
         s = "剩余" + loadItem.getCountDown() + "天";
         loadHolder.countDown.setText(s);
         if (loadItem.getCountDown() > 10) {
@@ -189,6 +198,12 @@ public class HomeListAdapter extends RecyclerView.Adapter {
             if (loadItem.isSignClick()) {
                 loadHolder.sign.setVisibility(View.INVISIBLE);
                 loadHolder.more.setVisibility(View.VISIBLE);
+                if (loadItem.isDailyFinish()) {
+                    loadHolder.more.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+                    loadHolder.more.setBackgroundResource(R.drawable.solid_half_circle_btn_gray);
+                    loadHolder.more.setText("今天已经双倍咯~");
+                    loadHolder.more.setEnabled(false);
+                }
             }
         } else {
             loadHolder.start.setVisibility(View.VISIBLE);
@@ -394,7 +409,7 @@ public class HomeListAdapter extends RecyclerView.Adapter {
         TextView countDown;
         Button start;
         Button sign;
-        Button more;
+        public Button more;
         RelativeLayout toMusic;
 
         public LoadHolder(View itemView) {

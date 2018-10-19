@@ -2,8 +2,12 @@ package com.example.carson.yjenglish.utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.example.carson.yjenglish.MyApplication;
@@ -70,14 +74,23 @@ public class NetUtils {
     public OkHttpClient getClientInstance() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
             @Override
-            public void log(String message) {
+            public void log(@NonNull String message) {
                 String text;
                 try {
-                    text = URLDecoder.decode(message, "utf-8");
-                    Log.e("======", text);
+                    if (!message.isEmpty()) {
+                        String msg = message.replaceAll("%(?![0-9a-fA-F)]{2})", "%25");
+                        text = URLDecoder.decode(msg, "utf-8");
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                            Log.e("======", text);
+                        }
+                    }
                 } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
-                    Log.e("======", e.getMessage());
+                    if (e.getMessage() != null && !e.getMessage().isEmpty()) {
+                        e.printStackTrace();
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                            Log.e("======", e.getMessage());
+                        }
+                    }
                 }
             }
         });
@@ -95,22 +108,38 @@ public class NetUtils {
         return builder.build();
     }
 
-    public OkHttpClient getTokenClientInstance() {
+    public OkHttpClient getPhotoClientInstance() {
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+            @Override
+            public void log(String message) {
+                if (message != null && !message.isEmpty()) {
+                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                        Log.e("=======", message);
+                    }
+                }
+            }
+        });
         Interceptor interceptor = new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
                 Request re = chain.request();
+                String cookie = MyApplication.getContext().getSharedPreferences("cookies_prefs",
+                        Context.MODE_PRIVATE).getString("123.207.85.37", "");
                 Log.e("Interceptor", UserConfig.getToken(MyApplication.getContext()));
-                re.newBuilder()
-                        .addHeader("token", UserConfig.getToken(MyApplication.getContext()))
-                        .build();
-                return chain.proceed(re);
+                Request.Builder builder = re.newBuilder();
+                if (!cookie.isEmpty()) {
+                    builder.addHeader("Cookie", cookie)
+                            .build();
+                }
+
+                return chain.proceed(builder.build());
             }
         };
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(interceptor)
-                .addInterceptor(new SaveCookiesInterceptor())
-                .addInterceptor(new AddCookiesInterceptor())
+                .addInterceptor(loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY))
+//                .addInterceptor(new SaveCookiesInterceptor())
+//                .addInterceptor(new AddCookiesInterceptor())
                 .build();
         return client;
     }

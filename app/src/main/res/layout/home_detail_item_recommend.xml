@@ -12,7 +12,7 @@
     <ImageView
         android:id="@+id/recommend_img"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="125dp"
         android:scaleType="centerCrop"
         android:src="@color/colorAccent"
         app:layout_constraintTop_toTopOf="parent"
@@ -39,14 +39,14 @@
         android:layout_height="wrap_content"
         android:text="必须具备的单词词汇合集"
         android:textColor="@color/colorTextWord"
-        android:textSize="15sp"
+        android:textSize="14.5sp"
         app:layout_constraintTop_toBottomOf="@id/recommend_tag"
         app:layout_constraintStart_toStartOf="@id/recommend_tag"/>
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/portrait"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
         android:src="@color/colorAccent"
         android:layout_marginTop="15dp"
         android:layout_marginBottom="15dp"
@@ -60,7 +60,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Carson"
-        android:textSize="13.5sp"
+        android:textSize="13sp"
         android:layout_marginStart="5dp"
         app:layout_constraintStart_toEndOf="@id/portrait"
         app:layout_constraintTop_toTopOf="@id/portrait"

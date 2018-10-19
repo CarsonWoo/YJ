@@ -322,11 +322,14 @@ public class HomeItemInfo {
             }
 
             public class InnerComment {
+                private String id;//副评论id
                 private String user_id;
                 private String set_time;
                 private String comment;
                 private String portrait;
                 private String username;
+                private String likes;
+                private String is_like;
 
                 public String getUser_id() {
                     return user_id;
@@ -366,6 +369,30 @@ public class HomeItemInfo {
 
                 public void setUsername(String username) {
                     this.username = username;
+                }
+
+                public String getId() {
+                    return id;
+                }
+
+                public void setId(String id) {
+                    this.id = id;
+                }
+
+                public String getLikes() {
+                    return likes;
+                }
+
+                public void setLikes(String likes) {
+                    this.likes = likes;
+                }
+
+                public String getIs_like() {
+                    return is_like;
+                }
+
+                public void setIs_like(String is_like) {
+                    this.is_like = is_like;
                 }
             }
         }

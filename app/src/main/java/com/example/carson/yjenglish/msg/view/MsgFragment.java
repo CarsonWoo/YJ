@@ -1,4 +1,4 @@
-package com.example.carson.yjenglish.msg;
+package com.example.carson.yjenglish.msg.view;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -18,9 +18,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.msg.view.CommentFragment;
-import com.example.carson.yjenglish.msg.view.LikeFragment;
-import com.example.carson.yjenglish.msg.view.SysNoticeFragment;
 
 /**
  * A simple {@link Fragment} subclass.

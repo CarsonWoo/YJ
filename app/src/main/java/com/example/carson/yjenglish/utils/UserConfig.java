@@ -16,9 +16,17 @@ public class UserConfig {
 
     private static String APP_ID = "YJEnglish";
 
-    public static final String HOST = "http://123.207.85.37:8080/";
+    public static final int ALARM_START_STUDY_ID = 996;
+
+//    public static final String HOST = "http://123.207.85.37:8080/";
+
+    public static final String HOST = "http://47.107.62.22:8080/";
+
+    public static final String TMP_HOST = "http://beibei.yiluzou.cn:8080/";
 
     public static final String WECHAT_APP_ID = "wx3a33fd1f25154473";
+
+    public static final String QQ_APP_ID = "1107820868";
 
     public static void cacheToken(Context context, String token) {
         SharedPreferences sp = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE);
@@ -30,6 +38,18 @@ public class UserConfig {
     public static String getToken(Context context) {
         return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE)
                 .getString("token", "");
+    }
+
+    public static void cacheUsername(Context context, String username) {
+        SharedPreferences sp = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("username", username);
+        editor.apply();
+    }
+
+    public static String getUsername(Context context) {
+        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE)
+                .getString("username", "独角鲸");
     }
 
     public static void clearUserInfo(Context context) {
@@ -126,5 +146,23 @@ public class UserConfig {
 
     public static String getSelectedPlan(Context context) {
         return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getString("selected_plan", "");
+    }
+
+    public static void cacheDailyWord(Context context, String daily_count) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).edit();
+        editor.putString("daily_word", daily_count).apply();
+    }
+
+    public static String getDailyWord(Context context) {
+        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getString("daily_word", "");
+    }
+
+    public static void cacheMyPlan(Context context, String plan) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).edit();
+        editor.putString("my_plan", plan).apply();
+    }
+
+    public static String getMyPlan(Context context) {
+        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getString("my_plan", "");
     }
 }

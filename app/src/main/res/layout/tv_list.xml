@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:text="travel"
             android:textColor="@color/colorTextWord"
-            android:textSize="18sp"
+            android:textSize="19sp"
             android:layout_marginTop="6dp"
             android:layout_marginStart="10dp"
             />
@@ -73,7 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="[ˈtrævəl]"
-            android:layout_marginTop="5dp"
+            android:textSize="12sp"
             android:layout_marginStart="10dp"
             android:layout_below="@id/word"
             />
@@ -96,6 +96,7 @@
             android:layout_toLeftOf="@id/like_num"
             android:layout_marginEnd="45dp"
             android:text="999+"
+            android:textSize="13sp"
             />
 
         <ImageView
@@ -115,7 +116,8 @@
             android:layout_centerVertical="true"
             android:layout_alignParentEnd="true"
             android:text="1.3w"
-            android:layout_marginEnd="8dp"
+            android:textSize="13sp"
+            android:layout_marginEnd="12dp"
             />
 
     </RelativeLayout>

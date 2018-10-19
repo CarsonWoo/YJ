@@ -7,8 +7,8 @@
 
     <path
         android:strokeWidth="0.8"
-        android:strokeColor="@color/colorAccent"
-        android:fillColor="@color/colorAccent"
+        android:strokeColor="#5ee1c9"
+        android:fillColor="#5ee1c9"
         android:strokeLineJoin="round"
         android:strokeLineCap="round"
         android:pathData="M 2 4.5 L 2 7.5 L 3.5 7.5 L 6.5 11 L 6.5 1 L 3.5 4.5 Z" />
@@ -16,14 +16,14 @@
     <path
         android:name="sound_level_1"
         android:strokeWidth="0.8"
-        android:strokeColor="@color/colorAccent"
+        android:strokeColor="#5ee1c9"
         android:strokeLineCap="round"
         android:pathData="M 8.5 4 Q 10.5 6 8.5 8" />
 
     <path
         android:name="sound_level_2"
         android:strokeWidth="0.8"
-        android:strokeColor="@color/colorAccent"
+        android:strokeColor="#5ee1c9"
         android:strokeLineCap="round"
         android:pathData="M 9.5 2 Q 13.5 6 9.5 10" />
 
