@@ -158,21 +158,21 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (getActivity() != null) {
-                    String externalPath = getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
-                    for (int i = 0; i < 3; i++) {
-                        File mFile = new File(externalPath + "/lexicon/" + "考研词汇_3000单词" + i + ".txt");
-                        if (!mFile.exists()) {
-                            try {
-                                mFile.createNewFile();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }/* else {
-                            Log.e("Zone", "mFile != null");
-                        }*/
-                    }
-                }
+//                if (getActivity() != null) {
+//                    String externalPath = getActivity().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath();
+//                    for (int i = 0; i < 3; i++) {
+//                        File mFile = new File(externalPath + "/lexicon/" + "考研词汇_3000单词" + i + ".txt");
+//                        if (!mFile.exists()) {
+//                            try {
+//                                mFile.createNewFile();
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }/* else {
+//                            Log.e("Zone", "mFile != null");
+//                        }*/
+//                    }
+//                }
                 Intent toDownload = new Intent(getContext(), MyDownloadAty.class);
                 startActivity(toDownload);
                 if (getActivity() != null) {

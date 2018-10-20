@@ -124,7 +124,7 @@ public class NetUtils {
             public Response intercept(Chain chain) throws IOException {
                 Request re = chain.request();
                 String cookie = MyApplication.getContext().getSharedPreferences("cookies_prefs",
-                        Context.MODE_PRIVATE).getString("123.207.85.37", "");
+                        Context.MODE_PRIVATE).getString("47.107.62.22", "");
                 Log.e("Interceptor", UserConfig.getToken(MyApplication.getContext()));
                 Request.Builder builder = re.newBuilder();
                 if (!cookie.isEmpty()) {

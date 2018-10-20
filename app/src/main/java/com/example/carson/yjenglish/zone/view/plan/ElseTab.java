@@ -153,7 +153,7 @@ public class ElseTab extends Fragment implements WordTagViewBinder.OnTagClickLis
             mList = info.getData();
             loadData();
         } else {
-            Log.e("Else", info.getMsg());
+//            Log.e("Else", info.getMsg());
         }
     }
 
@@ -208,7 +208,7 @@ public class ElseTab extends Fragment implements WordTagViewBinder.OnTagClickLis
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e("error", t.getMessage());
+                Log.e("error", "连接超时");
             }
         });
     }

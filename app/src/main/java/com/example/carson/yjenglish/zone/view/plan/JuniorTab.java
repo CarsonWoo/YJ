@@ -151,7 +151,7 @@ public class JuniorTab extends Fragment implements WordTagViewBinder.OnTagClickL
             mList = info.getData();
             loadData();
         } else {
-            Log.e("Junior", info.getMsg());
+//            Log.e("Junior", info.getMsg());
         }
     }
 
@@ -206,7 +206,7 @@ public class JuniorTab extends Fragment implements WordTagViewBinder.OnTagClickL
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e("error", t.getMessage());
+                Log.e("error", "连接超时");
             }
         });
     }

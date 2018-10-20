@@ -103,7 +103,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         setContentView(R.layout.activity_code);
 
@@ -159,7 +159,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
     //当验证码四个框都输入完成后
     @Override
     public void onFinish(String code) {
-        Log.e("Code", "success : " + code);
+//        Log.e("Code", "success : " + code);
         this.code = code;
         if (timer != null) {
             timer.onFinish();
@@ -200,7 +200,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
         builder.build().newCall(request).enqueue(new okhttp3.Callback() {
             @Override
             public void onFailure(okhttp3.Call call, IOException e) {
-                Log.e("Code", e.getMessage());
+//                Log.e("Code", e.getMessage());
             }
 
             @Override
@@ -216,7 +216,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
                     startActivityForResult(toReset, 1);
                     overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                 } else {
-                    Log.e("Code", info.getMsg());
+//                    Log.e("Code", info.getMsg());
                 }
             }
         });
@@ -257,13 +257,13 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
                     if (info.getStatus().equals("200")) {
                         token = info.getData().getRegister_token();
                     } else {
-                        Log.e("Code", info.getMsg());
+//                        Log.e("Code", info.getMsg());
                     }
                 }
 
                 @Override
                 public void onFailure(Call<RegisterInfo> call, Throwable t) {
-                    Log.e("Code", t.getMessage());
+//                    Log.e("Code", t.getMessage());
                 }
             });
         } else {
@@ -276,7 +276,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
             builder.build().newCall(request).enqueue(new okhttp3.Callback() {
                 @Override
                 public void onFailure(okhttp3.Call call, IOException e) {
-                    Log.e("Code", e.getMessage());
+//                    Log.e("Code", e.getMessage());
                 }
 
                 @Override
@@ -286,7 +286,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
                     if (info.getStatus().equals("200")) {
                         token = info.getData().getForget_password_token();
                     } else {
-                        Log.e("Code", info.getMsg());
+//                        Log.e("Code", info.getMsg());
                     }
                 }
             });
@@ -301,11 +301,11 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.e("Code", "intent type = " + mIntentType);
+//        Log.e("Code", "intent type = " + mIntentType);
         if (mIntentType == INTENT_TYPE_FORGET) {
-            Log.e("Code", "requestCode = " + requestCode + " resultCode = " + resultCode);
+//            Log.e("Code", "requestCode = " + requestCode + " resultCode = " + resultCode);
             if (requestCode == 1 && resultCode == RESULT_OK) {
-                Log.e("Code", "in");
+//                Log.e("Code", "in");
                 if (data != null) {
                     setResult(RESULT_OK, data);
                 }
@@ -315,10 +315,10 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
             if (requestCode == 2 && resultCode == RESULT_OK) {
                 if (data != null) {
                     setResult(RESULT_REGISTER_OK, data);
-                    Log.e("Code", data.getStringExtra("password"));
+//                    Log.e("Code", data.getStringExtra("password"));
                 }
 //                onBackPressed();
-                Log.e("Code", "onBackPressed");
+//                Log.e("Code", "onBackPressed");
                 finishAfterTransition();
             }
         }
@@ -353,7 +353,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
 
     @Override
     public void onReadFinish(String smsMsg) {
-        Log.e("CodeAty", smsMsg);
+//        Log.e("CodeAty", smsMsg);
         //进行setText()
     }
 
@@ -384,8 +384,8 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
             }
 
         } else {
-            Log.e("Code", info.getStatus());
-            Log.e("Code", info.getMsg());
+//            Log.e("Code", info.getStatus());
+//            Log.e("Code", info.getMsg());
             Toast.makeText(getApplicationContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
         }
     }
@@ -410,7 +410,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
 
     @Override
     public void showCodeError(String msg) {
-        Log.e("CodeAty", msg);
+//        Log.e("CodeAty", msg);
     }
 
     @Override

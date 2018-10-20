@@ -83,7 +83,7 @@ public class MultiPortraitView extends FrameLayout {
 //            throw new RuntimeException("no list bind to the portrait");
 //        }
 
-        if (mUrlList != null) {
+        if (mUrlList != null && mUrlList.size() != 0) {
             for (int i = 0; i < mPortraits.size(); i++) {
                 Glide.with(context).load(mUrlList.get(i)).thumbnail(0.5f).placeholder(R.mipmap.loading)
                 .dontAnimate().fitCenter().into(mPortraits.get(i));

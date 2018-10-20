@@ -153,7 +153,7 @@ public class PrimaryTab extends Fragment implements PlanGetContract.View,
             mList = info.getData();
             loadData();
         } else {
-            Log.e("Pri", info.getMsg());
+//            Log.e("Pri", info.getMsg());
         }
     }
 
@@ -208,7 +208,7 @@ public class PrimaryTab extends Fragment implements PlanGetContract.View,
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e("error", t.getMessage());
+//                Log.e("error", t.getMessage());
             }
         });
     }

@@ -90,7 +90,7 @@ public class SettingAty extends AppCompatActivity {
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         setContentView(R.layout.activity_setting);
 
@@ -315,7 +315,7 @@ public class SettingAty extends AppCompatActivity {
         dialog.show();
         WindowManager.LayoutParams lp = dialog.getWindow().getAttributes();
         lp.width = ScreenUtils.dp2px(this, 260);
-        lp.height = ScreenUtils.dp2px(this, 240);
+        lp.height = ScreenUtils.dp2px(this, 260);
         lp.gravity = Gravity.CENTER;
         dialog.getWindow().setAttributes(lp);
 //        Intent toManage = new Intent(this, ManageAty.class);

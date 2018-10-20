@@ -155,7 +155,7 @@ public class CollegeTab extends Fragment implements PlanGetContract.View,
             mList = info.getData();
             loadData();
         } else {
-            Log.e("College", info.getMsg());
+//            Log.e("College", info.getMsg());
         }
     }
 
@@ -212,7 +212,7 @@ public class CollegeTab extends Fragment implements PlanGetContract.View,
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e("error", t.getMessage());
+                Log.e("error", "连接超时");
             }
         });
     }

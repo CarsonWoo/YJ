@@ -14,6 +14,7 @@ import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.DownloadMusicsItemAdapter;
 import com.example.carson.yjenglish.home.model.word.BaseWord;
 import com.example.carson.yjenglish.utils.ScreenUtils;
+import com.example.carson.yjenglish.utils.StatusBarUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,9 @@ public class DownloadMusicsAty extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setTheme(R.style.AppThemeWithoutTranslucent);
+        }
+        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         setContentView(R.layout.activity_download_musics);
         initViews();

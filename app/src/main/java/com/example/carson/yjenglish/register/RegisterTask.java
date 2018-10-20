@@ -10,6 +10,7 @@ import com.example.carson.yjenglish.register.model.RegisterModel;
 import com.example.carson.yjenglish.utils.AddCookiesInterceptor;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.SaveCookiesInterceptor;
+import com.example.carson.yjenglish.utils.UserConfig;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -32,7 +33,7 @@ public class RegisterTask implements NetTask<RegisterModel> {
 
     private static RegisterTask INSTANCE = null;
     private Retrofit retrofit;
-    private static final String HOST = "http://123.207.85.37:8080/";
+    private static final String HOST = UserConfig.HOST;
 
     private RegisterTask() {
         createRetrofit();

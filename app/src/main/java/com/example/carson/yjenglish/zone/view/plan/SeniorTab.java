@@ -154,7 +154,7 @@ public class SeniorTab extends Fragment implements PlanGetContract.View,
             mList = info.getData();
             loadData();
         } else {
-            Log.e("Senior", info.getMsg());
+//            Log.e("Senior", info.getMsg());
         }
     }
 
@@ -209,7 +209,7 @@ public class SeniorTab extends Fragment implements PlanGetContract.View,
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e("error", t.getMessage());
+//                Log.e("error", t.getMessage());
             }
         });
     }

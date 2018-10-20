@@ -98,7 +98,7 @@ public class PlanActivity extends AppCompatActivity {
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         setContentView(R.layout.activity_plan);
         executeGetMyPlanTask();
@@ -155,7 +155,7 @@ public class PlanActivity extends AppCompatActivity {
 
                     @Override
                     public void onFailure(Call<MyLearningPlanInfo> call, Throwable t) {
-                        Log.e(TAG, t.getMessage());
+//                        Log.e(TAG, t.getMessage());
                     }
                 });
     }
@@ -316,7 +316,7 @@ public class PlanActivity extends AppCompatActivity {
                     }
 
                     Log.e(TAG, "mTag = " + mTag);
-                    Log.e(TAG, "cachePlan = " + UserConfig.getSelectedPlan(PlanActivity.this));
+//                    Log.e(TAG, "cachePlan = " + UserConfig.getSelectedPlan(PlanActivity.this));
                     if (!mTag.equals(UserConfig.getSelectedPlan(PlanActivity.this))) {
                         //如果当前选择的计划不是正在学习的计划
                         executeSelectedPlanTask();
@@ -353,7 +353,7 @@ public class PlanActivity extends AppCompatActivity {
                     executeChangePlanTask();
                 } else {
 //                    Toast.makeText(PlanActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, info.getMsg());
+//                    Log.e(TAG, info.getMsg());
                 }
             }
 
@@ -395,13 +395,13 @@ public class PlanActivity extends AppCompatActivity {
                     mAdapter.notifyDataSetChanged();
                 } else {
 //                    Toast.makeText(PlanActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
-                    Log.e(TAG, info.getMsg());
+//                    Log.e(TAG, info.getMsg());
                 }
             }
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e(TAG, t.getMessage());
+                Log.e(TAG, "连接超时");
             }
         });
     }
@@ -464,13 +464,13 @@ public class PlanActivity extends AppCompatActivity {
                         }
                     }, 500);
                 } else {
-                    Log.e(TAG, info.getMsg());
+//                    Log.e(TAG, info.getMsg());
                 }
             }
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e(TAG, t.getMessage());
+                Log.e(TAG, "连接超时");
             }
         });
     }

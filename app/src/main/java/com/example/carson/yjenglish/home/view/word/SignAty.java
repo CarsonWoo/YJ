@@ -26,6 +26,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.customviews.ShareView;
 import com.example.carson.yjenglish.home.HomeService;
 import com.example.carson.yjenglish.home.view.HomeFragment;
 import com.example.carson.yjenglish.utils.CommonInfo;
@@ -94,7 +95,7 @@ public class SignAty extends AppCompatActivity {
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         setContentView(R.layout.activity_sign);
 
@@ -105,9 +106,9 @@ public class SignAty extends AppCompatActivity {
         insist_day = getIntent().getIntExtra("insist_day", 0);
         learned_word = getIntent().getIntExtra("learned_word", 0);
 
-        Log.e("SignAty", username);
-        Log.e("SignAty", insist_day + "");
-        Log.e("SignAty", learned_word + "");
+//        Log.e("SignAty", username);
+//        Log.e("SignAty", insist_day + "");
+//        Log.e("SignAty", learned_word + "");
 
         @SuppressLint("SimpleDateFormat") SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 
@@ -137,83 +138,93 @@ public class SignAty extends AppCompatActivity {
     }
 
     private void createFile() {
-        int res[] = new int[] {R.mipmap.word_loading_img, R.mipmap.daily_pic_1, R.mipmap.daily_pic_2,
-        R.mipmap.daily_pic_3, R.mipmap.daily_pic_4, R.mipmap.daily_pic_5, R.mipmap.daily_pic_6,
-        R.mipmap.daily_pic_7, R.mipmap.daily_pic_8, R.mipmap.daily_pic_9,
-        R.mipmap.daily_pic_10, R.mipmap.daily_pic_11, R.mipmap.daily_pic_12, R.mipmap.daily_pic_13,
-        R.mipmap.daily_pic_14};
+//        int res[] = new int[] {R.mipmap.daily_pic_1, R.mipmap.daily_pic_2,
+//        R.mipmap.daily_pic_3, R.mipmap.daily_pic_4, R.mipmap.daily_pic_5, R.mipmap.daily_pic_6,
+//        R.mipmap.daily_pic_7, R.mipmap.daily_pic_8, R.mipmap.daily_pic_9,
+//        R.mipmap.daily_pic_10, R.mipmap.daily_pic_11, R.mipmap.daily_pic_12, R.mipmap.daily_pic_13,
+//        R.mipmap.daily_pic_14};
+//
+//        int rNum = (int) (Math.random() * res.length);
+//
+//        //创建bitmap
+//        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), res[rNum])
+//                .copy(Bitmap.Config.ARGB_8888, true);
+//        Canvas canvas = new Canvas(bitmap);
+//
+//        //
+//        Log.e("Sign", "screen width = " + ScreenUtils.getScreenWidth(this));
+//
+//        Rect rect = new Rect(5, ScreenUtils.dp2px(this, 58),
+//                ScreenUtils.dp2px(this, 312) - 5,
+//                ScreenUtils.dp2px(this, 218));
+//        Log.e("Sign", "rect width = " + rect.width());
+//        Paint bgPaint = new Paint();
+//        bgPaint.setColor(Color.parseColor("#1e6c6c6c"));
+//        canvas.drawRoundRect(new RectF(rect), 10, 10, bgPaint);
+//
+//        Paint textPaint = new Paint();
+//        textPaint.setColor(Color.WHITE);
+//        textPaint.setTextSize(ScreenUtils.dp2px(this, 22));
+//        textPaint.setTextAlign(Paint.Align.CENTER);
+//
+//        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
+//        float top = fontMetrics.top;
+//        float bottom = fontMetrics.bottom;
+//
+//        int baseLineY = (int) (rect.centerY() - ScreenUtils.dp2px(this, 60) - top / 2 - bottom / 2);
+//
+//        canvas.drawText(username, rect.centerX(), baseLineY, textPaint);
+//
+//        textPaint.setTextSize(ScreenUtils.dp2px(this, 16));
+//
+//        fontMetrics = textPaint.getFontMetrics();
+//        top = fontMetrics.top;
+//        bottom = fontMetrics.bottom;
+//
+//        baseLineY = (int) (rect.centerY() - ScreenUtils.dp2px(this, 30) - top / 2 - bottom / 2);
+//
+//        canvas.drawText("\"透过语境记住你\"", rect.centerX(), baseLineY, textPaint);
+//
+//        canvas.drawLine(rect.centerX(), rect.centerY() + ScreenUtils.dp2px(this, 15), rect.centerX(),
+//                rect.centerY() + ScreenUtils.dp2px(this, 65) - ScreenUtils.dp2px(this, 15), textPaint);
+//
+//        textPaint.setTextSize(ScreenUtils.dp2px(this, 12));
+//
+//        fontMetrics = textPaint.getFontMetrics();
+//        top = fontMetrics.top;
+//        bottom = fontMetrics.bottom;
+//
+//        baseLineY = (int) (rect.centerY() + ScreenUtils.dp2px(this, 10) - top / 2 - bottom / 2);
+//        canvas.drawText("已坚持天数", rect.centerX() - ScreenUtils.dp2px(this, 80), baseLineY, textPaint);
+//
+//        canvas.drawText("已背单词数", rect.centerX() + ScreenUtils.dp2px(this, 80), baseLineY, textPaint);
+//
+//        textPaint.setTextSize(ScreenUtils.dp2px(this, 36));
+//
+//        fontMetrics = textPaint.getFontMetrics();
+//        top = fontMetrics.top;
+//        bottom = fontMetrics.bottom;
+//
+//        baseLineY = (int) (rect.centerY() + ScreenUtils.dp2px(this, 40) - top / 2 - bottom / 2);
+//
+//        canvas.drawText(String.valueOf(insist_day), rect.centerX() - ScreenUtils.dp2px(this, 80), baseLineY, textPaint);
+//        canvas.drawText(String.valueOf(learned_word), rect.centerX() + ScreenUtils.dp2px(this, 80), baseLineY, textPaint);
 
-        int rNum = (int) (Math.random() * res.length);
+        ShareView shareView = new ShareView(this);
+        shareView.setDays(String.valueOf(insist_day));
+        shareView.setUsername(username);
+        shareView.setWords(String.valueOf(learned_word));
 
-        //创建bitmap
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), res[rNum])
-                .copy(Bitmap.Config.ARGB_8888, true);
-        Canvas canvas = new Canvas(bitmap);
+        Bitmap bitmap = shareView.createImage();
 
-        //
-        Log.e("Sign", "screen width = " + ScreenUtils.getScreenWidth(this));
-
-
-        Rect rect = new Rect(5, ScreenUtils.dp2px(this, 58),
-                ScreenUtils.dp2px(this, 312) - 5,
-                ScreenUtils.dp2px(this, 218));
-        Log.e("Sign", "rect width = " + rect.width());
-        Paint bgPaint = new Paint();
-        bgPaint.setColor(Color.parseColor("#1e6c6c6c"));
-        canvas.drawRoundRect(new RectF(rect), 10, 10, bgPaint);
-
-        Paint textPaint = new Paint();
-        textPaint.setColor(Color.WHITE);
-        textPaint.setTextSize(ScreenUtils.dp2px(this, 22));
-        textPaint.setTextAlign(Paint.Align.CENTER);
-
-        Paint.FontMetrics fontMetrics = textPaint.getFontMetrics();
-        float top = fontMetrics.top;
-        float bottom = fontMetrics.bottom;
-
-        int baseLineY = (int) (rect.centerY() - ScreenUtils.dp2px(this, 60) - top / 2 - bottom / 2);
-
-        canvas.drawText(username, rect.centerX(), baseLineY, textPaint);
-
-        textPaint.setTextSize(ScreenUtils.dp2px(this, 16));
-
-        fontMetrics = textPaint.getFontMetrics();
-        top = fontMetrics.top;
-        bottom = fontMetrics.bottom;
-
-        baseLineY = (int) (rect.centerY() - ScreenUtils.dp2px(this, 30) - top / 2 - bottom / 2);
-
-        canvas.drawText("\"透过语境记住你\"", rect.centerX(), baseLineY, textPaint);
-
-        canvas.drawLine(rect.centerX(), rect.centerY() + 30, rect.centerX(),
-                rect.centerY() + ScreenUtils.dp2px(this, 65) - 30, textPaint);
-
-        textPaint.setTextSize(ScreenUtils.dp2px(this, 12));
-
-        fontMetrics = textPaint.getFontMetrics();
-        top = fontMetrics.top;
-        bottom = fontMetrics.bottom;
-
-        baseLineY = (int) (rect.centerY() + 20 - top / 2 - bottom / 2);
-        canvas.drawText("已坚持天数", rect.centerX() - 200, baseLineY, textPaint);
-
-        canvas.drawText("已背单词数", rect.centerX() + 200, baseLineY, textPaint);
-
-        textPaint.setTextSize(ScreenUtils.dp2px(this, 36));
-
-        fontMetrics = textPaint.getFontMetrics();
-        top = fontMetrics.top;
-        bottom = fontMetrics.bottom;
-
-        baseLineY = (int) (rect.centerY() + ScreenUtils.dp2px(this, 40) - top / 2 - bottom / 2);
-
-        canvas.drawText(String.valueOf(insist_day), rect.centerX() - 200, baseLineY, textPaint);
-        canvas.drawText(String.valueOf(learned_word), rect.centerX() + 200, baseLineY, textPaint);
-
+        //防止OOM
+        if (!bitmap.isRecycled()) {
+            bitmap.recycle();
+        }
 
         try {
             OutputStream os = new FileOutputStream(imgFile);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 80, os);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
             os.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -400,7 +411,7 @@ public class SignAty extends AppCompatActivity {
 
     private byte[] getWXThumb(Bitmap thumbBitmap) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        int quality = 100;
+        int quality = 2;
         thumbBitmap.compress(Bitmap.CompressFormat.PNG, quality, output);
         byte[] result = output.toByteArray();
         return result;
@@ -443,7 +454,7 @@ public class SignAty extends AppCompatActivity {
 //            finishAfterTransition();
 //            Toast.makeText(this, "分享成功", Toast.LENGTH_SHORT).show();
 //            finishAfterTransition();
-            executePostTask();
+//            executePostTask();
         }
     }
 
@@ -455,10 +466,10 @@ public class SignAty extends AppCompatActivity {
                     public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
                         CommonInfo info = response.body();
                         if (info.getStatus().equals("200")) {
-                            Intent toSignIn = new Intent(SignAty.this, SignInAty.class);
-                            startActivity(toSignIn);
-                            setResult(HomeFragment.RESULT_SIGN_OK);
-                            finishAfterTransition();
+//                            Intent toSignIn = new Intent(SignAty.this, SignInAty.class);
+//                            startActivity(toSignIn);
+//                            setResult(HomeFragment.RESULT_SIGN_OK);
+//                            finishAfterTransition();
                         } else {
                             Toast.makeText(SignAty.this, info.getMsg(), Toast.LENGTH_SHORT).show();
                         }
@@ -476,12 +487,12 @@ public class SignAty extends AppCompatActivity {
         @Override
         public void onComplete(Object response) {
 //            Log.e("SignAty", "response = " + response);
-            Toast.makeText(getApplicationContext(), "分享成功", Toast.LENGTH_SHORT).show();
-            Intent toSignIn = new Intent(SignAty.this, SignInAty.class);
-            startActivity(toSignIn);
-            setResult(HomeFragment.RESULT_SIGN_OK);
-//            finishAfterTransition();
-            executePostTask();
+//            Toast.makeText(getApplicationContext(), "分享成功", Toast.LENGTH_SHORT).show();
+//            Intent toSignIn = new Intent(SignAty.this, SignInAty.class);
+//            startActivity(toSignIn);
+//            setResult(HomeFragment.RESULT_SIGN_OK);
+////            finishAfterTransition();
+//            executePostTask();
 //            finishAfterTransition();
         }
 

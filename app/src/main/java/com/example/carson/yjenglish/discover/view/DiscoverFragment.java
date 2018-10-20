@@ -212,7 +212,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
         tmpAdapter = new DiscoverAdapters.AtyAdapter(getContext(), tmpList);
         rvGame.setAdapter(tmpAdapter);
         rvGame.setHasFixedSize(true);
-        initRecycler(rvGame, "暂时还没运营噢...", R.mipmap.welfare_place_holder);
+        initRecycler(rvGame, "暂时还没运营噢~敬请期待~", R.mipmap.welfare_place_holder);
 
     }
 
@@ -238,7 +238,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
 
                     }
                 } else {
-                    Log.e("Discover", info.getMsg());
+//                    Log.e("Discover", info.getMsg());
                 }
             }
 
@@ -300,7 +300,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
             mList = info.getData().getWelfare_service();
             initViews();
         } else {
-            Log.e("Discover", info.getMsg());
+//            Log.e("Discover", info.getMsg());
             if (info.getStatus().equals("400") && info.getMsg().equals("身份认证错误！")) {
                 UserConfig.clearUserInfo(getContext());
                 SharedPreferences.Editor editor = MyApplication.getContext().
@@ -407,7 +407,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
                 if (info.getStatus().equals("200")) {
                     Log.e("Discover", "点赞成功");
                 } else {
-                    Log.e("Discover", info.getMsg());
+//                    Log.e("Discover", info.getMsg());
                 }
             }
 
@@ -539,7 +539,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
         final File mFile = file;
         String url = imgUrl.substring("http://47.107.62.22/".length());
 
-        Log.e("Discover", url);
+//        Log.e("Discover", url);
 
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance("http://47.107.62.22/");
         retrofit.create(DownloadService.class).downFile(url)
@@ -655,7 +655,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
 
     private byte[] getWXThumb(Bitmap thumbBitmap) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        int quality = 70;
+        int quality = 40;
         thumbBitmap.compress(Bitmap.CompressFormat.JPEG, quality, output);
         byte[] result = output.toByteArray();
         return result;

@@ -153,7 +153,7 @@ public class ForeignTab extends Fragment implements PlanGetContract.View, WordTa
             mList = info.getData();
             loadData();
         } else {
-            Log.e("Foreign", info.getMsg());
+//            Log.e("Foreign", info.getMsg());
         }
     }
 
@@ -208,7 +208,7 @@ public class ForeignTab extends Fragment implements PlanGetContract.View, WordTa
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e("error", t.getMessage());
+                Log.e("error", "连接超时");
             }
         });
     }

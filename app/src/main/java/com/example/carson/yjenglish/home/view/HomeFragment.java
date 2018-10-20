@@ -660,7 +660,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 
     @Override
     public void showError(String msg) {
-        Log.e(TAG, msg);
+//        Log.e(TAG, msg);
 //        DialogUtils.getInstance(getContext()).newCommonDialog("没有网络噢...", R.mipmap.ic_no_network, false)
 //                .show();
 
@@ -691,8 +691,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             if (info.getData() != null) {
                 HomeInfo.Data data = info.getData();
                 UserConfig.cacheMyPlan(getContext(), data.getMy_plan());
-                Log.e(TAG, data.getMy_plan());
-                Log.e(TAG, UserConfig.getMyPlan(getContext()));
+//                Log.e(TAG, data.getMy_plan());
+//                Log.e(TAG, UserConfig.getMyPlan(getContext()));
                 if (data.getFlag().equals("0") && mHeaderStyle != 2) {
                     //即没有计划
                     initPicItem(data);

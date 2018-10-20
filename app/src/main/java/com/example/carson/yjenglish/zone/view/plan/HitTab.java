@@ -179,7 +179,7 @@ public class HitTab extends Fragment implements WordTagViewBinder.OnTagClickList
 
             @Override
             public void onFailure(Call<CommonInfo> call, Throwable t) {
-                Log.e("error", t.getMessage());
+//                Log.e("error", t.getMessage());
             }
         });
     }
@@ -191,7 +191,7 @@ public class HitTab extends Fragment implements WordTagViewBinder.OnTagClickList
 
     @Override
     public void showError(String msg) {
-        Log.e("HIT", msg);
+//        Log.e("HIT", msg);
         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
     }
 
@@ -218,7 +218,7 @@ public class HitTab extends Fragment implements WordTagViewBinder.OnTagClickList
             mList = info.getData();
             loadData();
         } else {
-            Log.e("Hit", info.getMsg());
+//            Log.e("Hit", info.getMsg());
         }
     }
 
