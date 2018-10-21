@@ -17,6 +17,7 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 
     <application
         android:name=".MyApplication"
@@ -37,6 +38,28 @@
                 android:resource="@xml/provider_paths"
                 tools:replace="android:resource" />
         </provider>
+
+  <!--      <meta-data
+            android:name="BUGLY_APPID"
+            android:value="e48367ed64" />
+        &lt;!&ndash; 配置APP版本号 &ndash;&gt;
+        <meta-data
+            android:name="BUGLY_APP_VERSION"
+            android:value="1.0" />
+        &lt;!&ndash;&lt;!&ndash; 配置APP渠道号 &ndash;&gt;&ndash;&gt;
+        &lt;!&ndash;<meta-data&ndash;&gt;
+            &lt;!&ndash;android:name="BUGLY_APP_CHANNEL"&ndash;&gt;
+            &lt;!&ndash;android:value="<APP_Channel>" />&ndash;&gt;
+        &lt;!&ndash; 配置Bugly调试模式（true或者false）&ndash;&gt;
+        <meta-data
+            android:name="BUGLY_ENABLE_DEBUG"
+            android:value="true" />-->
+
+        <!--bugly 指定activity-->
+        <activity
+            android:name="com.tencent.bugly.beta.ui.BetaActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize|locale"
+            android:theme="@android:style/Theme.Translucent" />
 
         <activity
             android:name=".HomeActivity"

@@ -55,6 +55,7 @@ import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.view.plan.PlanAddAty;
+import com.tencent.bugly.crashreport.CrashReport;
 
 import org.litepal.LitePal;
 import org.litepal.crud.DataSupport;
