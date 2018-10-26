@@ -92,7 +92,8 @@ public class SignAty extends AppCompatActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setTheme(R.style.AppThemeWithoutTranslucent);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -114,7 +115,7 @@ public class SignAty extends AppCompatActivity {
 
 
         imgFile = new File(Environment.getExternalStorageDirectory() + "/背呗背单词/分享/" +
-                df.format(new Date()) + ".png");
+                df.format(new Date()) + ".jpg");
 //        new Thread(new Runnable() {
 //            @Override
 //            public void run() {
@@ -218,13 +219,13 @@ public class SignAty extends AppCompatActivity {
         Bitmap bitmap = shareView.createImage();
 
         //防止OOM
-        if (!bitmap.isRecycled()) {
-            bitmap.recycle();
-        }
+//        if (!bitmap.isRecycled()) {
+//            bitmap.recycle();
+//        }
 
         try {
             OutputStream os = new FileOutputStream(imgFile);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, os);
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
             os.close();
         } catch (IOException e) {
             e.printStackTrace();
@@ -399,6 +400,8 @@ public class SignAty extends AppCompatActivity {
 
         Bitmap thumbBitmap = Bitmap.createScaledBitmap(bitmap, 150, 150, true);
 
+//        Toast.makeText(this, "size = " + getWXThumb(thumbBitmap).length, Toast.LENGTH_SHORT).show();
+
         msg.thumbData = getWXThumb(thumbBitmap);
 
         SendMessageToWX.Req req = new SendMessageToWX.Req();
@@ -410,11 +413,42 @@ public class SignAty extends AppCompatActivity {
     }
 
     private byte[] getWXThumb(Bitmap thumbBitmap) {
-        ByteArrayOutputStream output = new ByteArrayOutputStream();
-        int quality = 2;
-        thumbBitmap.compress(Bitmap.CompressFormat.PNG, quality, output);
-        byte[] result = output.toByteArray();
-        return result;
+//        ByteArrayOutputStream output = new ByteArrayOutputStream();
+//        int quality = 2;
+//        thumbBitmap.compress(Bitmap.CompressFormat.PNG, quality, output);
+//        byte[] result = output.toByteArray();
+//        return result;
+        int i;
+        int j;
+        if (thumbBitmap.getHeight() > thumbBitmap.getWidth()) {
+            i = thumbBitmap.getWidth();
+            j = thumbBitmap.getWidth();
+        } else {
+            i = thumbBitmap.getHeight();
+            j = thumbBitmap.getHeight();
+        }
+
+        Bitmap localBitmap = Bitmap.createBitmap(i, j, Bitmap.Config.RGB_565);
+        Canvas localCanvas = new Canvas(localBitmap);
+
+        while (true) {
+            localCanvas.drawBitmap(thumbBitmap, new Rect(0, 0, i, j), new Rect(0, 0,i, j), null);
+//            if (needRecycle)
+//                thumbBitmap.recycle();
+            ByteArrayOutputStream localByteArrayOutputStream = new ByteArrayOutputStream();
+            localBitmap.compress(Bitmap.CompressFormat.JPEG, 100,
+                    localByteArrayOutputStream);
+            localBitmap.recycle();
+            byte[] arrayOfByte = localByteArrayOutputStream.toByteArray();
+            try {
+                localByteArrayOutputStream.close();
+                return arrayOfByte;
+            } catch (Exception e) {
+                //F.out(e);
+            }
+            i = thumbBitmap.getHeight();
+            j = thumbBitmap.getHeight();
+        }
     }
 
     @Override
@@ -454,7 +488,7 @@ public class SignAty extends AppCompatActivity {
 //            finishAfterTransition();
 //            Toast.makeText(this, "分享成功", Toast.LENGTH_SHORT).show();
 //            finishAfterTransition();
-//            executePostTask();
+            executePostTask();
         }
     }
 
@@ -466,10 +500,10 @@ public class SignAty extends AppCompatActivity {
                     public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
                         CommonInfo info = response.body();
                         if (info.getStatus().equals("200")) {
-//                            Intent toSignIn = new Intent(SignAty.this, SignInAty.class);
-//                            startActivity(toSignIn);
-//                            setResult(HomeFragment.RESULT_SIGN_OK);
-//                            finishAfterTransition();
+                            Intent toSignIn = new Intent(SignAty.this, SignInAty.class);
+                            startActivity(toSignIn);
+                            setResult(HomeFragment.RESULT_SIGN_OK);
+                            finishAfterTransition();
                         } else {
                             Toast.makeText(SignAty.this, info.getMsg(), Toast.LENGTH_SHORT).show();
                         }
@@ -492,7 +526,7 @@ public class SignAty extends AppCompatActivity {
 //            startActivity(toSignIn);
 //            setResult(HomeFragment.RESULT_SIGN_OK);
 ////            finishAfterTransition();
-//            executePostTask();
+            executePostTask();
 //            finishAfterTransition();
         }
 

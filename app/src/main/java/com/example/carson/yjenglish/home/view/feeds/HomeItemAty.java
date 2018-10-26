@@ -1,8 +1,11 @@
 package com.example.carson.yjenglish.home.view.feeds;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -13,6 +16,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -22,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -136,13 +141,17 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
 
     private Dialog commentDialog;
 
+    private boolean isRecommendAdded = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setTheme(R.style.AppThemeWithoutTranslucent);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -296,7 +305,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                                     newComments.get(i).getInner_comment().get(0).getSet_time(),
                                     newComments.get(i).getInner_comment().get(0).getComment(),
                                     Integer.parseInt(newComments.get(i).getInner_comment().get(0).getLikes()),
-                                    newComments.get(i).getInner_comment().get(i).getId(),
+                                    newComments.get(i).getInner_comment().get(0).getId(),
                                     newComments.get(i).getInner_comment().get(0).getIs_like().equals("1")),
                     newComments.get(i).getId(), newComments.get(i).getIs_like().equals("1")));
         }
@@ -312,32 +321,35 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                 params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
                 imageView.setLayoutParams(params);
                 /* 将图片宽度设为MATCH_PARENT 并使高度自适配 */
-                Glide.with(HomeItemAty.this).load(order.getPic())
-                        .listener(new RequestListener<String, GlideDrawable>() {
-                            @Override
-                            public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                                if (imageView.getScaleType() != ImageView.ScaleType.FIT_XY) {
-                                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                if (!isFinishing()) {
+                    //如果没有按下返回键的话
+                    Glide.with(HomeItemAty.this).load(order.getPic())
+                            .listener(new RequestListener<String, GlideDrawable>() {
+                                @Override
+                                public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                                    return false;
                                 }
-                                ViewGroup.LayoutParams lp = imageView.getLayoutParams();
-                                int vw = imageView.getWidth() - imageView.getPaddingLeft() - imageView.getPaddingRight();
 
-                                //获取比例
-                                float scale = (float) vw / (float) resource.getIntrinsicWidth();
+                                @Override
+                                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                                    if (imageView.getScaleType() != ImageView.ScaleType.FIT_XY) {
+                                        imageView.setScaleType(ImageView.ScaleType.FIT_XY);
+                                    }
+                                    ViewGroup.LayoutParams lp = imageView.getLayoutParams();
+                                    int vw = imageView.getWidth() - imageView.getPaddingLeft() - imageView.getPaddingRight();
 
-                                int vh = Math.round(resource.getIntrinsicHeight() * scale);
-                                lp.height = vh + imageView.getPaddingTop() + imageView.getPaddingBottom();
+                                    //获取比例
+                                    float scale = (float) vw / (float) resource.getIntrinsicWidth();
 
-                                imageView.setLayoutParams(lp);
-                                return false;
-                            }
-                        })
-                        .thumbnail(0.5f).into(imageView);
+                                    int vh = Math.round(resource.getIntrinsicHeight() * scale);
+                                    lp.height = vh + imageView.getPaddingTop() + imageView.getPaddingBottom();
+
+                                    imageView.setLayoutParams(lp);
+                                    return false;
+                                }
+                            })
+                            .thumbnail(0.5f).into(imageView);
+                }
                 imageView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -350,7 +362,12 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                 String s = order.getParagraph();
                 TextView textView = new TextView(HomeItemAty.this);
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-                textView.setText(s);
+                textView.setLineSpacing(0.0f, 1.3f);
+                if (s != null && !s.isEmpty()) {
+                    textView.setText(Html.fromHtml(s));
+                } else {
+                    textView.setText(s);
+                }
                 mContentLayout.addView(textView);
                 LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -588,6 +605,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         mItems.add(new Content(author_id, title, portraitUrl, username, likeNum));
 
         if (recommendations.size() > 0) {
+            isRecommendAdded = true;
             mItems.add(new EmptyValue("热门推荐"));
             List<Recommend> recommendList = new ArrayList<>();
             for (int i = 0; i < recommendations.size(); i++) {
@@ -622,13 +640,23 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
             mItems.removeAll(mHitComments);
             mItems.removeAll(mLatestComments);
             int length = mAdapter.getItemCount();
-            for (int i = length - 1; mAdapter.getItemCount() - 4 > 0; i-- ) {
-                mItems.remove(i);
+            if (isRecommendAdded) {
+                for (int i = length - 1; mAdapter.getItemCount() - 4 > 0; i-- ) {
+                    mItems.remove(i);
+                }
+            } else {
+                for (int i = length - 1; mAdapter.getItemCount() - 2 > 0; i-- ) {
+                    mItems.remove(i);
+                }
             }
             firstTimeInitComment();
             mItems.add(new EmptyValue(""));
             mItems.add(new EmptyValue(""));
-            mAdapter.notifyItemRangeChanged(4, mItems.size() - 4);
+            if (isRecommendAdded) {
+                mAdapter.notifyItemRangeChanged(4, mItems.size() - 4);
+            } else {
+                mAdapter.notifyItemRangeChanged(2, mItems.size() - 2);
+            }
         } else {
             firstTimeInitComment();
         }
@@ -749,8 +777,12 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
      * 此方法为文章赞赏的回调
      */
     @Override
-    public void onLikeClick(final TextView tv, final String likes) {
-
+    public void onLikeClick(Button btn, final TextView tv, final String likes) {
+        ObjectAnimator animatorX = ObjectAnimator.ofFloat(btn, "scaleX", 0.8f, 1f);
+        ObjectAnimator animatorY = ObjectAnimator.ofFloat(btn, "scaleY", 0.8f, 1f);
+        AnimatorSet set = new AnimatorSet();
+        set.play(animatorX).with(animatorY);
+        set.setDuration(500).start();
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         HomeService service = retrofit.create(HomeService.class);
         service.postLikes(UserConfig.getToken(this), id).enqueue(new Callback<CommonInfo>() {

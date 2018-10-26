@@ -215,6 +215,7 @@ public class CommentAty extends AppCompatActivity implements View.OnClickListene
                     comments.get(i).getId(), false/*comments.get(i).getIs_like().equals("1")*/));
         }
         commentAdapter = new CommentAdapter(this, mReplies);
+        commentAdapter.setListener(this);
         rvReply.setAdapter(commentAdapter);
 //        rvReply.setItemAnimator(new DefaultItemAnimator());
     }
@@ -311,6 +312,15 @@ public class CommentAty extends AppCompatActivity implements View.OnClickListene
     }
 
     private void doLikeWork() {
+        isLike = !isLike;
+        btnLike.setSelected(isLike);
+        ObjectAnimator animatorX = ObjectAnimator.ofFloat(btnLike,
+                "scaleX", 1.3f, 1.0f);
+        ObjectAnimator animatorY = ObjectAnimator.ofFloat(btnLike,
+                "scaleY", 1.3f, 1.0f);
+        AnimatorSet set = new AnimatorSet();
+        set.play(animatorX).with(animatorY);
+        set.setDuration(400).start();
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         retrofit.create(HomeService.class).postCommentLike(UserConfig.getToken(this), comment_id)
                 .enqueue(new Callback<CommonInfo>() {
@@ -325,15 +335,9 @@ public class CommentAty extends AppCompatActivity implements View.OnClickListene
                                 num = Integer.parseInt(likeNum.getText().toString());
                             }
                             if (isLike) {
-                                isLike = !isLike;
-                                btnLike.setSelected(isLike);
-                                ObjectAnimator animatorX = ObjectAnimator.ofFloat(btnLike,
-                                        "scaleX", 1.3f, 1.0f);
-                                ObjectAnimator animatorY = ObjectAnimator.ofFloat(btnLike,
-                                        "scaleY", 1.3f, 1.0f);
-                                AnimatorSet set = new AnimatorSet();
-                                set.play(animatorX).with(animatorY);
-                                set.setDuration(400).start();
+                                likeNum.setText(String.valueOf(num + 1));
+                            } else {
+                                likeNum.setText(String.valueOf(num - 1));
                             }
 
                         }
@@ -424,12 +428,15 @@ public class CommentAty extends AppCompatActivity implements View.OnClickListene
     private void doSendWork() {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         retrofit.create(HomeService.class).sendSubComments(UserConfig.getToken(this),
-                id, editComment.getText().toString()).enqueue(new Callback<CommonInfo>() {
+                comment_id, editComment.getText().toString()).enqueue(new Callback<CommonInfo>() {
             @Override
             public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
                 CommonInfo info = response.body();
                 if (info.getStatus().equals("200")) {
                     editComment.setText("");
+                    if (imm.isActive()) {
+                        imm.hideSoftInputFromWindow(editComment.getWindowToken(), 0);
+                    }
                     isRefresh = true;
                     executeLoadTask();
                 }

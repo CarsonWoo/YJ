@@ -5,6 +5,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
+import rx.Observable;
 
 /**
  * Created by 84594 on 2018/9/26.
@@ -14,4 +15,8 @@ public interface DownloadService {
     @Streaming
     @GET
     Call<ResponseBody> downFile(@Url String fileUrl);
+
+    @Streaming
+    @GET
+    Observable<ResponseBody> downloadFileRx(@Url String fileUrl);
 }

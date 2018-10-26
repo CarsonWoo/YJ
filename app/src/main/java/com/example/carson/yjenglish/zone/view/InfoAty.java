@@ -265,6 +265,7 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
 
     private void initPhotoView() {
         setViewsClickable(false);
+        getWindow().setStatusBarColor(Color.BLACK);
         ObjectAnimator trans = ObjectAnimator.ofFloat(photoView, "translationX",
                 500f, 0f).setDuration(300);
         photoView.setVisibility(View.VISIBLE);
@@ -316,6 +317,7 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                     @Override
                     public void run() {
                         setViewsClickable(true);
+                        getWindow().setStatusBarColor(Color.TRANSPARENT);
                         photoView.setVisibility(View.GONE);
                         photoView.removeAllViews();
                     }
@@ -654,6 +656,7 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
             Toast.makeText(this, "修改成功", Toast.LENGTH_SHORT).show();
             name = etName.getText().toString();
             signature = etSign.getText().toString();
+            UserConfig.cacheUsername(this, name);
             setBackIntent();
         } else {
             Toast.makeText(this, info.getMsg(), Toast.LENGTH_SHORT).show();

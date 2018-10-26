@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ public class ImageShowActivity extends AppCompatActivity {
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
+        getWindow().setStatusBarColor(Color.BLACK);
         setContentView(R.layout.activity_image_show);
 
         img = findViewById(R.id.show_img);

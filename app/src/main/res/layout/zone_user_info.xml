@@ -24,8 +24,6 @@
         android:layout_width="20dp"
         android:layout_height="20dp"
         android:src="@drawable/ic_arrow_left"
-        android:paddingTop="5dp"
-        android:paddingBottom="15dp"
         android:layout_marginTop="30dp"
         android:layout_marginStart="10dp"
         app:layout_constraintStart_toStartOf="parent"

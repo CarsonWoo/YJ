@@ -57,7 +57,7 @@ public class DiscoverAdapters {
                 info = "结束时间:" + df.format(new Date(Long.parseLong(holder.item.getEt())));
             }
             holder.info.setText(info);
-            Glide.with(holder.bg.getContext()).load(holder.item.getPic()).thumbnail(0.5f)
+            Glide.with(holder.bg.getContext()).load(holder.item.getPic()).thumbnail(0.1f)
                     .into(holder.bg);
         }
 

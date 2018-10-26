@@ -10,7 +10,7 @@
     <android.support.v7.widget.CardView
         android:id="@+id/my_card_view"
         android:layout_width="match_parent"
-        android:layout_height="95dp"
+        android:layout_height="wrap_content"
         app:cardBackgroundColor="#f4f1f4"
         app:cardCornerRadius="4dp"
         app:cardElevation="0dp"
@@ -21,12 +21,14 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
             <com.example.carson.yjenglish.customviews.RoundRectImageView
                 android:id="@+id/cover_img"
                 android:layout_width="130dp"
-                android:layout_height="80dp"
+                android:layout_height="85dp"
                 android:layout_centerVertical="true"
                 android:layout_marginStart="10dp"
                 android:src="@color/colorAccent"
@@ -34,12 +36,14 @@
                 />
 
             <ImageView
+                android:id="@+id/iv_view_num"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:src="@drawable/ic_play_white_solid"
-                android:layout_marginStart="15dp"
-                android:layout_marginBottom="10dp"
-                android:layout_alignParentBottom="true"
+                android:layout_marginStart="5dp"
+                android:layout_marginBottom="5dp"
+                android:layout_alignBottom="@id/cover_img"
+                android:layout_alignStart="@id/cover_img"
                 />
 
             <TextView
@@ -49,9 +53,9 @@
                 android:text="35.6w"
                 android:textColor="@android:color/white"
                 android:textSize="10sp"
-                android:layout_marginBottom="11dp"
-                android:layout_marginStart="35dp"
-                android:layout_alignParentBottom="true"
+                android:layout_toEndOf="@id/iv_view_num"
+                android:layout_marginBottom="5dp"
+                android:layout_alignBottom="@id/cover_img"
                 />
 
             <TextView

@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.androidkun.PullToRefreshRecyclerView;
 import com.androidkun.callback.PullToRefreshListener;
 import com.bumptech.glide.Glide;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.RememberListAdapter;
 import com.example.carson.yjenglish.home.WordService;
@@ -70,7 +71,7 @@ public class RememberTab extends Fragment implements RememberListAdapter.OnButto
 
     private void executeRememberTask(final String page) {
         WordService service = retrofit.create(WordService.class);
-        Call<RememberWordInfo> call = service.getRememberWords(UserConfig.getToken(getContext()),
+        Call<RememberWordInfo> call = service.getRememberWords(UserConfig.getToken(MyApplication.getContext()),
                 page, "10");
         call.enqueue(new Callback<RememberWordInfo>() {
             @Override
@@ -85,19 +86,27 @@ public class RememberTab extends Fragment implements RememberListAdapter.OnButto
                         //后面加载的直接往后加
                         if (info.getData() != null && info.getData().size() > 0) {
                             mList.addAll(info.getData());
+                            executeRememberTask(String.valueOf(refreshCount));
+                            adapter.notifyDataSetChanged();
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recyclerView.setLoadMoreComplete();
+                                }
+                            }, 800);
                         } else {
                             Toast.makeText(getContext(), "没有更多了...", Toast.LENGTH_SHORT).show();
                             recyclerView.setLoadingMoreEnabled(false);
                         }
                     }
                 } else {
-                    Log.e("RememberTab", info.getMsg());
+//                    Log.e("RememberTab", info.getMsg());
                 }
             }
 
             @Override
             public void onFailure(Call<RememberWordInfo> call, Throwable t) {
-                Log.e("RememberTab", t.getMessage());
+                Log.e("RememberTab", "连接超时");
             }
         });
     }
@@ -106,7 +115,7 @@ public class RememberTab extends Fragment implements RememberListAdapter.OnButto
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(),
                 LinearLayoutManager.VERTICAL, false));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new DividerItemDecoration(MyApplication.getContext(), DividerItemDecoration.VERTICAL));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setPullRefreshEnabled(false);
         recyclerView.setLoadingMoreEnabled(true);
@@ -120,14 +129,7 @@ public class RememberTab extends Fragment implements RememberListAdapter.OnButto
             @Override
             public void onLoadMore() {
                 refreshCount++;
-                executeRememberTask(String.valueOf(refreshCount));
-                adapter.notifyDataSetChanged();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        recyclerView.setLoadMoreComplete();
-                    }
-                }, 800);
+
             }
         });
 

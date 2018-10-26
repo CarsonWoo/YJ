@@ -127,7 +127,7 @@ public class UserConfig {
     }
 
     public static String getNotificationTime(Context context) {
-        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getString("notification_time", null);
+        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getString("notification_time", "08时;00分");
     }
 
     public static void cacheHasPlan(Context context, boolean hasPlan) {
@@ -155,14 +155,5 @@ public class UserConfig {
 
     public static String getDailyWord(Context context) {
         return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getString("daily_word", "");
-    }
-
-    public static void cacheMyPlan(Context context, String plan) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).edit();
-        editor.putString("my_plan", plan).apply();
-    }
-
-    public static String getMyPlan(Context context) {
-        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getString("my_plan", "");
     }
 }

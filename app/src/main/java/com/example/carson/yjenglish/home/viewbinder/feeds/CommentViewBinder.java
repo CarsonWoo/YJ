@@ -217,7 +217,7 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         } else {
             likeNum.setText(String.valueOf(item.getReply().getLikeNum()));
         }
-        time.setText(item.getTime());
+        time.setText(item.getReply().getTime());
         content.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -233,7 +233,7 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
                 if (mListener != null) {
                     mListener.onSubLikeButtonClick(likeNum, item.getReply().getSub_comment_id(), true,
                             item.getReply().isLike());
-                    item.setLike(!item.getReply().isLike());
+                    item.getReply().setLike(!item.getReply().isLike());
                     btnLike.setSelected(item.getReply().isLike());
                     ObjectAnimator animatorX = ObjectAnimator.ofFloat(btnLike,
                             "scaleX", 1.3f, 1.0f);

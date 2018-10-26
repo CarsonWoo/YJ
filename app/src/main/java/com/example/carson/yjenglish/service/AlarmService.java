@@ -27,7 +27,11 @@ public class AlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String str = intent.getStringExtra("KEY_NOTIFY");
-        if(str == null || str.trim().length() == 0)return  super.onStartCommand(intent, flags, startId);
+        if(str == null || str.trim().length() == 0) {
+            //保证service在内存空间足够时被重新build 但不一定能接收到intent的信息
+            flags = START_STICKY;
+            return super.onStartCommand(intent, flags, startId);
+        }
         try {
             Log.e("AlarmService", "onStartCommand");
             NotifyObject obj = NotifyObject.from(str);
@@ -35,6 +39,7 @@ public class AlarmService extends Service {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
+        flags = START_STICKY;
         return super.onStartCommand(intent, flags, startId);
     }
 }

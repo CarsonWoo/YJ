@@ -14,10 +14,12 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androidkun.PullToRefreshRecyclerView;
 import com.androidkun.callback.PullToRefreshListener;
 import com.bumptech.glide.Glide;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.MsgAdapters;
 import com.example.carson.yjenglish.msg.GetFavoursContract;
@@ -81,7 +83,7 @@ public class LikeFragment extends Fragment implements GetFavoursContract.View {
         GetFavoursTask task = GetFavoursTask.getInstance();
         GetFavoursPresenter favoursPresenter = new GetFavoursPresenter(task, this);
         this.setPresenter(favoursPresenter);
-        presenter.getInfo(UserConfig.getToken(getContext()));
+        presenter.getInfo(UserConfig.getToken(MyApplication.getContext()));
     }
 
     private void initRecyclerView() {
@@ -132,7 +134,7 @@ public class LikeFragment extends Fragment implements GetFavoursContract.View {
 
     private void refreshList() {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
-        retrofit.create(MsgService.class).refreshFavoursInfo(UserConfig.getToken(getContext()))
+        retrofit.create(MsgService.class).refreshFavoursInfo(UserConfig.getToken(MyApplication.getContext()))
                 .enqueue(new Callback<FavoursInfo>() {
                     @Override
                     public void onResponse(Call<FavoursInfo> call, Response<FavoursInfo> response) {
@@ -173,7 +175,7 @@ public class LikeFragment extends Fragment implements GetFavoursContract.View {
 
     @Override
     public void showError(String msg) {
-
+        Toast.makeText(MyApplication.getContext(), "请保持网络通畅", Toast.LENGTH_SHORT).show();
     }
 
     @Override

@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
@@ -100,7 +101,7 @@ public class ActiveFragment extends Fragment {
 
     private void executeLoadTask() {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
-        retrofit.create(ZoneService.class).getActiveInfo(UserConfig.getToken(getContext()),
+        retrofit.create(ZoneService.class).getActiveInfo(UserConfig.getToken(MyApplication.getContext()),
                 user_id)
                 .enqueue(new Callback<UserActiveInfo>() {
                     @Override

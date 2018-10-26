@@ -1,5 +1,6 @@
 package com.example.carson.yjenglish.zone.viewbinder;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.CardView;
@@ -12,9 +13,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.example.carson.yjenglish.ImageShowActivity;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.BaseViewHolder;
 import com.example.carson.yjenglish.customviews.RoundRectImageView;
+import com.example.carson.yjenglish.home.view.feeds.HomeItemAty;
+import com.example.carson.yjenglish.tv.view.TVItemAty;
 import com.example.carson.yjenglish.utils.ScreenUtils;
 import com.example.carson.yjenglish.zone.model.forviewbinder.UserActive;
 import com.example.carson.yjenglish.zone.view.users.ActiveFragment;
@@ -113,7 +117,9 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(view.getContext(), ImageShowActivity.class);
+                intent.putExtra("img_url", item.getDailyCardItem().getImgUrl());
+                view.getContext().startActivity(intent);
             }
         });
     }
@@ -164,7 +170,10 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         mTVView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(view.getContext(), TVItemAty.class);
+                intent.putExtra("video_id", item.getTvFeeds().getId());
+                intent.putExtra("is_favour", true);
+                view.getContext().startActivity(intent);
             }
         });
     }
@@ -187,7 +196,13 @@ public class UserActiveBinder extends ItemViewBinder<UserActive, UserActiveBinde
         mHomeView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(view.getContext(), HomeItemAty.class);
+                intent.putExtra("id", item.getHomeFeeds().getId());
+                intent.putExtra("img_url", item.getHomeFeeds().getImgUrl());
+                intent.putExtra("username", item.getHomeFeeds().getAuthorName());
+                intent.putExtra("portrait_url", item.getHomeFeeds().getPortraitUrl());
+                intent.putExtra("title", item.getHomeFeeds().getTitle());
+                view.getContext().startActivity(intent);
             }
         });
     }

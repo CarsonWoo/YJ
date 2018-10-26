@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.icu.text.IDNA;
 import android.os.Build;
@@ -165,6 +166,7 @@ public class TVItemAty extends AppCompatActivity implements VideoViewBinder.OnVi
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
+        getWindow().setStatusBarColor(Color.BLACK);
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
@@ -434,7 +436,7 @@ public class TVItemAty extends AppCompatActivity implements VideoViewBinder.OnVi
         WXMediaMessage msg = new WXMediaMessage();
         msg.mediaObject = videoObject;
         msg.title = "背呗视频";
-        msg.description = "边看视频边学英语~快乐就完事儿了~";
+        msg.description = "边学单词边看剧，看看歪果仁是怎么用词的~";
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
                 android.R.drawable.dialog_frame);
@@ -461,7 +463,7 @@ public class TVItemAty extends AppCompatActivity implements VideoViewBinder.OnVi
         WXMediaMessage msg = new WXMediaMessage();
         msg.mediaObject = videoObject;
         msg.title = "背呗视频";
-        msg.description = "边看视频边学英语~快乐就完事儿了~";
+        msg.description = "边学单词边看剧，看看歪果仁是怎么用词的~";
 
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(),
                 android.R.drawable.dialog_frame);
@@ -483,7 +485,7 @@ public class TVItemAty extends AppCompatActivity implements VideoViewBinder.OnVi
             bundle.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
             bundle.putString(QQShare.SHARE_TO_QQ_TITLE, "背呗视频");
             bundle.putString(QQShare.SHARE_TO_QQ_TARGET_URL, videoUrl);
-            bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, "...");
+            bundle.putString(QQShare.SHARE_TO_QQ_SUMMARY, "边学单词边看剧，看看歪果仁是怎么用词的~");
             bundle.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, coverImg);
             bundle.putString(QQShare.SHARE_TO_QQ_APP_NAME, "背呗背单词");
             bundle.putString(QQShare.SHARE_TO_QQ_EXT_INT, "其它附加功能");

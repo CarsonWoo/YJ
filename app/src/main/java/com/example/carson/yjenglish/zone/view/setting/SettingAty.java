@@ -97,8 +97,8 @@ public class SettingAty extends AppCompatActivity {
         initViews();
         sp = getSharedPreferences("YJEnglish", MODE_PRIVATE);
         soundSwtich.setChecked(sp.getBoolean("sound", true));
-        lockScreenSwitch.setChecked(sp.getBoolean("lock", false));
-        autoWifiSwitch.setChecked(sp.getBoolean("wifi", false));
+//        lockScreenSwitch.setChecked(sp.getBoolean("lock", false));
+//        autoWifiSwitch.setChecked(sp.getBoolean("wifi", false));
         publicSwitch.setChecked(sp.getBoolean("public", true));
         notification.setChecked(sp.getBoolean("notification",false));
 
@@ -355,8 +355,8 @@ public class SettingAty extends AppCompatActivity {
         //缓存各种状态
         SharedPreferences.Editor editor = sp.edit();
         editor.putBoolean("sound", soundSwtich.isChecked());
-        editor.putBoolean("lock", lockScreenSwitch.isChecked());
-        editor.putBoolean("wifi", autoWifiSwitch.isChecked());
+//        editor.putBoolean("lock", lockScreenSwitch.isChecked());
+//        editor.putBoolean("wifi", autoWifiSwitch.isChecked());
 
         editor.putBoolean("notification", notification.isChecked());
         editor.apply();

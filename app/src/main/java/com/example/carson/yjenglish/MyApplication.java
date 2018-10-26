@@ -49,7 +49,7 @@ public class MyApplication extends Application {
 
 //        CrashReport.initCrashReport(getApplicationContext(), "e48367ed64", true, strategy);
 
-        Bugly.init(getApplicationContext(), "e48367ed64", false);
+        Bugly.init(getApplicationContext(), "e48367ed64", true);
 
         LitePal.initialize(context);
         regist2WX();
@@ -59,7 +59,7 @@ public class MyApplication extends Application {
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(base);
 
-        MultiDex.install(base);
+        MultiDex.install(this);
 
         //安装tinker
         Beta.installTinker();
@@ -101,15 +101,17 @@ public class MyApplication extends Application {
 
     }
 
-    public static int getVersionCode(Context ctx) {
+    public static String getVersionCode(Context ctx) {
         int code = 0;
+        String versionName = "1.0";
         PackageManager pm = ctx.getPackageManager();
         try {
             PackageInfo pi = pm.getPackageInfo(ctx.getPackageName(), 0);
             code = pi.versionCode;
+            versionName = pi.versionName;
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
-        return code;
+        return versionName + "." + code;
     }
 }

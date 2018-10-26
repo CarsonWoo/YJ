@@ -225,6 +225,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         }
 
         if (fromIntent != 0) {
+            recyclerView.setPadding(0, 0, 0, 0);
             next.setVisibility(View.GONE);
             pass.setVisibility(View.GONE);
         }
@@ -330,12 +331,16 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 items.add(new Sentence(phrase, trans, null));
             }
         }
+
         //其他例句
-        items.add(new EmptyValue("其他例句"));
-        for (int i = 0; i < mVideoList.size(); i++) {
-            items.add(new Sentence(mVideoList.get(i).getSentence(), mVideoList.get(i).getTranslation(),
-                    mVideoList.get(i).getSentence_audio(), mVideoList.get(i).getVideo_name()));
+        if (mVideoList != null && mVideoList.size() != 0) {
+            items.add(new EmptyValue("其他例句"));
+            for (int i = 0; i < mVideoList.size(); i++) {
+                items.add(new Sentence(mVideoList.get(i).getSentence(), mVideoList.get(i).getTranslation(),
+                        mVideoList.get(i).getSentence_audio(), mVideoList.get(i).getVideo_name()));
+            }
         }
+
         //同义词
         if (synonym != null && !synonym.isEmpty()) {
             items.add(new EmptyValue("同义词"));
@@ -353,9 +358,23 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         }
         items.add(new EmptyValue("单词笔记"));
         //需要记录
-        items.add(new Text("添加单词笔记", true));
+        SharedPreferences pref = getSharedPreferences("YJEnglish", MODE_PRIVATE);
+        boolean b = false;
+        if (pref != null) {
+            b = pref.getString(wordTag, "").isEmpty();
+        }
+        if (b) {
+            //无单词笔记
+            items.add(new Text("添加单词笔记", true));
+        } else {
+            items.add(new Text("查看单词笔记", true));
+        }
         items.add("");
 
+        if (fromIntent != 0) {
+            items.add(new EmptyValue(""));
+            items.add(new EmptyValue(""));
+        }
         adapter.setItems(items);
         adapter.notifyDataSetChanged();
     }
@@ -388,8 +407,10 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 }
                 videoFrame.removeAllViews();
                 videoContainer.setVisibility(View.GONE);
-                next.setVisibility(View.VISIBLE);
-                pass.setEnabled(true);
+                if (fromIntent == 0) {
+                    next.setVisibility(View.VISIBLE);
+                    pass.setEnabled(true);
+                }
                 back.setEnabled(true);
                 recyclerView.setEnabled(true);
                 break;
@@ -459,7 +480,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             mVideo = null;
         }
         setResult(WordActivity.RESULT_WORD_NEXT);
-        super.onBackPressed();
+        finishAfterTransition();
         overridePendingTransition(R.anim.ani_left_get_into, R.anim.ani_right_sign_out);
     }
 
@@ -492,12 +513,14 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
 
     @Override
     public void onSentenceSoundClick(String mAACFile) {
-        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/背呗背单词/BeibeiRecorder/" + word + ".aac");
+        File file = new File(Environment.getExternalStorageDirectory().getPath() + "/背呗背单词/BeibeiRecorder/" + word + ".mp3");
         if (file.exists()) {
             //解析aac音频帧 例句
             initPlayer(file.getPath());
         } else {
-            Toast.makeText(this, "请先学习该单词噢~", Toast.LENGTH_SHORT).show();
+            if (sentence_audio.trim().endsWith("mp3")) {
+                initPlayer(sentence_audio);
+            }
         }
 
     }

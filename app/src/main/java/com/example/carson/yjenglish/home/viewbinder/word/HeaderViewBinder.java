@@ -38,7 +38,7 @@ public class HeaderViewBinder extends ItemViewBinder<Header, HeaderViewBinder.Vi
         holder.word.setText(item.getWord());
         holder.basicTrans.setText(item.getBasicTrans());
         holder.soundMark.setText(item.getSoundMark());
-        holder.sound.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (listener != null) {
@@ -53,8 +53,10 @@ public class HeaderViewBinder extends ItemViewBinder<Header, HeaderViewBinder.Vi
         private TextView basicTrans;
         private TextView soundMark;
         private ImageView sound;
+        View itemView;
         ViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             word = itemView.findViewById(R.id.word);
             basicTrans = itemView.findViewById(R.id.basic_trans);
             soundMark = itemView.findViewById(R.id.soundmark);

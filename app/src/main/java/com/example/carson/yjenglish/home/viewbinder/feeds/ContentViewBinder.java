@@ -54,7 +54,7 @@ public class ContentViewBinder extends ItemViewBinder<Content, ContentViewBinder
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onLikeClick(holder.likeNum, item.getLikeNum());
+                    mListener.onLikeClick(holder.fabLike, holder.likeNum, item.getLikeNum());
                 }
             }
         });
@@ -89,6 +89,6 @@ public class ContentViewBinder extends ItemViewBinder<Content, ContentViewBinder
     }
 
     public interface OnLikeFabClickListener {
-        void onLikeClick(TextView textView, String likeNum);
+        void onLikeClick(Button btn, TextView textView, String likeNum);
     }
 }

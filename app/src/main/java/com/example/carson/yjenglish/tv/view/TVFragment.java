@@ -109,6 +109,8 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
 
     private int clickFeedsPos = 0;
 
+    private int errorCount = 0;
+
     public TVFragment() {
         // Required empty public constructor
     }
@@ -145,11 +147,11 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
         return view;
     }
 
-    private void executeLoadTask() {
+    public void executeLoadTask() {
         TvInfoTask task = TvInfoTask.getInstance();
         tvPresenter = new TVInfoPresenter(task, this);
         this.setPresenter(tvPresenter);
-        presenter.getTvInfo(UserConfig.getToken(getContext()));
+        presenter.getTvInfo(UserConfig.getToken(MyApplication.getContext()));
     }
 
     private void initViews(View view) {
@@ -192,7 +194,7 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
 
     private void executeLoadMoreTask() {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
-        retrofit.create(TVService.class).getMoreTvInfo(UserConfig.getToken(getContext()),
+        retrofit.create(TVService.class).getMoreTvInfo(UserConfig.getToken(MyApplication.getContext()),
                 String.valueOf(mCurPage), "4").enqueue(new Callback<TVMoreInfo>() {
             @Override
             public void onResponse(Call<TVMoreInfo> call, Response<TVMoreInfo> response) {
@@ -560,7 +562,7 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
 
     private void executeCaptionTask(final View view, final String word_id, final int position, String video_id) {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
-        retrofit.create(VideoService.class).getVideoInfo(UserConfig.getToken(getContext()),
+        retrofit.create(VideoService.class).getVideoInfo(UserConfig.getToken(MyApplication.getContext()),
                 video_id).enqueue(new Callback<VideoCaptionInfo>() {
             @Override
             public void onResponse(Call<VideoCaptionInfo> call, Response<VideoCaptionInfo> response) {
@@ -606,7 +608,7 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
     @Override
     public void onFavourClick(String video_id, final TextView tv, final boolean isFavour) {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
-        retrofit.create(TVService.class).postFavours(UserConfig.getToken(getContext()),
+        retrofit.create(TVService.class).postFavours(UserConfig.getToken(MyApplication.getContext()),
                 video_id).enqueue(new Callback<CommonInfo>() {
             @Override
             public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
@@ -685,14 +687,20 @@ public class TVFragment extends Fragment implements TVListAdapter.OnItemClickLis
     @Override
     public void showError(String msg) {
 //        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-        Log.e(TAG, msg);
+        if (errorCount < 3) {
+            errorCount ++;
+            Toast.makeText(MyApplication.getContext(), "连接超时 正在重试...", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    executeLoadTask();
+                }
+            }, 2000);
+        } else {
+            Toast.makeText(MyApplication.getContext(), "请检查网络 再次点击页面进行刷新~", Toast.LENGTH_SHORT).show();
+        }
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                executeLoadTask();
-            }
-        }, 5000);
+
     }
 
     @Override

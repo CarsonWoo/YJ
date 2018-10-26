@@ -36,7 +36,7 @@
             android:layout_height="20dp"
             android:src="@drawable/selector_feeds_like"
             android:layout_alignParentEnd="true"
-            android:layout_marginEnd="70dp"
+            android:layout_marginEnd="15dp"
             />
 
         <ImageView
@@ -44,6 +44,7 @@
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:src="@drawable/ic_share_gray"
+            android:visibility="gone"
             android:layout_marginEnd="15dp"
             android:layout_alignParentEnd="true"
             />

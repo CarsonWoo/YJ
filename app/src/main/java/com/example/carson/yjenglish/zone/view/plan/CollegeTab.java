@@ -179,7 +179,7 @@ public class CollegeTab extends Fragment implements PlanGetContract.View,
     private void executeAddTask(final String tag, final String day, final String count, final int word_number) {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         PlanService service = retrofit.create(PlanService.class);
-        Call<CommonInfo> call = service.addPlan(UserConfig.getToken(getContext()),
+        Call<CommonInfo> call = service.addPlan(UserConfig.getToken(MyApplication.getContext()),
                 tag, day, count);
         call.enqueue(new Callback<CommonInfo>() {
             @Override
@@ -197,12 +197,12 @@ public class CollegeTab extends Fragment implements PlanGetContract.View,
                             UserConfig.cacheHasPlan(getContext(), true);
                         }
                         UserConfig.cacheDailyWord(getContext(), String.valueOf(count));
+                        getActivity().sendBroadcast(new Intent("WORDS_START_DOWNLOAD"));
                         if (PlanAddAty.fromIntent == PlanAddAty.INTENT_FROM_PLAN) {
                             getActivity().setResult(Activity.RESULT_OK);
                             getActivity().onBackPressed();
                         } else {
                             setHomeResult(day, word_number);
-
                         }
                     }
                 } else {

@@ -24,9 +24,11 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -53,6 +55,7 @@ import com.example.carson.yjenglish.home.view.word.WordActivity;
 import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.NetUtils;
+import com.example.carson.yjenglish.utils.ScreenUtils;
 import com.example.carson.yjenglish.utils.UserConfig;
 import com.example.carson.yjenglish.zone.view.plan.PlanAddAty;
 import com.tencent.bugly.crashreport.CrashReport;
@@ -127,6 +130,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 
     private HeaderChangeBroadcastReceiver mReceiver;
 
+    private int mDistance = 0;
+
     public HomeFragment() {
 
     }
@@ -141,9 +146,10 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         //作UI请求
-        mDialog = new ProgressDialog(getActivity());
+        mDialog = DialogUtils.getInstance(getContext()).newCommonDialog("加载中",
+                R.mipmap.gif_loading_video, true);
         if (mPresenter != null) {
-            mPresenter.getInfo(UserConfig.getToken(getContext()));
+            mPresenter.getInfo(UserConfig.getToken(MyApplication.getContext()));
         }
     }
 
@@ -410,7 +416,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 
     private void executeFavourTask(String id, final String isFavour, final TextView tv) {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
-        retrofit.create(HomeService.class).postFavours(UserConfig.getToken(getContext()), id)
+        retrofit.create(HomeService.class).postFavours(UserConfig.getToken(MyApplication.getContext()), id)
                 .enqueue(new Callback<CommonInfo>() {
                     @Override
                     public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
@@ -455,7 +461,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                 isFullClick = false;
             }
         } else if (requestCode == REQUEST_WORD_CODE && resultCode == RESULT_WORD_OK) {
-            Log.e(TAG, "today finish");
+//            Log.e(TAG, "today finish");
             if (data != null) {
                 String learned_word = data.getStringExtra("learned_word");
                 if (learned_word != null) {
@@ -470,12 +476,14 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             mLoadData.setTodayFinish(true);
             mLoadData.save();
             mAdapter.notifyItemChanged(0);
+//            onRefreshHomeItem();
             Intent toSign = new Intent(getContext(), SignAty.class);
             toSign.putExtra("username", UserConfig.getUsername(getContext()))
                     .putExtra("insist_day", mLoadData.getInsistCount())
                     .putExtra("learned_word", mLoadData.getWordsCount());
             startActivityForResult(toSign, REQUEST_SIGN_CODE);
             if (getActivity() != null) {
+                getActivity().sendBroadcast(new Intent("WORDS_START_DOWNLOAD"));
                 getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
             }
         } else if (requestCode == REQUEST_SIGN_CODE && resultCode == RESULT_SIGN_OK) {
@@ -483,7 +491,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             mLoadData.save();
             mAdapter.notifyItemChanged(0);
         } else if (requestCode == REQUEST_MORE_CODE && resultCode == Activity.RESULT_OK) {
-//            Log.e(TAG, "progress finish");
+            onRefreshHomeItem();
+            Log.e(TAG, "progress finish");
             if (data != null) {
                 String learned_word = data.getStringExtra("learned_word");
                 if (learned_word != null) {
@@ -497,33 +506,38 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             mLoadData.setDailyFinish(true);
             mLoadData.save();
             mAdapter.notifyItemChanged(0);
+            if (getActivity() != null) {
+                getActivity().sendBroadcast(new Intent("WORDS_START_DOWNLOAD"));
+            }
+
         } else if (requestCode == REQUEST_ADD_PLAN_CODE && resultCode == RESULT_ADD_PLAN_OK) {
-            loadPlanFromDB();
-            mHeaderStyle = 3;
-            if (mLoadData == null) {
-                Log.e(TAG, "new Instance");
-                mLoadData = new LoadHeader();
-                mLoadData.setHeader_id(1);
-                mLoadData.setTodayFinish(false);
-                mLoadData.setSignClick(false);
-            }
-            if (data != null) {
-                String rest_days = data.getStringExtra("rest_days");
-                if (rest_days != null) {
-                    mLoadData.setCountDown(Integer.parseInt(rest_days));
-                }
-                int plan_number = data.getIntExtra("plan_number", 0);
-                if (plan_number != 0) {
-                    mLoadData.setTargetCount(plan_number);
-                }
-            }
-            mLoadData.setInsistCount(0);
-            mLoadData.setWordsCount(0);
-            mLoadData.setProgress(0);
-
-            mLoadData.save();
-
-            initViews(view);
+//            loadPlanFromDB();
+//            mHeaderStyle = 3;
+//            if (mLoadData == null) {
+//                Log.e(TAG, "new Instance");
+//                mLoadData = new LoadHeader();
+//                mLoadData.setHeader_id(1);
+//                mLoadData.setTodayFinish(false);
+//                mLoadData.setSignClick(false);
+//            }
+//            if (data != null) {
+//                String rest_days = data.getStringExtra("rest_days");
+//                if (rest_days != null) {
+//                    mLoadData.setCountDown(Integer.parseInt(rest_days));
+//                }
+//                int plan_number = data.getIntExtra("plan_number", 0);
+//                if (plan_number != 0) {
+//                    mLoadData.setTargetCount(plan_number);
+//                }
+//            }
+//            mLoadData.setInsistCount(0);
+//            mLoadData.setWordsCount(0);
+//            mLoadData.setProgress(0);
+//
+//            mLoadData.save();
+//
+//            initViews(view);
+            onRefreshHomeItem();
         } else if (requestCode == REQUEST_TO_DETAIL && resultCode == RESULT_LIKE_CHANGE) {
 //            Log.e(TAG, "onActivityResult(1)");
             mListData.get(clickFeedPos).setIs_favour(data.getStringExtra("favour_change"));
@@ -651,7 +665,13 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 
     @Override
     public void showLoading() {
+        mDialog.setCanceledOnTouchOutside(false);
         mDialog.show();
+        WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
+        lp.width = ScreenUtils.dp2px(getContext(), 260);
+        lp.height = ScreenUtils.dp2px(getContext(), 240);
+        lp.gravity = Gravity.CENTER;
+        mDialog.getWindow().setAttributes(lp);
     }
 
     @Override
@@ -664,7 +684,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 //        Log.e(TAG, msg);
 //        DialogUtils.getInstance(getContext()).newCommonDialog("没有网络噢...", R.mipmap.ic_no_network, false)
 //                .show();
-
+        Toast.makeText(getContext(), "请检查网络噢", Toast.LENGTH_SHORT).show();
         if (UserConfig.HasPlan(getContext())) {
             loadPlanFromDB();
             initViews(view);
@@ -676,10 +696,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                HomeInfoTask task = HomeInfoTask.getInstance();
-                HomeInfoPresenter infoPresenter = new HomeInfoPresenter(task, HomeFragment.this);
-                setPresenter(infoPresenter);
-                mPresenter.getInfo(UserConfig.getToken(getContext()));
+                onRefreshHomeItem();
             }
         }, 5000);
     }
@@ -691,7 +708,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         if (info.getStatus().equals("200")) {
             if (info.getData() != null) {
                 HomeInfo.Data data = info.getData();
-                UserConfig.cacheMyPlan(getContext(), data.getMy_plan());
+                UserConfig.cacheSelectedPlan(getContext(), info.getData().getMy_plan());
 //                Log.e(TAG, data.getMy_plan());
 //                Log.e(TAG, UserConfig.getMyPlan(getContext()));
                 if (data.getFlag().equals("0") && mHeaderStyle != 2) {
@@ -798,7 +815,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
         public void onReceive(Context context, Intent intent) {
             Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
             HomeService service = retrofit.create(HomeService.class);
-            service.getHomeInfo(UserConfig.getToken(getContext())).subscribeOn(Schedulers.io())
+            service.getHomeInfo(UserConfig.getToken(MyApplication.getContext())).subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread()).subscribe(new Subscriber<HomeInfo>() {
                 @Override
                 public void onCompleted() {
@@ -807,7 +824,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 
                 @Override
                 public void onError(Throwable e) {
-
+                    Toast.makeText(getContext(), "网络开小差了...", Toast.LENGTH_SHORT).show();
+                    onRefreshHomeItem();
                 }
 
                 @Override
@@ -840,5 +858,12 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             getActivity().unregisterReceiver(mReceiver);
             mReceiver = null;
         }
+    }
+
+    public void onRefreshHomeItem() {
+        HomeInfoTask task = HomeInfoTask.getInstance();
+        HomeInfoPresenter infoPresenter = new HomeInfoPresenter(task, HomeFragment.this);
+        this.setPresenter(infoPresenter);
+        mPresenter.getInfo(UserConfig.getToken(MyApplication.getContext()));
     }
 }

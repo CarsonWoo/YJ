@@ -194,6 +194,7 @@ public class SeniorTab extends Fragment implements PlanGetContract.View,
                             UserConfig.cacheHasPlan(getContext(), true);
                         }
                         UserConfig.cacheDailyWord(getContext(), String.valueOf(count));
+                        getActivity().sendBroadcast(new Intent("WORDS_START_DOWNLOAD"));
                         if (PlanAddAty.fromIntent == PlanAddAty.INTENT_FROM_PLAN) {
                             getActivity().setResult(Activity.RESULT_OK);
                             getActivity().onBackPressed();

@@ -2,13 +2,16 @@ package com.example.carson.yjenglish.zone.view;
 
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -78,12 +81,27 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
     private ZoneContract.Presenter presenter;
     private ZonePresenter zonePresenter;
 
+    private ZoneRefreshBroadcastReceiver mReceiver;
+
+    private int errorCount = 0;
+
     public ZoneFragment() {
         // Required empty public constructor
     }
 
     public static ZoneFragment newInstance() {
         return new ZoneFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("ZONE_INFO_CHANGE");
+        mReceiver = new ZoneRefreshBroadcastReceiver();
+        if (getActivity() != null) {
+            getActivity().registerReceiver(mReceiver, filter);
+        }
     }
 
     @Override
@@ -134,11 +152,11 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
         });
     }
 
-    private void executeTask() {
+    public void executeTask() {
         ZoneTask task = ZoneTask.getInstance();
         zonePresenter = new ZonePresenter(task, this);
         this.setPresenter(zonePresenter);
-        presenter.getUserInfo(UserConfig.getToken(getContext()));
+        presenter.getUserInfo(UserConfig.getToken(MyApplication.getContext()));
     }
 
     private void initViews() {
@@ -254,6 +272,15 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (mReceiver != null && getActivity() != null) {
+            getActivity().unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context instanceof OnZoneEventListener) {
@@ -280,7 +307,7 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
             signDays.setText(mInfo.getInsist_day());
             remember.setText(mInfo.getLearned_word());
             countDown.setText(mInfo.getRemaining_words());
-            UserConfig.cacheUsername(getContext(), nameStr);
+            UserConfig.cacheUsername(MyApplication.getContext(), nameStr);
             initViews();
         } else {
 //            Toast.makeText(getContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
@@ -299,15 +326,29 @@ public class ZoneFragment extends Fragment implements ZoneContract.View {
     @Override
     public void onFailed(String msg) {
 //        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                executeTask();
-            }
-        }, 5000);
+        if (errorCount < 3) {
+            errorCount ++;
+            Toast.makeText(MyApplication.getContext(), "连接超时 正在重试...", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    executeTask();
+                }
+            }, 2000);
+        } else {
+            Toast.makeText(MyApplication.getContext(), "请检查网络 再次点击页面进行刷新~", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public interface OnZoneEventListener {
         void onSetting();
+    }
+
+    public class ZoneRefreshBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            executeTask();
+        }
     }
 }

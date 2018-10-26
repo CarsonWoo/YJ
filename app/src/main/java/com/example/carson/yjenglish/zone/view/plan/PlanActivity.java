@@ -319,8 +319,28 @@ public class PlanActivity extends AppCompatActivity {
 //                    Log.e(TAG, "cachePlan = " + UserConfig.getSelectedPlan(PlanActivity.this));
                     if (!mTag.equals(UserConfig.getSelectedPlan(PlanActivity.this))) {
                         //如果当前选择的计划不是正在学习的计划
-                        executeSelectedPlanTask();
+                        DialogUtils du = DialogUtils.getInstance(PlanActivity.this);
+                        Dialog mDialog = du.newTipsDialog("确定将该计划设置为学习中的计划吗?", View.TEXT_ALIGNMENT_CENTER);
+                        mDialog.show();
+                        WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
+                        lp.width = ScreenUtils.dp2px(PlanActivity.this, 260);
+                        lp.height = ScreenUtils.dp2px(PlanActivity.this, 240);
+                        lp.gravity = Gravity.CENTER;
+                        mDialog.getWindow().setAttributes(lp);
+
+                        du.setTipsListener(new DialogUtils.OnTipsListener() {
+                            @Override
+                            public void onConfirm() {
+                                executeSelectedPlanTask();
+                            }
+
+                            @Override
+                            public void onCancel() {
+
+                            }
+                        });
                     } else {
+
                         executeChangePlanTask();
                     }
 
@@ -341,6 +361,7 @@ public class PlanActivity extends AppCompatActivity {
         container.addView(planView);
     }
 
+    //改变计划
     private void executeSelectedPlanTask() {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         PlanService service = retrofit.create(PlanService.class);
@@ -364,6 +385,7 @@ public class PlanActivity extends AppCompatActivity {
         });
     }
 
+    //改变天数
     private void executeChangePlanTask() {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         PlanService service = retrofit.create(PlanService.class);
@@ -377,6 +399,8 @@ public class PlanActivity extends AppCompatActivity {
                     edit.setText("编辑");
                     UserConfig.cacheDailyWord(PlanActivity.this, mWordPiker.getText().replace("单词", ""));
                     sendBroadcast(new Intent("HEADER_CHANGE"));
+                    sendBroadcast(new Intent("ZONE_INFO_CHANGE"));
+                    sendBroadcast(new Intent("WORDS_START_DOWNLOAD"));
                     Toast.makeText(PlanActivity.this, "更改计划成功", Toast.LENGTH_SHORT).show();
                     for (MyLearningPlanInfo.Data.WordInfo data : mPlans) {
                         if (data.getPlan().equals(UserConfig.getSelectedPlan(MyApplication.getContext()))) {

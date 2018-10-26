@@ -9,6 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.carson.yjenglish.ImageShowActivity;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.StartActivity;
@@ -43,6 +46,20 @@ public class DailyCardItemBinder extends ItemViewBinder<DailyCardItem, DailyCard
         Glide.with(holder.coverImg.getContext())
                 .load(item.getSmallImgUrl())
                 .thumbnail(0.5f)
+                .listener(new RequestListener<String, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        if (holder.coverImg.getScaleType() != ImageView.ScaleType.FIT_XY) {
+                            holder.coverImg.setScaleType(ImageView.ScaleType.FIT_XY);
+                        }
+                        return false;
+                    }
+                })
                 .into(holder.coverImg);
         holder.delete.setVisibility(View.VISIBLE);
 

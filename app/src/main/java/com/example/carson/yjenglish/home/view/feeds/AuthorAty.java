@@ -1,6 +1,7 @@
 package com.example.carson.yjenglish.home.view.feeds;
 
 import android.app.Dialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.design.widget.CollapsingToolbarLayout;
@@ -35,7 +36,7 @@ import java.util.List;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 public class AuthorAty extends AppCompatActivity implements HomeListAdapter.OnVideoListener,
-    HomeListAdapter.OnItemClickListener, AuthorInfoContract.View{
+    HomeListAdapter.OnItemClickListener, AuthorInfoContract.View {
 
     private ImageView back;
     private CircleImageView portrait;
@@ -71,7 +72,9 @@ public class AuthorAty extends AppCompatActivity implements HomeListAdapter.OnVi
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setTheme(R.style.AppThemeWithoutTranslucent);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -150,7 +153,18 @@ public class AuthorAty extends AppCompatActivity implements HomeListAdapter.OnVi
 
     @Override
     public void onClick(ArrayList item, boolean requestComment, int position) {
-
+        HomeInfo.Data.Feed mItem = (HomeInfo.Data.Feed) item.get(0);
+        Intent toDetail = new Intent(this, HomeItemAty.class);
+        toDetail.putExtra("id", mItem.getId());
+        toDetail.putExtra("video_url", mItem.getVideo());
+        toDetail.putExtra("img_url", mItem.getPic());
+        toDetail.putExtra("username", mItem.getAuthor_username());
+        toDetail.putExtra("title", mItem.getTitle());
+        toDetail.putExtra("portrait_url", mItem.getAuthor_portrait());
+        toDetail.putExtra("like_num", mItem.getLikes());
+        toDetail.putExtra("request_comment", requestComment);
+//        toDetail.putExtra("is_like", mItem.getIs_favour().equals("1"));
+        startActivity(toDetail);
     }
 
     @Override

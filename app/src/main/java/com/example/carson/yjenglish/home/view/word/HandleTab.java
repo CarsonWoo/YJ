@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.androidkun.PullToRefreshRecyclerView;
 import com.androidkun.callback.PullToRefreshListener;
 import com.bumptech.glide.Glide;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.HandledListAdapter;
 import com.example.carson.yjenglish.home.WordService;
@@ -70,7 +71,7 @@ public class HandleTab extends Fragment implements HandledListAdapter.onButtonCl
 
     private void executeHandleTask(final String page) {
         WordService service = retrofit.create(WordService.class);
-        Call<HandledWordInfo> call = service.getHandleWords(UserConfig.getToken(getContext()),
+        Call<HandledWordInfo> call = service.getHandleWords(UserConfig.getToken(MyApplication.getContext()),
                 page, "10");
         call.enqueue(new Callback<HandledWordInfo>() {
             @Override
@@ -85,19 +86,27 @@ public class HandleTab extends Fragment implements HandledListAdapter.onButtonCl
                         //后面加载的直接往后加
                         if (info.getData() != null && info.getData().size() > 0) {
                             mList.addAll(info.getData());
+                            executeHandleTask(String.valueOf(refreshCount));
+                            adapter.notifyDataSetChanged();
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recyclerView.setLoadMoreComplete();
+                                }
+                            }, 800);
                         } else {
                             Toast.makeText(getContext(), "没有更多了...", Toast.LENGTH_SHORT).show();
                             recyclerView.setLoadingMoreEnabled(false);
                         }
                     }
                 } else {
-                    Log.e("HandleTab", info.getMsg());
+//                    Log.e("HandleTab", info.getMsg());
                 }
             }
 
             @Override
             public void onFailure(Call<HandledWordInfo> call, Throwable t) {
-                Log.e("HandleTab", t.getMessage());
+                Log.e("HandleTab", "连接超时");
             }
         });
     }
@@ -120,14 +129,7 @@ public class HandleTab extends Fragment implements HandledListAdapter.onButtonCl
             @Override
             public void onLoadMore() {
                 refreshCount++;
-                executeHandleTask(String.valueOf(refreshCount));
-                adapter.notifyDataSetChanged();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        recyclerView.setLoadMoreComplete();
-                    }
-                }, 800);
+
             }
         });
 

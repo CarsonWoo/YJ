@@ -19,6 +19,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.CookieManager;
 import java.net.CookiePolicy;
 import java.net.URLDecoder;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.Interceptor;
 import okhttp3.JavaNetCookieJar;
@@ -109,16 +110,16 @@ public class NetUtils {
     }
 
     public OkHttpClient getPhotoClientInstance() {
-        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
-            @Override
-            public void log(String message) {
-                if (message != null && !message.isEmpty()) {
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                        Log.e("=======", message);
-                    }
-                }
-            }
-        });
+//        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(new HttpLoggingInterceptor.Logger() {
+//            @Override
+//            public void log(String message) {
+//                if (message != null && !message.isEmpty()) {
+//                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+//                        Log.e("=======", message);
+//                    }
+//                }
+//            }
+//        });
         Interceptor interceptor = new Interceptor() {
             @Override
             public Response intercept(Chain chain) throws IOException {
@@ -137,11 +138,20 @@ public class NetUtils {
         };
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(interceptor)
-                .addInterceptor(loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY))
+//                .addInterceptor(loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY))
 //                .addInterceptor(new SaveCookiesInterceptor())
 //                .addInterceptor(new AddCookiesInterceptor())
                 .build();
         return client;
+    }
+
+    public OkHttpClient getDownloadClient(DownloadInterceptor interceptor) {
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder();
+        builder.retryOnConnectionFailure(true)
+                .addInterceptor(interceptor)
+                .connectTimeout(15, TimeUnit.SECONDS);
+        return builder.build();
     }
 
     public Retrofit getRetrofitInstance(String url) {

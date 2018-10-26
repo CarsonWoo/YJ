@@ -42,7 +42,7 @@ public class RememberListAdapter extends RecyclerView.Adapter<RememberListAdapte
     public void onBindViewHolder(@NonNull final ListViewHolder holder, final int position) {
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
-        holder.trans.setText(holder.item.getReal_Meaning());
+        holder.trans.setText(holder.item.getMeaning());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

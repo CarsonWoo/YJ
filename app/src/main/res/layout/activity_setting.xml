@@ -151,6 +151,7 @@
                     android:paddingTop="15dp"
                     android:paddingBottom="15dp"
                     android:layout_marginTop="1dp"
+                    android:visibility="gone"
                     app:layout_constraintTop_toBottomOf="@id/notify_sound"
                     />
 
@@ -161,6 +162,7 @@
                     android:track="@drawable/switch_track"
                     android:thumb="@drawable/switch_thumb"
                     android:layout_marginEnd="10dp"
+                    android:visibility="gone"
                     app:layout_constraintTop_toTopOf="@id/notify_auto_play_wifi"
                     app:layout_constraintBottom_toBottomOf="@id/notify_auto_play_wifi"
                     app:layout_constraintEnd_toEndOf="@id/notify_auto_play_wifi"

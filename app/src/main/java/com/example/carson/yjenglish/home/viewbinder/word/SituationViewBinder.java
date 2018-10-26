@@ -42,9 +42,9 @@ public class SituationViewBinder extends ItemViewBinder<WordSituation, Situation
                 .load(item.getImgUrl())
                 .placeholder(R.mipmap.word_placeholder)
                 .dontAnimate()
-                .thumbnail(0.2f)
+                .thumbnail(0.05f)
                 .into(holder.img);
-        holder.sound.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (listener != null) {
@@ -59,8 +59,10 @@ public class SituationViewBinder extends ItemViewBinder<WordSituation, Situation
         private TextView sentence;
         private TextView sentenceTrans;
         private ImageView sound;
+        View itemView;
         public ViewHolder(View itemView) {
             super(itemView);
+            this.itemView = itemView;
             img = itemView.findViewById(R.id.img);
             sentence = itemView.findViewById(R.id.sentence);
             sentenceTrans = itemView.findViewById(R.id.sentence_trans);

@@ -22,9 +22,9 @@
     <application
         android:name=".MyApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/logo_1"
+        android:icon="@mipmap/ic_launcher_logo_round"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/logo_1"
+        android:roundIcon="@mipmap/ic_launcher_logo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:replace="android:allowBackup,icon,theme,label">
@@ -35,10 +35,22 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"
+                android:resource="@xml/photo_provider_paths"
                 tools:replace="android:resource" />
         </provider>
 
+        
+        <provider
+            android:authorities="${applicationId}.fileProvider"
+            android:name=".utils.BuglyFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            tools:replace="name,authorities,exported,grantUriPermissions">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"
+                tools:replace="name,resource"/>
+        </provider>
   <!--      <meta-data
             android:name="BUGLY_APPID"
             android:value="e48367ed64" />

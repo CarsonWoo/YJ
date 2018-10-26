@@ -15,6 +15,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Html;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -80,7 +81,6 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
     private CodeView mCodeView;
     private ImageView back;
     private TextView countDown;
-    private TextView tv1;
 
     private CountDownTimer timer;
 
@@ -125,13 +125,11 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
         reload = findViewById(R.id.reload_code);
         back = findViewById(R.id.code_back);
         countDown = findViewById(R.id.count_down_code);
-        tv1 = findViewById(R.id.tv1);
 
         //隐藏掉重新发送验证码 直接进入倒数
         reload.setVisibility(View.INVISIBLE);
         reload.setEnabled(false);
-        tv1.setVisibility(View.INVISIBLE);
-
+        reload.setText(Html.fromHtml("若未收到验证码请点击" + "<font color=\"#d1ff3939\">重新发送验证码</font>"));
 
         tvPhone.setText(phone);
         mCodeView.setmInputListener(this);
@@ -238,7 +236,6 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
         } else if (view.getId() == R.id.reload_code) {
             reload.setVisibility(View.INVISIBLE);
             reload.setEnabled(false);
-            tv1.setVisibility(View.INVISIBLE);
             mCodeView.setText("");
 //            sendCode();
             //需要做的是setResult() 使其返回上一级重发验证码
@@ -403,7 +400,6 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
                 countDown.setVisibility(View.INVISIBLE);
                 reload.setVisibility(View.VISIBLE);
                 reload.setEnabled(true);
-                tv1.setVisibility(View.VISIBLE);
             }
         }.start();
     }

@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
@@ -24,8 +25,10 @@ import com.example.carson.yjenglish.utils.ScreenUtils;
 import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -201,29 +204,38 @@ public class RememSettingAty extends AppCompatActivity implements View.OnClickLi
         calendar.set(Calendar.MINUTE, minute);
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
+
+//        SimpleDateFormat df = new SimpleDateFormat("yyyy年MM月dd日 HH:mm:ss");
+
         //选择当前时间
         long selectTime = calendar.getTimeInMillis();
+//        Log.e("Remember selectTime = ", df.format(new Date(selectTime)));
 
         long sysTime = System.currentTimeMillis();
+//        Log.e("Remember sysTime = ", df.format(new Date(sysTime)));
 
         if (sysTime > selectTime) {
             //已超过 则从明天开始
             calendar.add(Calendar.DAY_OF_MONTH, 1);
             selectTime = calendar.getTimeInMillis();
+//            Log.e("Remember reSelectTime=", df.format(new Date(selectTime)));
         }
 
-        long firstTime = SystemClock.elapsedRealtime(); //开机之后到现在的运行时间
-        long time = selectTime - sysTime;
-        firstTime += time;
+//        long firstTime = SystemClock.elapsedRealtime(); //开机之后到现在的运行时间
+//        Log.e("Remember firstTime = ", df.format(new Date(firstTime)));
+//        long time = selectTime - sysTime;
+//        firstTime += time;
+
+//        Log.e("Remember 提醒时间：", df.format(new Date(firstTime)));
 
         NotifyObject obj = new NotifyObject();
         obj.title = "小呗秘书";
         obj.subText = "背单词提醒";
         obj.content = "是时候去背单词了噢~";
         obj.type = UserConfig.ALARM_START_STUDY_ID;
-        obj.icon = R.mipmap.logo_1;
+        obj.icon = R.mipmap.ic_launcher_logo_round;
         obj.activityClass = HomeActivity.class;
-        obj.firstTime = firstTime;
+        obj.firstTime = selectTime;
 
         Map<Integer, NotifyObject> map = new HashMap<>();
         map.put(obj.type, obj);

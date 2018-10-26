@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.utils.StatusBarUtil;
+import com.tencent.bugly.beta.Beta;
 
 public class AboutAty extends AppCompatActivity {
 
@@ -47,11 +48,9 @@ public class AboutAty extends AppCompatActivity {
 
         versionCode.setText("版本号：" + MyApplication.getVersionCode(this));
 
-        btnCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //检查更新
-            }
+        btnCheck.setOnClickListener(v -> {
+            //检查更新
+            Beta.checkUpgrade();
         });
     }
 

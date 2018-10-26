@@ -175,7 +175,7 @@ public class PrimaryTab extends Fragment implements PlanGetContract.View,
     private void executeAddTask(final String tag, final String day, final String count, final int word_number) {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         PlanService service = retrofit.create(PlanService.class);
-        Call<CommonInfo> call = service.addPlan(UserConfig.getToken(getContext()),
+        Call<CommonInfo> call = service.addPlan(UserConfig.getToken(MyApplication.getContext()),
                 tag, day, count);
         call.enqueue(new Callback<CommonInfo>() {
             @Override
@@ -184,7 +184,7 @@ public class PrimaryTab extends Fragment implements PlanGetContract.View,
                 if (info.getStatus().equals("200")) {
                     UserConfig.cacheSelectedPlan(MyApplication.getContext(), tag);
                     Toast.makeText(getContext(), "添加计划成功", Toast.LENGTH_SHORT).show();
-                    SharedPreferences.Editor editor = getContext().getSharedPreferences(tag, Context.MODE_PRIVATE).edit();
+                    SharedPreferences.Editor editor = MyApplication.getContext().getSharedPreferences(tag, Context.MODE_PRIVATE).edit();
                     editor.putString("plan_day", day + "天");
                     editor.putString("plan_daily_count", count + "单词");
                     editor.apply();
@@ -193,6 +193,7 @@ public class PrimaryTab extends Fragment implements PlanGetContract.View,
                             UserConfig.cacheHasPlan(getContext(), true);
                         }
                         UserConfig.cacheDailyWord(getContext(), String.valueOf(count));
+                        getActivity().sendBroadcast(new Intent("WORDS_START_DOWNLOAD"));
                         if (PlanAddAty.fromIntent == PlanAddAty.INTENT_FROM_PLAN) {
                             getActivity().setResult(Activity.RESULT_OK);
                             getActivity().onBackPressed();

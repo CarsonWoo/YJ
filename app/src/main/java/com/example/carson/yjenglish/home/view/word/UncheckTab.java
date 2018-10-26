@@ -20,6 +20,7 @@ import android.widget.Toast;
 import com.androidkun.PullToRefreshRecyclerView;
 import com.androidkun.callback.PullToRefreshListener;
 import com.bumptech.glide.Glide;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.adapter.UncheckListAdapter;
 import com.example.carson.yjenglish.home.WordService;
@@ -73,8 +74,8 @@ public class UncheckTab extends Fragment implements UncheckListAdapter.OnButtonC
 
     private void executeUncheckTask(final String page) {
         WordService service = retrofit.create(WordService.class);
-        Call<UncheckWordInfo> call = service.getUncheckWords(UserConfig.getToken(getContext()),
-                page, "10");
+        Call<UncheckWordInfo> call = service.getUncheckWords(UserConfig.getToken(MyApplication.getContext()),
+                page, "30");
         call.enqueue(new Callback<UncheckWordInfo>() {
             @Override
             public void onResponse(Call<UncheckWordInfo> call, Response<UncheckWordInfo> response) {
@@ -87,22 +88,30 @@ public class UncheckTab extends Fragment implements UncheckListAdapter.OnButtonC
                     } else {
                         //后面加载的直接往后加
                         if (info.getData() != null && info.getData().size() > 0) {
-                            Log.e("Uncheck", "onAdd");
+//                            Log.e("Uncheck", "onAdd");
                             mList.addAll(info.getData());
+                            adapter.notifyDataSetChanged();
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    recyclerView.setLoadMoreComplete();
+                                }
+                            }, 800);
                         } else {
-                            Log.e("Uncheck", "onNotAdd");
+//                            Log.e("Uncheck", "onNotAdd");
                             Toast.makeText(getContext(), "没有更多了...", Toast.LENGTH_SHORT).show();
                             recyclerView.setLoadingMoreEnabled(false);
                         }
                     }
                 } else {
-                    Log.e("Uncheck", info.getMsg());
+//                    Log.e("Uncheck", info.getMsg());
                 }
             }
 
             @Override
             public void onFailure(Call<UncheckWordInfo> call, Throwable t) {
-                Log.e("Uncheck", t.getMessage());
+                Log.e("Uncheck", "连接超时");
+                Toast.makeText(MyApplication.getContext(), "网络不给力~请检查一下网络噢~", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -125,13 +134,7 @@ public class UncheckTab extends Fragment implements UncheckListAdapter.OnButtonC
             public void onLoadMore() {
                 refreshCount++;
                 executeUncheckTask(String.valueOf(refreshCount));
-                adapter.notifyDataSetChanged();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        recyclerView.setLoadMoreComplete();
-                    }
-                }, 800);
+
             }
         });
 

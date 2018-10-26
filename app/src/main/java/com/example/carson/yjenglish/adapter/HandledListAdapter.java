@@ -41,7 +41,7 @@ public class HandledListAdapter extends RecyclerView.Adapter<HandledListAdapter.
     public void onBindViewHolder(@NonNull final ListViewHolder holder, final int position) {
         holder.item = mList.get(position);
         holder.word.setText(holder.item.getWord());
-        holder.trans.setText(holder.item.getReal_meaning());
+        holder.trans.setText(holder.item.getMeaning());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -91,6 +91,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         } else {
             holder.likeNum.setText("" + holder.item.getLikeNum());
         }
+        holder.btnLike.setSelected(holder.item.isLike());
         holder.btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

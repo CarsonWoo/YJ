@@ -30,6 +30,10 @@ import android.widget.Toast;
 
 import com.androidkun.PullToRefreshRecyclerView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.example.carson.yjenglish.BaseActivity;
 import com.example.carson.yjenglish.DownloadService;
 import com.example.carson.yjenglish.ImageShowActivity;
@@ -118,6 +122,8 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
 
     private File tmpFile;
 
+    private int errorCount = 0;
+
     public DiscoverFragment() {
         // Required empty public constructor
     }
@@ -156,11 +162,11 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
         rvGame = view.findViewById(R.id.rv_game);
     }
 
-    private void executeLoadingTask() {
+    public void executeLoadingTask() {
         DiscoverInfoTask task = DiscoverInfoTask.getInstance();
         infoPresenter = new DiscoverInfoPresenter(task, this);
         this.setPresenter(infoPresenter);
-        mPresenter.getInfo(UserConfig.getToken(getContext()));
+        mPresenter.getInfo(UserConfig.getToken(MyApplication.getContext()));
     }
 
     private void initViews() {
@@ -218,7 +224,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
 
     private void flushData() {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
-        retrofit.create(DiscoverService.class).getMorePics(UserConfig.getToken(getContext()),
+        retrofit.create(DiscoverService.class).getMorePics(UserConfig.getToken(MyApplication.getContext()),
                 String.valueOf(mLoadingPage), "6").enqueue(new Callback<DailyCardInfo>() {
             @Override
             public void onResponse(Call<DailyCardInfo> call, Response<DailyCardInfo> response) {
@@ -283,12 +289,18 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
     @Override
     public void showError(String msg) {
 //        Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                executeLoadingTask();
-            }
-        }, 5000);
+        if (errorCount < 3) {
+            errorCount ++;
+            Toast.makeText(MyApplication.getContext(), "连接超时 正在重新连接", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    executeLoadingTask();
+                }
+            }, 3000);
+        } else {
+            Toast.makeText(MyApplication.getContext(), "请检查网络 再次点击页面进行刷新~", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -375,7 +387,27 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
                 }
             });
 
-            Glide.with(getContext()).load(mDailyCards.get(position).getDaily_pic()).thumbnail(0.7f).into(bg);
+            Glide.with(getContext())
+                    .load(mDailyCards.get(position).getDaily_pic())
+                    .placeholder(R.mipmap.daily_place_holder)
+                    .listener(new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                            if (bg.getScaleType() != ImageView.ScaleType.FIT_XY) {
+                                bg.setScaleType(ImageView.ScaleType.FIT_XY);
+                            }
+                            return false;
+                        }
+                    })
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .dontAnimate()
+                    .thumbnail(0.1f)
+                    .into(bg);
             container.addView(itemView);
             return itemView;
         }
@@ -399,7 +431,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
 
     private void executeFavourTask(String id) {
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
-        retrofit.create(DiscoverService.class).postDailyCardFavours(UserConfig.getToken(getContext()),
+        retrofit.create(DiscoverService.class).postDailyCardFavours(UserConfig.getToken(MyApplication.getContext()),
                 id).enqueue(new Callback<CommonInfo>() {
             @Override
             public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
@@ -495,12 +527,12 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
 
         if (tmpFile == null) {
             //pic_url里包含了名字
-            if (pic_url.endsWith(".jpg")) {
+            if (pic_url.endsWith(".jpg") || pic_url.endsWith(".png")) {
                 tmpFile = FileUtils.createImageFile(MyApplication.getContext(),
                         pic_url, "每日一图");
             } else {
                 tmpFile = FileUtils.createImageFile(MyApplication.getContext(),
-                        pic_url + ".jpg", "每日一图");
+                        pic_url + ".png", "每日一图");
             }
         }
 
@@ -655,7 +687,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
 
     private byte[] getWXThumb(Bitmap thumbBitmap) {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
-        int quality = 40;
+        int quality = 100;
         thumbBitmap.compress(Bitmap.CompressFormat.JPEG, quality, output);
         byte[] result = output.toByteArray();
         return result;

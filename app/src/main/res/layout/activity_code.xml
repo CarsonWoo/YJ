@@ -68,30 +68,16 @@
         app:layout_constraintEnd_toEndOf="@id/tv_phone"
         />
 
-    <TextView
-        android:id="@+id/tv1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="若未收到验证码，请点击"
-        android:textColor="#bd4b4b4b"
-        android:textSize="14sp"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="10dp"
-        app:layout_constraintTop_toBottomOf="@id/code_view"
-        app:layout_constraintStart_toStartOf="@id/code_view"
-        />
-
         <TextView
-        android:id="@+id/reload_code"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/reload_code"
-        android:textSize="14sp"
-        android:textColor="#d1ff3939"
-        android:layout_marginTop="10dp"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="197dp"
-        app:layout_constraintTop_toBottomOf="@id/code_view"
+            android:id="@+id/reload_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="@id/code_view"
+            app:layout_constraintEnd_toEndOf="@id/code_view"
+            app:layout_constraintTop_toBottomOf="@id/code_view"
         />
 
     <TextView
