@@ -13,7 +13,7 @@
         android:layout_width="160dp"
         android:layout_height="160dp"
         android:layout_marginTop="70dp"
-        android:src="@mipmap/logo_header"
+        android:src="@mipmap/app_logo_cartoon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
@@ -22,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/round_rect_edit"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="30dp"
         android:layout_marginStart="15dp"
         android:layout_marginEnd="15dp"
         app:layout_constraintTop_toBottomOf="@id/tv1" />
@@ -34,6 +34,7 @@
         android:textColor="#aeaeae"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:text="@string/test_use"
@@ -43,7 +44,7 @@
         android:id="@+id/edit_phone"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="70dp"
         android:layout_marginStart="55dp"
         android:layout_marginEnd="55dp"
         android:background="@drawable/baseline_edit_gray"
@@ -87,16 +88,16 @@
         app:layout_constraintEnd_toEndOf="@id/btn_login"
         />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="10sp"
-        android:text="登录表示您已同意《背呗背单词用户协议》"
-        android:layout_marginTop="20dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv1"
-        />
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textSize="10sp"-->
+        <!--android:text="登录表示您已同意《背呗背单词用户协议》"-->
+        <!--android:layout_marginTop="20dp"-->
+        <!--app:layout_constraintStart_toStartOf="parent"-->
+        <!--app:layout_constraintEnd_toEndOf="parent"-->
+        <!--app:layout_constraintTop_toBottomOf="@id/tv1"-->
+        <!--/>-->
 
     <TextView
         android:id="@+id/tv_forget_password"

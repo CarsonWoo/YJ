@@ -86,7 +86,7 @@ public class RememberTab extends Fragment implements RememberListAdapter.OnButto
                         //后面加载的直接往后加
                         if (info.getData() != null && info.getData().size() > 0) {
                             mList.addAll(info.getData());
-                            executeRememberTask(String.valueOf(refreshCount));
+//                            executeRememberTask(String.valueOf(refreshCount));
                             adapter.notifyDataSetChanged();
                             new Handler().postDelayed(new Runnable() {
                                 @Override
@@ -96,6 +96,7 @@ public class RememberTab extends Fragment implements RememberListAdapter.OnButto
                             }, 800);
                         } else {
                             Toast.makeText(getContext(), "没有更多了...", Toast.LENGTH_SHORT).show();
+                            recyclerView.setLoadMoreComplete();
                             recyclerView.setLoadingMoreEnabled(false);
                         }
                     }
@@ -129,7 +130,7 @@ public class RememberTab extends Fragment implements RememberListAdapter.OnButto
             @Override
             public void onLoadMore() {
                 refreshCount++;
-
+                executeRememberTask(String.valueOf(refreshCount));
             }
         });
 

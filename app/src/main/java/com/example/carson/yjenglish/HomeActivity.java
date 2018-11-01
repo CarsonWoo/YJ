@@ -126,8 +126,6 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
 //        tintManager.setStatusBarTintEnabled(true);
 //        tintManager.setTintColor(Color.parseColor("#5ee1c9"));
 
-        UserConfig.cacheShouldSendNotification(this, true);
-
         if (UserConfig.getSelectedPlan(this) != null && !UserConfig.getSelectedPlan(this).isEmpty()) {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     == PackageManager.PERMISSION_GRANTED) {
@@ -139,7 +137,9 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
             }
         }
 
-        notifyService();
+        if (UserConfig.shouldSendNotification(this)) {
+            notifyService();
+        }
 
         SharedPreferences sp = getSharedPreferences("YJEnglish", MODE_PRIVATE);
         boolean disableNotify = sp.getBoolean("notification", false);//根据设置中的消息免打扰决定是否开启
@@ -639,8 +639,8 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
 
         NotifyObject obj = new NotifyObject();
         obj.title = "小呗秘书";
-        obj.subText = "背单词提醒";
-        obj.content = "是时候去背单词了噢~";
+        obj.subText = "背呗学习提醒";
+        obj.content = "你的背单词时间到啦，每天小小坚持，收获大大进步";
         obj.type = UserConfig.ALARM_START_STUDY_ID;
         obj.icon = R.mipmap.logo_1;
         obj.activityClass = HomeActivity.class;

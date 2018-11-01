@@ -195,6 +195,7 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
         final TextView likeNum = childView.findViewById(R.id.like_num);
         final ImageView menuMore = childView.findViewById(R.id.menu_more);
         ConstraintLayout container = childView.findViewById(R.id.like_container);
+        Log.e("childView", "reply isLike = " + item.getReply().isLike());
         btnLike.setSelected(item.getReply().isLike());
         TextView time = childView.findViewById(R.id.time);
 //        ConstraintLayout content = childView.findViewById(R.id.fit_content);
@@ -235,6 +236,7 @@ public class CommentViewBinder extends ItemViewBinder<Comment, CommentViewBinder
                             item.getReply().isLike());
                     item.getReply().setLike(!item.getReply().isLike());
                     btnLike.setSelected(item.getReply().isLike());
+                    Log.e("childView", "reply isLike = " + item.getReply().isLike());
                     ObjectAnimator animatorX = ObjectAnimator.ofFloat(btnLike,
                             "scaleX", 1.3f, 1.0f);
                     ObjectAnimator animatorY = ObjectAnimator.ofFloat(btnLike,

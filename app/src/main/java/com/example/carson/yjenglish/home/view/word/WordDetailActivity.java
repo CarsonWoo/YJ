@@ -62,6 +62,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import me.drakeet.multitype.ClassLinker;
 import me.drakeet.multitype.ItemViewBinder;
@@ -125,7 +126,9 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setTheme(R.style.AppThemeWithoutTranslucent);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -301,8 +304,25 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         /**
          * 需要用正则表达式匹配
          */
-        for (int i = 0; i < trans.trim().split("；").length; i++) {
-            items.add(new Text(trans.trim().split("；")[i].trim(), false));
+        List<String> mList = new ArrayList<>();
+        String[] splits = trans.trim().split("；");
+        int j = 0;
+        for (String split : splits) {
+            String start = split.trim().substring(0, 1);
+            boolean b = Pattern.compile("^[A-Za-z]+$").matcher(start).matches();
+            if (!b) {
+                if (mList.size() > 0) {
+                    String tmp = mList.get(j - 1);
+                    mList.remove(j - 1);
+                    mList.add(tmp + "；" + split.trim());
+                }
+            } else {
+                j++;
+                mList.add(split.trim());
+            }
+        }
+        for (String s : mList) {
+            items.add(new Text(s, false));
         }
         //语境
         items.add(new EmptyValue("语境"));

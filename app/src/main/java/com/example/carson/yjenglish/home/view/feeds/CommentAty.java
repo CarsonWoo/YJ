@@ -147,7 +147,7 @@ public class CommentAty extends AppCompatActivity implements View.OnClickListene
                             mReplies.add(new Comment(comments.get(i).getUser_id(), comments.get(i).getUsername(),
                                     comments.get(i).getPortrait(), comments.get(i).getSet_time(),
                                     comments.get(i).getComment(), null, Integer.parseInt(comments.get(i).getLikes()), null,
-                                    comments.get(i).getId(), false/*comments.get(i).getIs_like().equals("1")*/));
+                                    comments.get(i).getId(), comments.get(i).getIs_like().equals("1")));
                         }
                         commentAdapter.notifyDataSetChanged();
                     }
@@ -212,7 +212,7 @@ public class CommentAty extends AppCompatActivity implements View.OnClickListene
             mReplies.add(new Comment(comments.get(i).getUser_id(), comments.get(i).getUsername(),
                     comments.get(i).getPortrait(), comments.get(i).getSet_time(),
                     comments.get(i).getComment(), null, Integer.parseInt(comments.get(i).getLikes()), null,
-                    comments.get(i).getId(), false/*comments.get(i).getIs_like().equals("1")*/));
+                    comments.get(i).getId(), comments.get(i).getIs_like().equals("1")));
         }
         commentAdapter = new CommentAdapter(this, mReplies);
         commentAdapter.setListener(this);

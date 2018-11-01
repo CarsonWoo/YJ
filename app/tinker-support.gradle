@@ -5,7 +5,7 @@ def bakPath = file("${buildDir}\\bakApk\\")
 /**
  * 此处填写每次构建生成的基准包目录，基准包就是你第一次打的正式包
  */
-def baseApkDir = "app-1023-23-33-04"
+def baseApkDir = "app-1029-21-54-32"
 
 /**
  * 对于插件各参数的详细解析请参考
@@ -41,7 +41,7 @@ tinkerSupport {
     // buildAllFlavorsDir = "${bakPath}/${baseApkDir}"
 
     // 是否启用加固模式，默认为false.(tinker-spport 1.0.7起支持），使用加固必须打开
-    // isProtectedApp = true
+     isProtectedApp = true
 
     // 是否开启反射Application模式
     enableProxyApplication = true

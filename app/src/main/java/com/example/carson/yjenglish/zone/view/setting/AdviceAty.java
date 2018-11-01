@@ -1,6 +1,5 @@
 package com.example.carson.yjenglish.zone.view.setting;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Build;
@@ -16,7 +15,6 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.carson.yjenglish.R;
-import com.example.carson.yjenglish.net.NetTask;
 import com.example.carson.yjenglish.utils.CommonInfo;
 import com.example.carson.yjenglish.utils.DialogUtils;
 import com.example.carson.yjenglish.utils.ScreenUtils;
@@ -47,7 +45,9 @@ public class AdviceAty extends AppCompatActivity implements View.OnClickListener
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setTheme(R.style.AppThemeWithoutTranslucent);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);

@@ -6,10 +6,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.nfc.Tag;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -72,7 +74,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             holder.replyComment.setVisibility(View.VISIBLE);
             View childView = LayoutInflater.from(holder.replyComment.getContext()).inflate(R.layout.home_detail_comment,
                     null, false);
-            initChildView(childView, holder.item);
+//            initChildView(childView, holder.item);
             holder.replyComment.addView(childView);
             ConstraintLayout.LayoutParams lp = (ConstraintLayout.LayoutParams) holder.replyComment.getLayoutParams();
             lp.width = ConstraintLayout.LayoutParams.MATCH_PARENT;
@@ -91,14 +93,15 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
         } else {
             holder.likeNum.setText("" + holder.item.getLikeNum());
         }
+        Log.e("CommentAdapter", "isLike = " + holder.item.isLike());
         holder.btnLike.setSelected(holder.item.isLike());
         holder.btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
+                    mListener.onLikeButtonClick(holder.item.getComment_id(), holder.likeNum, holder.item.isLike());
                     holder.item.setLike(!holder.item.isLike());
                     holder.btnLike.setSelected(holder.item.isLike());
-                    mListener.onLikeButtonClick(holder.item.getComment_id(), holder.likeNum, holder.item.isLike());
                     ObjectAnimator animatorX = ObjectAnimator.ofFloat(holder.btnLike,
                             "scaleX", 1.3f, 1.0f);
                     ObjectAnimator animatorY = ObjectAnimator.ofFloat(holder.btnLike,

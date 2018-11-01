@@ -75,7 +75,7 @@ public class UncheckTab extends Fragment implements UncheckListAdapter.OnButtonC
     private void executeUncheckTask(final String page) {
         WordService service = retrofit.create(WordService.class);
         Call<UncheckWordInfo> call = service.getUncheckWords(UserConfig.getToken(MyApplication.getContext()),
-                page, "30");
+                page, "20");
         call.enqueue(new Callback<UncheckWordInfo>() {
             @Override
             public void onResponse(Call<UncheckWordInfo> call, Response<UncheckWordInfo> response) {
@@ -96,10 +96,11 @@ public class UncheckTab extends Fragment implements UncheckListAdapter.OnButtonC
                                 public void run() {
                                     recyclerView.setLoadMoreComplete();
                                 }
-                            }, 800);
+                            }, 500);
                         } else {
 //                            Log.e("Uncheck", "onNotAdd");
                             Toast.makeText(getContext(), "没有更多了...", Toast.LENGTH_SHORT).show();
+                            recyclerView.setLoadMoreComplete();
                             recyclerView.setLoadingMoreEnabled(false);
                         }
                     }
@@ -134,7 +135,6 @@ public class UncheckTab extends Fragment implements UncheckListAdapter.OnButtonC
             public void onLoadMore() {
                 refreshCount++;
                 executeUncheckTask(String.valueOf(refreshCount));
-
             }
         });
 

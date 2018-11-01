@@ -6,6 +6,7 @@ import android.os.Message;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -340,7 +341,7 @@ public class MyVideoView extends ConstraintLayout {
             if (videoCaptionModels != null && !videoCaptionModels.isEmpty()) {
                 if (mVideoView.getCurrentPosition() >= Long.parseLong(videoCaptionModels.get(0).getSt())) {
                     Log.e("MyVideo", "get caption start");
-                    mEnglishCaption.setText(videoCaptionModels.get(0).getEn());
+                    mEnglishCaption.setText(Html.fromHtml(videoCaptionModels.get(0).getEn()));
                     mChineseCaption.setText(videoCaptionModels.get(0).getCn());
                     VideoCaptionModel model = videoCaptionModels.get(0);
                     videoCaptionModels.remove(0);

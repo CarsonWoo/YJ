@@ -149,9 +149,10 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             setTheme(R.style.AppThemeWithoutTranslucent);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
-                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+//            getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -782,7 +783,7 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
         ObjectAnimator animatorY = ObjectAnimator.ofFloat(btn, "scaleY", 0.8f, 1f);
         AnimatorSet set = new AnimatorSet();
         set.play(animatorX).with(animatorY);
-        set.setDuration(500).start();
+        set.setDuration(300).start();
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         HomeService service = retrofit.create(HomeService.class);
         service.postLikes(UserConfig.getToken(this), id).enqueue(new Callback<CommonInfo>() {

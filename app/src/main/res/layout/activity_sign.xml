@@ -5,12 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipChildren="false"
     tools:context="com.example.carson.yjenglish.home.view.word.SignAty">
 
     <ImageView
         android:id="@+id/img_bg"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="fitXY"/>
 
     <ImageView
         android:id="@+id/back"

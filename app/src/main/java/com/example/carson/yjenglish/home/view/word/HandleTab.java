@@ -86,7 +86,7 @@ public class HandleTab extends Fragment implements HandledListAdapter.onButtonCl
                         //后面加载的直接往后加
                         if (info.getData() != null && info.getData().size() > 0) {
                             mList.addAll(info.getData());
-                            executeHandleTask(String.valueOf(refreshCount));
+//                            executeHandleTask(String.valueOf(refreshCount));
                             adapter.notifyDataSetChanged();
                             new Handler().postDelayed(new Runnable() {
                                 @Override
@@ -96,6 +96,7 @@ public class HandleTab extends Fragment implements HandledListAdapter.onButtonCl
                             }, 800);
                         } else {
                             Toast.makeText(getContext(), "没有更多了...", Toast.LENGTH_SHORT).show();
+                            recyclerView.setLoadMoreComplete();
                             recyclerView.setLoadingMoreEnabled(false);
                         }
                     }
@@ -129,7 +130,7 @@ public class HandleTab extends Fragment implements HandledListAdapter.onButtonCl
             @Override
             public void onLoadMore() {
                 refreshCount++;
-
+                executeHandleTask(String.valueOf(refreshCount));
             }
         });
 

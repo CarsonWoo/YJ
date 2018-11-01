@@ -30,7 +30,6 @@ import com.example.carson.yjenglish.utils.StatusBarUtil;
 import com.example.carson.yjenglish.utils.UserConfig;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +60,8 @@ public class SignInAty extends AppCompatActivity {
             setTheme(R.style.AppThemeWithoutTranslucent);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
         getWindow().setStatusBarColor(Color.BLACK);
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {

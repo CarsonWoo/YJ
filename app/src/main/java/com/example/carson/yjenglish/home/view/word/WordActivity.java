@@ -28,6 +28,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -40,7 +41,9 @@ import android.widget.ViewSwitcher;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.FutureTarget;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.example.carson.yjenglish.DownloadService;
 import com.example.carson.yjenglish.MyApplication;
@@ -159,7 +162,8 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
             setTheme(R.style.AppThemeWithoutTranslucent);
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-            View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
         if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
@@ -394,6 +398,7 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
         if (word_list == null || word_list.isEmpty()) {
             Gson gson = new Gson();
             word_list = gson.toJson(totalList, new TypeToken<ArrayList<WordInfo.ListObject.WordData>>(){}.getType());
+            Log.e(TAG, word_list);
         }
 //        Log.e(TAG, word_list);
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
@@ -455,12 +460,29 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
         getWindow().setStatusBarColor(Color.BLACK);
         //加载页
         mLoadingView.removeAllViews();
-        View loadingView = LayoutInflater.from(this).inflate(R.layout.loading_view, null, false);
+        View loadingView = LayoutInflater.from(this).inflate(R.layout.loading_view, mLoadingView,
+                false);
         ImageView bg = loadingView.findViewById(R.id.img);
         ImageView loadingBack = loadingView.findViewById(R.id.back);
-        Glide.with(this).load(R.mipmap.word_loading_img).thumbnail(0.5f).into(bg);
+        Glide.with(this).load(R.mipmap.word_loading_img)
+                .listener(new RequestListener<Integer, GlideDrawable>() {
+                    @Override
+                    public boolean onException(Exception e, Integer model, Target<GlideDrawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(GlideDrawable resource, Integer model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        if (bg.getScaleType() != ImageView.ScaleType.FIT_XY) {
+                            bg.setScaleType(ImageView.ScaleType.FIT_XY);
+                        }
+                        return false;
+                    }
+                })
+                .thumbnail(0.5f)
+                .into(bg);
         final ProgressBar loadingProgress = loadingView.findViewById(R.id.progress_bar);
-        mLoadingView.addView(loadingView);
+        mLoadingView.addView(loadingView, -1, -1);
 
         File tmpFile;
         if (totalList.get(0).getPic().endsWith("jpg")) {
@@ -616,8 +638,10 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
 
     private void initTextViews() {
         mTextSwitcher.setText("");
-        word.setText(totalList.get(mCurPos - 1).getWord());
-        soundMark.setText(totalList.get(mCurPos - 1).getPhonetic_symbol_us());
+        if (totalList.size() >= mCurPos) {
+            word.setText(totalList.get(mCurPos - 1).getWord());
+            soundMark.setText(totalList.get(mCurPos - 1).getPhonetic_symbol_us());
+        }
 
         if (Build.VERSION.SDK_INT >= 24) {
             mProgressBar.setProgress((int) ((float) mTotalProgress * 100 / mTotalSize) , true);
@@ -748,34 +772,58 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
         List<String> mTrans = new ArrayList<>();
 
         if (totalList.size() >= 4) {
-            boolean isCorrectInList = false;
-
-            for (int i = 1; mTrans.size() < 4;) {
-                int rNum = (int) (Math.random() * 10) + (mCurPos - 1);//index:mCurPos - 1 ~ mCurPos + 9
-                if (rNum > totalList.size() - 1) {
-                    rNum -= totalList.size();
+            int index;
+            //取得当前正确的选项
+            String correctItem = totalList.get(mCurPos - 1).getMeaning();
+            //记录随机数 作为正确选项应放的地方
+            index = (int) (Math.random() * 4);
+            for (; mTrans.size() < 3; ) {
+                int random = (int) (Math.random() * totalList.size());
+                Log.e(TAG, "rNum = " + random);
+                if (correctItem.equals(totalList.get(random).getMeaning())) {
+                    continue;
                 }
                 boolean isAdded = false;
-                if (mTrans.size() == 3 && !isCorrectInList) {
-                    mTrans.add(totalList.get(mCurPos - 1).getMeaning());
-                    correctAnswer = 4;
-                    break;
-                }
-                for (String tran : mTrans) {
-                    if (tran.equals(totalList.get(rNum).getMeaning())) {
+                for (String text : mTrans) {
+                    if (text.equals(totalList.get(random).getMeaning())) {
                         isAdded = true;
                         break;
                     }
                 }
                 if (!isAdded) {
-                    if (rNum == mCurPos - 1) {
-                        correctAnswer = i;
-                        isCorrectInList = true;
-                    }
-                    i++;
-                    mTrans.add(totalList.get(rNum).getMeaning());
+                    mTrans.add(totalList.get(random).getMeaning());
                 }
             }
+            mTrans.add(index, correctItem);
+            correctAnswer = index + 1;
+//            boolean isCorrectInList = false;
+//
+//            for (int i = 1; mTrans.size() < 4;) {
+//                int rNum = (int) (Math.random() * totalList.size())/* + (mCurPos - 1)*/;//index:mCurPos - 1 ~ mCurPos + 9
+//                if (rNum > totalList.size() - 1) {
+//                    rNum -= totalList.size();
+//                }
+//                boolean isAdded = false;
+//                if (mTrans.size() == 3 && !isCorrectInList) {
+//                    mTrans.add(totalList.get(mCurPos - 1).getMeaning());
+//                    correctAnswer = 4;
+//                    break;
+//                }
+//                for (String tran : mTrans) {
+//                    if (tran.equals(totalList.get(rNum).getMeaning())) {
+//                        isAdded = true;
+//                        break;
+//                    }
+//                }
+//                if (!isAdded) {
+//                    if (rNum == mCurPos - 1) {
+//                        correctAnswer = i;
+//                        isCorrectInList = true;
+//                    }
+//                    i++;
+//                    mTrans.add(totalList.get(rNum).getMeaning());
+//                }
+//            }
         } else {
             switch (totalList.size()) {
                 case 3:
@@ -931,58 +979,106 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
 //        List<File> fileUrls = new ArrayList<>();
 
         if (totalList.size() >= 4) {
-            boolean isCorrectInList = false;
-            for (int i = 1; imgUrls.size() < 4;) {
-                int rNum = (int) (Math.random() * 10) + (mCurPos - 1);
-                if (rNum > totalList.size() - 1) {
-                    rNum -= totalList.size();
+            int index;
+            //取得当前正确的选项
+            String correctItem = filePath + totalList.get(mCurPos - 1).getWord();
+            if (totalList.get(mCurPos - 1).getPic().endsWith("jpg")) {
+                correctItem = correctItem + ".jpg";
+            } else {
+                correctItem = correctItem + ".png";
+            }
+            //记录随机数 作为正确选项应放的地方
+            index = (int) (Math.random() * 4);
+            for (; imgUrls.size() < 3; ) {
+                int random = (int) (Math.random() * totalList.size());
+                Log.e(TAG, "rNum = " + random);
+                String s = filePath + totalList.get(random).getWord();
+                if (totalList.get(random).getPic().endsWith("jpg")) {
+                    s = s + ".jpg";
+                } else {
+                    s = s + ".png";
                 }
-                Log.e(TAG, "rNum = " + rNum);//index:mCurPos - 1 ~ mCurPos + 4
+                if (correctItem.equals(s)) {
+                    continue;
+                }
                 boolean isAdded = false;
-                if (imgUrls.size() == 3 && !isCorrectInList) {
-                    //如果正确答案在size = 3时还没有加进来过
-//                    File file = new File(filePath + totalList.get(mCurPos - 1).getWord() + ".jpg");
-//                    imgUrls.add(totalList.get(mCurPos - 1).getPic());
-                    if (totalList.get(mCurPos - 1).getPic().endsWith("jpg")) {
-                        imgUrls.add(filePath + totalList.get(mCurPos - 1).getWord() + ".jpg");
-                    } else {
-                        imgUrls.add(filePath + totalList.get(mCurPos - 1).getWord() + ".png");
-                    }
-//                    fileUrls.add(file);
-                    correctAnswer = 4;
-                    break;
-                }
                 for (String url : imgUrls) {
-//                    if (url.equals(totalList.get(rNum).getPic())) {
-//                        isAdded = true;
-//                        break;
-//                    }
-                    String s;
-                    if (totalList.get(rNum).getPic().endsWith(".jpg")) {
-                        s = filePath + totalList.get(rNum).getWord() + ".jpg";
+                    String tmp;
+                    if (totalList.get(random).getPic().endsWith(".jpg")) {
+                        tmp = filePath + totalList.get(random).getWord() + ".jpg";
                     } else {
-                        s = filePath + totalList.get(rNum).getWord() + ".png";
+                        tmp = filePath + totalList.get(random).getWord() + ".png";
                     }
-                    if (url.equals(s)) {
+                    if (url.equals(tmp)) {
                         isAdded = true;
                         break;
                     }
                 }
                 if (!isAdded) {
-                    if (rNum == mCurPos - 1) {
-                        //rNum == mCurPos - 1 则为正确答案
-                        correctAnswer = i;//index:1-4
-                        isCorrectInList = true;
-                    }
-                    i++;
-                    if (totalList.get(rNum).getPic().endsWith("jpg")) {
-                        imgUrls.add(filePath + totalList.get(rNum).getWord() + ".jpg");
+                    String url = filePath + totalList.get(random).getWord();
+                    if (totalList.get(random).getPic().endsWith("jpg")) {
+                        url = url + ".jpg";
                     } else {
-                        imgUrls.add(filePath + totalList.get(rNum).getWord() + ".png");
+                        url = url + ".png";
                     }
-//                    imgUrls.add(totalList.get(rNum).getPic());
+                    imgUrls.add(url);
                 }
             }
+            imgUrls.add(index, correctItem);
+            correctAnswer = index + 1;
+//            boolean isCorrectInList = false;
+//            Log.e(TAG, "mCurPos = " + mCurPos);
+//            for (int i = 1; imgUrls.size() < 4;) {
+//                int rNum = (int) (Math.random() * totalList.size())/* + (mCurPos - 1)*/;
+//                if (rNum > totalList.size() - 1) {
+//                    rNum -= totalList.size();
+//                }
+//                Log.e(TAG, "rNum = " + rNum);//index:mCurPos - 1 ~ mCurPos + 4
+//                boolean isAdded = false;
+//                if (imgUrls.size() == 3 && !isCorrectInList) {
+//                    //如果正确答案在size = 3时还没有加进来过
+////                    File file = new File(filePath + totalList.get(mCurPos - 1).getWord() + ".jpg");
+////                    imgUrls.add(totalList.get(mCurPos - 1).getPic());
+//                    if (totalList.get(mCurPos - 1).getPic().endsWith("jpg")) {
+//                        imgUrls.add(filePath + totalList.get(mCurPos - 1).getWord() + ".jpg");
+//                    } else {
+//                        imgUrls.add(filePath + totalList.get(mCurPos - 1).getWord() + ".png");
+//                    }
+////                    fileUrls.add(file);
+//                    correctAnswer = 4;
+//                    break;
+//                }
+//                for (String url : imgUrls) {
+////                    if (url.equals(totalList.get(rNum).getPic())) {
+////                        isAdded = true;
+////                        break;
+////                    }
+//                    String s;
+//                    if (totalList.get(rNum).getPic().endsWith(".jpg")) {
+//                        s = filePath + totalList.get(rNum).getWord() + ".jpg";
+//                    } else {
+//                        s = filePath + totalList.get(rNum).getWord() + ".png";
+//                    }
+//                    if (url.equals(s)) {
+//                        isAdded = true;
+//                        break;
+//                    }
+//                }
+//                if (!isAdded) {
+//                    if (rNum == mCurPos - 1) {
+//                        //rNum == mCurPos - 1 则为正确答案
+//                        correctAnswer = i;//index:1-4
+//                        isCorrectInList = true;
+//                    }
+//                    i++;
+//                    if (totalList.get(rNum).getPic().endsWith("jpg")) {
+//                        imgUrls.add(filePath + totalList.get(rNum).getWord() + ".jpg");
+//                    } else {
+//                        imgUrls.add(filePath + totalList.get(rNum).getWord() + ".png");
+//                    }
+////                    imgUrls.add(totalList.get(rNum).getPic());
+//                }
+//            }
         } else {
             switch (totalList.size()) {
                 case 3:
@@ -1020,22 +1116,13 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
 
         int l = 0;
         for (CorrectOrWrongImageView img : mImgs) {
-            /*if (isFileDirectoryExist) {
-                Glide.with(this).load(fileUrls.get(l))
-                        .placeholder(R.mipmap.word_placeholder)
-                        .thumbnail(0.1f)
-                        .dontAnimate()
-                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
-                        .into(img.getMainImg());
-            } else {*/
-                Glide.with(this).load(imgUrls.get(l))
-                        .placeholder(R.mipmap.word_placeholder)
-                        .thumbnail(0.05f)
+            Glide.with(this).load(imgUrls.get(l))
+                    .placeholder(R.mipmap.word_placeholder)
+                    .thumbnail(0.05f)
 //                    .crossFade()
-                        .dontAnimate()
-                        .diskCacheStrategy(DiskCacheStrategy.RESULT)
-                        .into(img.getMainImg());
-            /*}*/
+                    .dontAnimate()
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    .into(img.getMainImg());
             l++;
         }
         int i = 1;

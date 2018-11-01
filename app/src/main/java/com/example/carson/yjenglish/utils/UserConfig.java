@@ -118,7 +118,7 @@ public class UserConfig {
     }
 
     public static boolean shouldSendNotification(Context context) {
-        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getBoolean("should_send_notification", false);
+        return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE).getBoolean("should_send_notification", true);
     }
 
     public static void cacheNotificationTime(Context context, String hour, String minute) {

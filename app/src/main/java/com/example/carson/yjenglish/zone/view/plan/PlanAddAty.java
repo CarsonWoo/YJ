@@ -116,10 +116,10 @@ public class PlanAddAty extends AppCompatActivity {
         mTags.get(0).setSelected(true);
         mTags.get(0).setTextColor(Color.WHITE);
         mHitTab = HitTab.newInstance();
+        transaction.add(R.id.plan_container, mHitTab);
         GetPlanTask task = GetPlanTask.getInstance();
         presenter = new GetPlanPresenter(task, mHitTab);
         mHitTab.setPresenter(presenter);
-        transaction.add(R.id.plan_container, mHitTab);
         transaction.commit();
     }
 
@@ -130,76 +130,84 @@ public class PlanAddAty extends AppCompatActivity {
         hideAllFragments(transaction);
         switch (tabInt) {
             case 0:
-                transaction.show(mHitTab);
-                GetPlanTask task = GetPlanTask.getInstance();
-                presenter = new GetPlanPresenter(task, mHitTab);
-                mHitTab.setPresenter(presenter);
+                if (mHitTab != null) {
+                    transaction.show(mHitTab);
+                }
+//                transaction.show(mHitTab);
+//                GetPlanTask task = GetPlanTask.getInstance();
+//                presenter = new GetPlanPresenter(task, mHitTab);
+//                mHitTab.setPresenter(presenter);
                 break;
             case 1:
                 if (mPriTab == null) {
                     mPriTab = PrimaryTab.newInstance();
                     transaction.add(R.id.plan_container, mPriTab);
+                    GetPlanTask priTask = GetPlanTask.getInstance();
+                    presenter = new GetPlanPresenter(priTask, mPriTab);
+                    mPriTab.setPresenter(presenter);
                 } else {
                     transaction.show(mPriTab);
                 }
-                GetPlanTask priTask = GetPlanTask.getInstance();
-                presenter = new GetPlanPresenter(priTask, mPriTab);
-                mPriTab.setPresenter(presenter);
+
                 break;
             case 2:
                 if (mJuniorTab == null) {
                     mJuniorTab = JuniorTab.newInstance();
                     transaction.add(R.id.plan_container, mJuniorTab);
+                    GetPlanTask juniorTask = GetPlanTask.getInstance();
+                    presenter = new GetPlanPresenter(juniorTask, mJuniorTab);
+                    mJuniorTab.setPresenter(presenter);
                 } else {
                     transaction.show(mJuniorTab);
                 }
-                GetPlanTask juniorTask = GetPlanTask.getInstance();
-                presenter = new GetPlanPresenter(juniorTask, mJuniorTab);
-                mJuniorTab.setPresenter(presenter);
+
                 break;
             case 3:
                 if (mSeniorTab == null) {
                     mSeniorTab = SeniorTab.newInstance();
                     transaction.add(R.id.plan_container, mSeniorTab);
+                    GetPlanTask seniorTask = GetPlanTask.getInstance();
+                    presenter = new GetPlanPresenter(seniorTask, mSeniorTab);
+                    mSeniorTab.setPresenter(presenter);
                 } else {
                     transaction.show(mSeniorTab);
                 }
-                GetPlanTask seniorTask = GetPlanTask.getInstance();
-                presenter = new GetPlanPresenter(seniorTask, mSeniorTab);
-                mSeniorTab.setPresenter(presenter);
+
                 break;
             case 4:
                 if (mCollegeTab == null) {
                     mCollegeTab = CollegeTab.newInstance();
                     transaction.add(R.id.plan_container, mCollegeTab);
+                    GetPlanTask collegeTask = GetPlanTask.getInstance();
+                    presenter = new GetPlanPresenter(collegeTask, mCollegeTab);
+                    mCollegeTab.setPresenter(presenter);
                 } else {
                     transaction.show(mCollegeTab);
                 }
-                GetPlanTask collegeTask = GetPlanTask.getInstance();
-                presenter = new GetPlanPresenter(collegeTask, mCollegeTab);
-                mCollegeTab.setPresenter(presenter);
+
                 break;
             case 5:
                 if (mForTab == null) {
                     mForTab = ForeignTab.newInstance();
                     transaction.add(R.id.plan_container, mForTab);
+                    GetPlanTask forTask = GetPlanTask.getInstance();
+                    presenter = new GetPlanPresenter(forTask, mForTab);
+                    mForTab.setPresenter(presenter);
                 } else {
                     transaction.show(mForTab);
                 }
-                GetPlanTask forTask = GetPlanTask.getInstance();
-                presenter = new GetPlanPresenter(forTask, mForTab);
-                mForTab.setPresenter(presenter);
+
                 break;
             case 6:
                 if (mElseTab == null) {
                     mElseTab = ElseTab.newInstance();
                     transaction.add(R.id.plan_container, mElseTab);
+                    GetPlanTask elseTask = GetPlanTask.getInstance();
+                    presenter = new GetPlanPresenter(elseTask, mElseTab);
+                    mElseTab.setPresenter(presenter);
                 } else {
                     transaction.show(mElseTab);
                 }
-                GetPlanTask elseTask = GetPlanTask.getInstance();
-                presenter = new GetPlanPresenter(elseTask, mElseTab);
-                mElseTab.setPresenter(presenter);
                 break;
             default:
                 break;
