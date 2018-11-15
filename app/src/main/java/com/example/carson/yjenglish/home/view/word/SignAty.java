@@ -96,9 +96,7 @@ public class SignAty extends AppCompatActivity {
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
-        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
+        getWindow().setStatusBarColor(Color.BLACK);
         setContentView(R.layout.activity_sign);
 
         mTencent = Tencent.createInstance(UserConfig.QQ_APP_ID, MyApplication.getContext());

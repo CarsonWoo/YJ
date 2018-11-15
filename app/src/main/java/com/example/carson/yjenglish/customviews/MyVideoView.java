@@ -84,6 +84,8 @@ public class MyVideoView extends ConstraintLayout {
 
     private List<VideoCaptionModel> mCps = new ArrayList<>();
 
+    private String target;
+
     @SuppressLint("HandlerLeak")
     private Handler mHandler = new Handler() {
         @Override
@@ -341,6 +343,10 @@ public class MyVideoView extends ConstraintLayout {
             if (videoCaptionModels != null && !videoCaptionModels.isEmpty()) {
                 if (mVideoView.getCurrentPosition() >= Long.parseLong(videoCaptionModels.get(0).getSt())) {
                     Log.e("MyVideo", "get caption start");
+//                    if (videoCaptionModels.get(0).getEn().contains("<em>")) {
+//                        videoCaptionModels.get(0).getEn().replace("<em>", "<font color=\"#5ee1c9\">");
+//                        videoCaptionModels.get(0).getEn().replace("</em>", "</font>");
+//                    }
                     mEnglishCaption.setText(Html.fromHtml(videoCaptionModels.get(0).getEn()));
                     mChineseCaption.setText(videoCaptionModels.get(0).getCn());
                     VideoCaptionModel model = videoCaptionModels.get(0);

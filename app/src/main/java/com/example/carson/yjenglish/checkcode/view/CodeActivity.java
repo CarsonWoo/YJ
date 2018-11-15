@@ -65,7 +65,7 @@ import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class CodeActivity extends AppCompatActivity implements CodeView.OnInputFinishListener,
-        View.OnClickListener, SmsContent.OnReadFinishListener, CodeContract.View {
+        View.OnClickListener,/* SmsContent.OnReadFinishListener,*/ CodeContract.View {
 
     //总共有2个入口 注册、忘记密码
     private final int INTENT_TYPE_REGISTER = 1;
@@ -89,7 +89,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
     private CodePresenter codePresenter;
     private CodeContract.Presenter presenter;
 
-    private SmsContent mContent;
+//    private SmsContent mContent;
 
     private String token;
 
@@ -140,19 +140,19 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
         startCountDown();
 //        doReadAction();
 
-        initContent();
+//        initContent();
 
     }
 
-    private void initContent() {
-        if (Build.VERSION.SDK_INT >= 23) {
-            if (checkSelfPermission(Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_SMS},
-                        1);
-            }
-        }
-        doReadAction();
-    }
+//    private void initContent() {
+////        if (Build.VERSION.SDK_INT >= 23) {
+////            if (checkSelfPermission(Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED) {
+////                ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.READ_SMS},
+////                        1);
+////            }
+////        }
+////        doReadAction();
+//    }
 
     //当验证码四个框都输入完成后
     @Override
@@ -185,7 +185,7 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
 //        builder.cookieJar(cookieJar);
         builder.interceptors().add(new Interceptor() {
             @Override
-            public okhttp3.Response intercept(Chain chain) throws IOException {
+            public okhttp3.Response intercept(@NonNull Chain chain) throws IOException {
                 String cookie = MyApplication.getContext().getSharedPreferences("cookies_prefs", Context.MODE_PRIVATE)
                         .getString(UserConfig.HOST + "user/forget_password_a.do", "");
                 if (!TextUtils.isEmpty(cookie)) {
@@ -197,25 +197,35 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
         builder.addInterceptor(new SaveCookiesInterceptor());
         builder.build().newCall(request).enqueue(new okhttp3.Callback() {
             @Override
-            public void onFailure(okhttp3.Call call, IOException e) {
+            public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
 //                Log.e("Code", e.getMessage());
             }
 
             @Override
-            public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+            public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                 Gson gson = new Gson();
                 CommonInfo info = gson.fromJson(response.body().string(), CommonInfo.class);
-                if (info.getStatus().equals("200")) {
-                    Intent toReset = new Intent(CodeActivity.this, ForgetActivity.class);
-                    toReset.putExtra("type", 1);
-                    toReset.putExtra("forget_token", token);
+                if (info != null) {
+                    if (info.getStatus().equals("200")) {
+                        Intent toReset = new Intent(CodeActivity.this, ForgetActivity.class);
+                        toReset.putExtra("type", 1);
+                        toReset.putExtra("forget_token", token);
 //                    toReset.putExtra("phone", phone);
 //                    toReset.putExtra("code", Integer.parseInt(code));
-                    startActivityForResult(toReset, 1);
-                    overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
-                } else {
+                        startActivityForResult(toReset, 1);
+                        overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                    } else {
 //                    Log.e("Code", info.getMsg());
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(MyApplication.getContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
+
             }
         });
 //        NetUtils.getClientInstance(this)
@@ -251,10 +261,18 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
                 @Override
                 public void onResponse(Call<RegisterInfo> call, Response<RegisterInfo> response) {
                     RegisterInfo info = response.body();
-                    if (info.getStatus().equals("200")) {
-                        token = info.getData().getRegister_token();
-                    } else {
+                    if (info != null) {
+                        if (info.getStatus().equals("200")) {
+                            token = info.getData().getRegister_token();
+                        } else {
 //                        Log.e("Code", info.getMsg());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MyApplication.getContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 }
 
@@ -272,19 +290,29 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
                             .add("phone", phone).build()).build();
             builder.build().newCall(request).enqueue(new okhttp3.Callback() {
                 @Override
-                public void onFailure(okhttp3.Call call, IOException e) {
+                public void onFailure(@NonNull okhttp3.Call call, @NonNull IOException e) {
 //                    Log.e("Code", e.getMessage());
                 }
 
                 @Override
-                public void onResponse(okhttp3.Call call, okhttp3.Response response) throws IOException {
+                public void onResponse(@NonNull okhttp3.Call call, @NonNull okhttp3.Response response) throws IOException {
                     Gson gson = new Gson();
                     ForgetInfo info = gson.fromJson(response.body().string(), ForgetInfo.class);
-                    if (info.getStatus().equals("200")) {
-                        token = info.getData().getForget_password_token();
-                    } else {
+                    if (info != null) {
+                        if (info.getStatus().equals("200")) {
+                            token = info.getData().getForget_password_token();
+                        } else {
 //                        Log.e("Code", info.getMsg());
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MyApplication.getContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
+                                }
+                            });
+
+                        }
                     }
+
                 }
             });
         }
@@ -331,28 +359,28 @@ public class CodeActivity extends AppCompatActivity implements CodeView.OnInputF
         }
     }
 
-    private void doReadAction() {
-        mContent = SmsContent.getInstance(new Handler(), this, this);
-        this.getContentResolver().registerContentObserver(Uri.parse("content://sms/"),
-                true, mContent);
-    }
+//    private void doReadAction() {
+//        mContent = SmsContent.getInstance(new Handler(), this, this);
+//        this.getContentResolver().registerContentObserver(Uri.parse("content://sms/"),
+//                true, mContent);
+//    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (mContent != null) {
-            this.getContentResolver().unregisterContentObserver(mContent);
-        }
+//        if (mContent != null) {
+//            this.getContentResolver().unregisterContentObserver(mContent);
+//        }
         if (codePresenter != null) {
             codePresenter.unsubscribe();
         }
     }
 
-    @Override
-    public void onReadFinish(String smsMsg) {
-//        Log.e("CodeAty", smsMsg);
-        //进行setText()
-    }
+//    @Override
+//    public void onReadFinish(String smsMsg) {
+////        Log.e("CodeAty", smsMsg);
+//        //进行setText()
+//    }
 
     @Override
     public void setPresenter(CodeContract.Presenter presenter) {

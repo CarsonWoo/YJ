@@ -60,6 +60,7 @@
         android:background="#e0fff7"
         android:text="@string/next"
         android:textColor="@color/colorAccent"
+        android:focusableInTouchMode="false"
         app:layout_constraintBottom_toBottomOf="parent"
         />
 
@@ -67,14 +68,14 @@
         android:id="@+id/video_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#e9303030"
+        android:background="#000"
         android:visibility="gone"
         >
 
         <ImageView
             android:id="@+id/close_video"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
             android:src="@mipmap/ic_delete_item_gray"
             android:layout_margin="10dp"
             android:layout_gravity="end"

@@ -1,5 +1,6 @@
 package com.example.carson.yjenglish.register.view;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -7,11 +8,13 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.checkcode.model.RegisterCodeBean;
 import com.example.carson.yjenglish.customviews.PasswordEditText;
@@ -50,7 +53,11 @@ public class SetupPasswordActivity extends AppCompatActivity implements SetupCon
         setContentView(R.layout.activity_setup_password);
         Intent intent = getIntent();
         registerToken = intent.getStringExtra("register_token");
+
+
+
         initViews();
+
     }
 
     private void initViews() {
@@ -74,6 +81,14 @@ public class SetupPasswordActivity extends AppCompatActivity implements SetupCon
                 doConfirmWork();
             }
         });
+
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        edit.requestFocus();
+        if (imm != null) {
+            imm.showSoftInput(edit, 0);
+        }
+
     }
 
     private void doConfirmWork() {
@@ -115,12 +130,15 @@ public class SetupPasswordActivity extends AppCompatActivity implements SetupCon
             setResult(RESULT_OK, backIntent);
             onBackPressed();
         } else {
-            Log.e("Setup", msg);
+//            Log.e("Setup", msg);
         }
     }
 
     @Override
     public void showError(String msg) {
-        Log.e("Setup", msg);
+//        Log.e("Setup", msg);
+        if (msg != null && !msg.isEmpty()) {
+            Toast.makeText(MyApplication.getContext(), msg, Toast.LENGTH_SHORT).show();
+        }
     }
 }

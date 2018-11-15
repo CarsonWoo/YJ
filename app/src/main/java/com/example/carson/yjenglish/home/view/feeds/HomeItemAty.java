@@ -84,7 +84,6 @@ import retrofit2.Retrofit;
 public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.OnVideoClickListener,
         ContentViewBinder.OnLikeFabClickListener, CommentViewBinder.OnItemSelectListener{
 
-    private ConstraintLayout mRoot;
     private RelativeLayout mToolbar;
     private ImageView back;
     private ImageView like;
@@ -154,9 +153,8 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
 //            getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
-        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+
         setContentView(R.layout.activity_home_item);
 
         mContentLayout = new LinearLayout(this);
@@ -380,7 +378,6 @@ public class HomeItemAty extends AppCompatActivity implements VideoViewBinder.On
     }
 
     private void bindViews() {
-        mRoot = findViewById(R.id.root_view);
         mToolbar = findViewById(R.id.toolbar);
         setToolbarAlpha(0);
         back = findViewById(R.id.back);

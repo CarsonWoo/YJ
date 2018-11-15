@@ -2,8 +2,10 @@ package com.example.carson.yjenglish.login.view;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -11,6 +13,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -81,6 +84,8 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
         }
         setContentView(R.layout.activity_forget);
 
+
+
         initViews();
 
     }
@@ -105,6 +110,14 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
             initPhoneView();
         }
 
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        phone.requestFocus();
+
+        if (imm != null) {
+            imm.showSoftInput(phone, 0);
+        }
+
     }
 
     private void initPhoneView() {
@@ -114,6 +127,7 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
         phone.setStartDrawable(getResources().getDrawable(R.drawable.ic_phone_20dp));
         phone.setHint("请输入手机号码");
         phone.setShowVisible(false);
+
     }
 
     private void initPasswordView() {
@@ -175,12 +189,12 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
                 .add("phone", phone.getText().toString()).build()).build();
         builder.build().newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 Log.e("Forget", e.getMessage());
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 Gson gson = new Gson();
                 ForgetInfo info = gson.fromJson(response.body().string(), ForgetInfo.class);
                 Log.e("Forget", info.getStatus());
@@ -198,7 +212,12 @@ public class ForgetActivity extends AppCompatActivity implements View.OnClickLis
                     overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
                 } else {
                     //提示用户信息
-                    Toast.makeText(ForgetActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ForgetActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             }
         });

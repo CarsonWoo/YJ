@@ -11,7 +11,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.utils.StatusBarUtil;
 
@@ -22,6 +24,7 @@ public class EditAty extends AppCompatActivity {
     private EditText edit;
     private TextView word;
     private TextView soundMark;
+    private TextView submit;
 
     private String wordStr;
     private String soundMarkStr;
@@ -47,6 +50,7 @@ public class EditAty extends AppCompatActivity {
         word = findViewById(R.id.word);
         edit = findViewById(R.id.edit_mark);
         soundMark = findViewById(R.id.soundmark);
+        submit = findViewById(R.id.btn_submit);
 
         Intent fromData = getIntent();
         wordStr = fromData.getStringExtra("tag");
@@ -61,18 +65,17 @@ public class EditAty extends AppCompatActivity {
             edit.setText(pref.getString(wordStr, ""));
         }
 
-        back.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences sp = getSharedPreferences("YJEnglish", MODE_PRIVATE);
-                if (!edit.getText().toString().isEmpty()) {
-                    sp.edit().putString(wordStr, edit.getText().toString()).apply();
-                } else {
-                    if (sp != null) {
-                        sp.edit().clear().apply();
-                    }
+        back.setOnClickListener(view -> onBackPressed());
+
+        submit.setOnClickListener(v -> {
+            SharedPreferences sp = getSharedPreferences("YJEnglish", MODE_PRIVATE);
+            if (!edit.getText().toString().isEmpty()) {
+                sp.edit().putString(wordStr, edit.getText().toString()).apply();
+                Toast.makeText(MyApplication.getContext(), "保存成功", Toast.LENGTH_SHORT).show();
+            } else {
+                if (sp != null) {
+                    sp.edit().clear().apply();
                 }
-                onBackPressed();
             }
         });
 

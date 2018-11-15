@@ -107,20 +107,23 @@ public class ActiveFragment extends Fragment {
                     @Override
                     public void onResponse(Call<UserActiveInfo> call, Response<UserActiveInfo> response) {
                         UserActiveInfo info = response.body();
-                        if (info.getStatus().equals("200")) {
-                            mInfos = info.getData().getIts_dynamic();
-                            isOpen = info.getData().getIs_open().equals("1");
-                            insist_day = info.getData().getInsist_day();
-                            username = info.getData().getUsername();
-                            portrait = info.getData().getPortrait();
+                        if (info != null && info.getData() != null) {
+                            if (info.getStatus().equals("200")) {
+                                mInfos = info.getData().getIts_dynamic();
+                                isOpen = info.getData().getIs_open().equals("1");
+                                insist_day = info.getData().getInsist_day();
+                                username = info.getData().getUsername();
+                                portrait = info.getData().getPortrait();
 
-                            if (mListener != null) {
-                                mListener.onChange(insist_day);
+                                if (mListener != null) {
+                                    mListener.onChange(insist_day);
+                                }
+
+                                initRecyclerViews();
+
                             }
-
-                            initRecyclerViews();
-
                         }
+
                     }
 
                     @Override

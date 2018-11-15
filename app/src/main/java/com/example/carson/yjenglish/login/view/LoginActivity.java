@@ -2,6 +2,7 @@ package com.example.carson.yjenglish.login.view;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
@@ -12,6 +13,7 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -93,7 +95,11 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
         }
         setContentView(R.layout.activity_login);
         mTencent = Tencent.createInstance(QQ_APP_ID, MyApplication.getContext());
+
+
+
         iniViews();
+
         if (getIntent() != null) {
             String phoneStr = getIntent().getStringExtra("phone");
             String passwordStr = getIntent().getStringExtra("password");
@@ -132,6 +138,13 @@ public class LoginActivity extends AppCompatActivity implements LoginContract.Vi
 //        testUse.setOnClickListener(this);
         btnQQ.setOnClickListener(this);
         btnWechat.setOnClickListener(this);
+
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        phone.requestFocus();
+        if (imm != null) {
+            imm.showSoftInput(phone, 0);
+        }
     }
 
     //判断密码框是否显示

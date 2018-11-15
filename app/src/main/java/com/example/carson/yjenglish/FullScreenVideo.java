@@ -56,7 +56,7 @@ public class FullScreenVideo extends AppCompatActivity implements MyVideoView.IO
         mCurPos = intent.getIntExtra("current_position", 0);
         type = intent.getIntExtra("caption_type", 0);//0表示没有caption，1表示有caption
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         fullscreen = findViewById(R.id.full_screen);
         videoView = new MyVideoView(this, hasMulVideos, true);

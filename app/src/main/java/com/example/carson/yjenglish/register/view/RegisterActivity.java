@@ -4,6 +4,7 @@ import android.app.ActivityManager;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -57,6 +59,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         }
         setContentView(R.layout.activity_register);
+
+
+
         initViews();
     }
 
@@ -73,6 +78,12 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         confirm.setOnClickListener(this);
 
         phone.setFilters(new InputFilter[]{new InputFilter.LengthFilter(16)}); //最大输入长度
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        phone.requestFocus();
+        if (imm != null) {
+            imm.showSoftInput(phone, 0);
+        }
 
     }
 

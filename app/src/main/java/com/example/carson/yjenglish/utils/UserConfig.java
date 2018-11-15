@@ -49,7 +49,7 @@ public class UserConfig {
 
     public static String getUsername(Context context) {
         return context.getSharedPreferences(APP_ID, Context.MODE_PRIVATE)
-                .getString("username", "独角鲸");
+                .getString("username", "背单词 上背呗");
     }
 
     public static void clearUserInfo(Context context) {

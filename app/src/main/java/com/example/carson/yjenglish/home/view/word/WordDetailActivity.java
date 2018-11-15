@@ -1,9 +1,13 @@
 package com.example.carson.yjenglish.home.view.word;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -13,6 +17,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -24,10 +29,13 @@ import android.widget.Toast;
 
 import com.example.carson.yjenglish.EmptyValue;
 import com.example.carson.yjenglish.FullScreenVideo;
+import com.example.carson.yjenglish.HomeActivity;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.VideoCaptionInfo;
 import com.example.carson.yjenglish.VideoCaptionModel;
 import com.example.carson.yjenglish.VideoService;
+import com.example.carson.yjenglish.broadcastreceiver.NetworkReceiver;
 import com.example.carson.yjenglish.customviews.MyVideoView;
 import com.example.carson.yjenglish.home.HomeService;
 import com.example.carson.yjenglish.home.WordService;
@@ -76,7 +84,7 @@ import retrofit2.Retrofit;
 public class WordDetailActivity extends AppCompatActivity implements View.OnClickListener,
         TextDrawableViewBinder.OnEditSelectListener, HeaderViewBinder.HeaderSoundListener,
         SituationViewBinder.SituationListener, VideoViewBinder.OnVideoClickListener,
-        SentenceSoundViewBinder.OnSentenceSoundListener, PostWrongBinder.OnErrorPostListener {
+        SentenceSoundViewBinder.OnSentenceSoundListener, PostWrongBinder.OnErrorPostListener, NetUtils.NetEvent {
 
     private RecyclerView recyclerView;
     private ImageView back;
@@ -89,6 +97,8 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
 
     private MultiTypeAdapter adapter;
     private Items items;
+
+    private NetworkReceiver mNetworkReceiver;
 
     private String wordTag;//用于记录当前的单词 并用作sharedpreference存值
     private String word;
@@ -121,6 +131,18 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
     private int fromIntent;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        if (mNetworkReceiver == null) {
+            mNetworkReceiver = new NetworkReceiver();
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+            registerReceiver(mNetworkReceiver, filter);
+            mNetworkReceiver.setNetEvent(this);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -130,10 +152,13 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
-        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
+//        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+//            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+//        }
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
         setContentView(R.layout.activity_word_detail);
+        //保持屏幕高亮
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         sp = getSharedPreferences("word_favours", MODE_PRIVATE);
 
@@ -141,8 +166,18 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         tipsCount = getSharedPreferences("YJEnglish", MODE_PRIVATE).getInt("tips_count", 0);
         Log.e("WordDetail", "tipsCount = " + tipsCount);
         initData();
-        executeWordTask();
         bindViews();
+
+        if (fromIntent == 0) {
+            Log.e("WordDetail", "fromIntent = 0");
+            initRecycler();
+        }
+
+        if (pronunciation != null && !pronunciation.isEmpty()) {
+            initPlayer(pronunciation);
+        }
+
+        executeWordTask();
     }
 
     private void executeWordTask() {
@@ -152,48 +187,51 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             @Override
             public void onResponse(Call<WordDetailInfo> call, Response<WordDetailInfo> response) {
                 WordDetailInfo info = response.body();
-                if (info.getStatus().equals("200")) {
-                    stem_affix = info.getData().getStem_affix();
-                    word_similar_form = info.getData().getWord_of_similar_form();
-                    mVideoList = info.getData().getVideo_info();
-                    if (soundMark == null || soundMark.isEmpty()) {
-                        soundMark = info.getData().getPhonetic_symbol_us();
-                    }
-                    if (trans == null || trans.isEmpty()) {
-                        trans = info.getData().getMeaning();
-                    }
-                    basicTrans = trans.trim().split("；")[0];
-                    if (paraphrase == null || paraphrase.isEmpty()) {
-                        paraphrase = info.getData().getParaphrase();
-                    }
-                    if (sentence == null || sentence.isEmpty()) {
-                        sentence = info.getData().getSentence();
-                    }
-                    if (sentenceTrans == null || sentenceTrans.isEmpty()) {
-                        sentenceTrans = info.getData().getSentence_cn();
-                    }
-                    if (imgUrl == null || imgUrl.isEmpty()) {
-                        imgUrl = info.getData().getPic();
-                    }
-                    if (pronunciation == null || pronunciation.isEmpty()) {
-                        pronunciation = info.getData().getPronunciation_us();
-                    }
-                    if (synonym == null || synonym.isEmpty()) {
-                        synonym = info.getData().getSynonym();
-                    }
-                    if (sentence_audio == null || sentence_audio.isEmpty()) {
-                        sentence_audio = info.getData().getSentence_audio();
-                    }
-                    if (phrase == null || phrase.isEmpty()) {
-                        phrase = info.getData().getPhrase();
-                    }
+                if (info != null && info.getData() != null) {
+                    if (info.getStatus().equals("200")) {
+                        stem_affix = info.getData().getStem_affix();
+                        word_similar_form = info.getData().getWord_of_similar_form();
+                        mVideoList = info.getData().getVideo_info();
+                        if (soundMark == null || soundMark.isEmpty()) {
+                            soundMark = info.getData().getPhonetic_symbol_us();
+                        }
+                        if (trans == null || trans.isEmpty()) {
+                            trans = info.getData().getMeaning();
+                        }
+                        basicTrans = trans.trim().split("；")[0];
+                        if (paraphrase == null || paraphrase.isEmpty()) {
+                            paraphrase = info.getData().getParaphrase();
+                        }
+                        if (sentence == null || sentence.isEmpty()) {
+                            sentence = info.getData().getSentence();
+                        }
+                        if (sentenceTrans == null || sentenceTrans.isEmpty()) {
+                            sentenceTrans = info.getData().getSentence_cn();
+                        }
+                        if (imgUrl == null || imgUrl.isEmpty()) {
+                            imgUrl = info.getData().getPic();
+                        }
+                        if (pronunciation == null || pronunciation.isEmpty()) {
+                            pronunciation = info.getData().getPronunciation_us();
+                        }
+                        if (synonym == null || synonym.isEmpty()) {
+                            synonym = info.getData().getSynonym();
+                        }
+                        if (sentence_audio == null || sentence_audio.isEmpty()) {
+                            sentence_audio = info.getData().getSentence_audio();
+                        }
+                        if (phrase == null || phrase.isEmpty()) {
+                            phrase = info.getData().getPhrase();
+                        }
 
-                    if (word == null || word.isEmpty()) {
-                        word = info.getData().getWord();
+                        if (word == null || word.isEmpty()) {
+                            word = info.getData().getWord();
+                        }
+                        Log.e("WordDetail", "executeTask");
+                        initRecycler();
+                    } else {
+                        Toast.makeText(WordDetailActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
                     }
-                    initRecycler();
-                } else {
-                    Toast.makeText(WordDetailActivity.this, info.getMsg(), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -204,6 +242,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         });
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private void bindViews() {
         recyclerView = findViewById(R.id.recycler_view);
         back = findViewById(R.id.back);
@@ -220,6 +259,21 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         like.setOnClickListener(this);
         pass.setOnClickListener(this);
         next.setOnClickListener(this);
+
+//        next.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN:
+//                        Log.e("WordDetail", "onTouch");
+//                        onBackPressed();
+//                        break;
+//                    default:
+//                        break;
+//                }
+//                return false;
+//            }
+//        });
 
         boolean isFavour = getIntent().getBooleanExtra("is_favour", false);
 
@@ -260,6 +314,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
     }
 
     private void initRecycler() {
+        Log.e("WordDetail", "initRecycler()");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new MultiTypeAdapter();
         recyclerView.setAdapter(adapter);
@@ -297,8 +352,10 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         //头部
         items.add(new Header(word, basicTrans, "美" + soundMark, pronunciation));
         //paraphrase
-        items.add(new EmptyValue("英文释义"));
-        items.add(new Text(paraphrase, false));
+        if (paraphrase != null && !paraphrase.isEmpty()) {
+            items.add(new EmptyValue("英文释义"));
+            items.add(new Text(paraphrase, false));
+        }
         //meaning
         items.add(new EmptyValue("中文释义"));
         /**
@@ -328,12 +385,14 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         items.add(new EmptyValue("语境"));
         items.add(new WordSituation(imgUrl, sentence, sentenceTrans, null));
         //视频
-        List<Video> mVideoItems = new ArrayList<>();
-        for (int i = 0; i < mVideoList.size(); i++) {
-            mVideoItems.add(new Video(mVideoList.get(i).getId(), mVideoList.get(i).getImg(),
-                    mVideoList.get(i).getVideo()));
+        if (mVideoList != null && mVideoList.size() > 0) {
+            List<Video> mVideoItems = new ArrayList<>();
+            for (int i = 0; i < mVideoList.size(); i++) {
+                mVideoItems.add(new Video(mVideoList.get(i).getId(), mVideoList.get(i).getImg(),
+                        mVideoList.get(i).getVideo()));
+            }
+            items.add(new VideoList(mVideoItems));
         }
-        items.add(new VideoList(mVideoItems));
         //词形变化
 
 
@@ -397,6 +456,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
         }
         adapter.setItems(items);
         adapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -426,6 +486,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                     mVideo = null;
                 }
                 videoFrame.removeAllViews();
+                getWindow().setStatusBarColor(Color.TRANSPARENT);
                 videoContainer.setVisibility(View.GONE);
                 if (fromIntent == 0) {
                     next.setVisibility(View.VISIBLE);
@@ -557,7 +618,11 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
     public void onVideoClick(String video_id, String videoUrl, int pos) {
 //        Log.e("WordDetail", video_id);
 //        Log.e("WordDetail", videoUrl);
-        executeCaptionTask(pos, videoUrl, video_id);
+        if (videoUrl != null && !videoUrl.isEmpty()) {
+            executeCaptionTask(pos, videoUrl, video_id);
+        } else {
+            Toast.makeText(MyApplication.getContext(), "视频链接有误 请试试其他视频~", Toast.LENGTH_SHORT).show();
+        }
 //        showVideo(pos, videoUrl);
     }
 
@@ -575,7 +640,10 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                     }
                     showVideo(pos, videoUrl);
                 } else {
-                    Log.e("WordDetail", info.getMsg());
+                    if (info.getMsg() != null) {
+                        Toast.makeText(MyApplication.getContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
+                    }
+//                    Log.e("WordDetail", info.getMsg());
                 }
             }
 
@@ -598,6 +666,8 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             mVideo = new MyVideoView(this, true, false, mCaptions);
         }
         videoFrame.removeAllViews();
+        //设置顶部为黑色
+        getWindow().setStatusBarColor(Color.BLACK);
         videoFrame.addView(mVideo, new ViewGroup.LayoutParams(-1, -1));
 //        mVideo.stop();
         mVideo.setVideoPath(path);
@@ -609,7 +679,11 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
 //                videoFrame.removeAllViews();
                 if (pos + 1 < mVideoList.size()) {
                     //还有下一个视频
-                    executeCaptionTask(pos + 1, mVideoList.get(pos + 1).getVideo(), mVideoList.get(pos + 1).getId());
+                    if (mVideoList.get(pos + 1).getVideo() == null || mVideoList.get(pos + 1).getVideo().isEmpty()) {
+                        Toast.makeText(MyApplication.getContext(), "视频链接有误 请试试其他视频~", Toast.LENGTH_SHORT).show();
+                    } else {
+                        executeCaptionTask(pos + 1, mVideoList.get(pos + 1).getVideo(), mVideoList.get(pos + 1).getId());
+                    }
                 } else {
                     //没有视频了
                     Toast.makeText(WordDetailActivity.this, "没有下一个视频咯", Toast.LENGTH_SHORT).show();
@@ -621,7 +695,11 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             public void onFormerClick() {
                 if (pos > 0) {
                     //存在上一个视频
-                    executeCaptionTask(pos - 1, mVideoList.get(pos - 1).getVideo(), mVideoList.get(pos - 1).getId());
+                    if (mVideoList.get(pos - 1).getVideo() == null || mVideoList.get(pos - 1).getVideo().isEmpty()) {
+                        Toast.makeText(MyApplication.getContext(), "视频链接有误 请试试其他视频~", Toast.LENGTH_SHORT).show();
+                    } else {
+                        executeCaptionTask(pos - 1, mVideoList.get(pos - 1).getVideo(), mVideoList.get(pos - 1).getId());
+                    }
                 } else {
                     Toast.makeText(WordDetailActivity.this, "没有上一个视频噢", Toast.LENGTH_SHORT).show();
                 }
@@ -631,7 +709,11 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             public void onLatterClick() {
                 if (pos + 1 < mVideoList.size()) {
                     //还有下一个视频
-                    executeCaptionTask(pos + 1, mVideoList.get(pos + 1).getVideo(), mVideoList.get(pos + 1).getId());
+                    if (mVideoList.get(pos + 1).getVideo() == null || mVideoList.get(pos + 1).getVideo().isEmpty()) {
+                        Toast.makeText(MyApplication.getContext(), "视频链接有误 请试试其他视频~", Toast.LENGTH_SHORT).show();
+                    } else {
+                        executeCaptionTask(pos + 1, mVideoList.get(pos + 1).getVideo(), mVideoList.get(pos + 1).getId());
+                    }
                 } else {
                     //没有视频了
                     Toast.makeText(WordDetailActivity.this, "没有下一个视频咯",
@@ -704,7 +786,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
                 CommonInfo info = response.body();
                 if (info.getStatus().equals("200")) {
                     Toast.makeText(WordDetailActivity.this,
-                            "您的修改意见大队长已经呈交给领队~请耐心等候反馈~", Toast.LENGTH_SHORT).show();
+                            "谢谢你的建议，我们会即时查看~", Toast.LENGTH_SHORT).show();
                     //可以send一个广播通知系统消息 并存入数据库
                 }
             }
@@ -713,5 +795,29 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
             public void onFailure(Call<CommonInfo> call, Throwable t) {
             }
         });
+    }
+
+    @Override
+    public void onNetworkChange(int netMobile) {
+        switch (netMobile) {
+            case 0://移动网络
+            case 1://WIFI网络
+                executeWordTask();
+                break;
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mVideo != null) {
+            if (mVideo.isPlaying()) {
+                mVideo.pause();
+            }
+        }
+        if (mNetworkReceiver != null) {
+            unregisterReceiver(mNetworkReceiver);
+            mNetworkReceiver = null;
+        }
     }
 }

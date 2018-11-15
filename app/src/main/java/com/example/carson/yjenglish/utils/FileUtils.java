@@ -86,30 +86,16 @@ public class FileUtils {
 
                     os.write(buff,0,len);
                     currentLength+=len;
-                    Log.e("vivi","当前进度:"+currentLength);
+                    Log.e("vivi","当前进度: " + currentLength);
 //                httpCallBack.onLoading(currentLength,totalLength);
                 }
                 // httpCallBack.onLoading(currentLength,totalLength,true);
 
-            } catch(FileNotFoundException e) {
-                e.printStackTrace();
+                os.close();
+                is.close();
+
             } catch(IOException e) {
                 e.printStackTrace();
-            } finally {
-                if(os!=null){
-                    try {
-                        os.close();
-                    } catch(IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                if(is!=null){
-                    try {
-                        is.close();
-                    } catch(IOException e) {
-                        e.printStackTrace();
-                    }
-                }
             }
         }
 

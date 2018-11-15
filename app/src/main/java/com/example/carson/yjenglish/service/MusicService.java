@@ -52,7 +52,9 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         } catch (IOException e) {
             e.printStackTrace();
         }
-        mPlayer.prepareAsync();
+        if (mPlayer != null) {
+            mPlayer.prepareAsync();
+        }
         mPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
             @Override
             public void onPrepared(MediaPlayer mediaPlayer) {

@@ -215,10 +215,10 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
         rvAty.setHasFixedSize(true);
         initRecycler(rvAty, "暂时没有更多活动噢\n小语正在努力筹划~", R.mipmap.welfare_place_holder);
 
-        tmpAdapter = new DiscoverAdapters.AtyAdapter(getContext(), tmpList);
-        rvGame.setAdapter(tmpAdapter);
-        rvGame.setHasFixedSize(true);
-        initRecycler(rvGame, "暂时还没运营噢~敬请期待~", R.mipmap.welfare_place_holder);
+//        tmpAdapter = new DiscoverAdapters.AtyAdapter(getContext(), tmpList);
+//        rvGame.setAdapter(tmpAdapter);
+//        rvGame.setHasFixedSize(true);
+//        initRecycler(rvGame, "暂时还没运营噢~敬请期待~", R.mipmap.welfare_place_holder);
 
     }
 

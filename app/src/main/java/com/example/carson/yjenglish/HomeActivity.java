@@ -555,7 +555,7 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
         if (downloadReceiver != null) {
             unregisterReceiver(downloadReceiver);
         }
-        Log.e(TAG, "onDestroy");
+//        Log.e(TAG, "onDestroy");
     }
 
     @Override

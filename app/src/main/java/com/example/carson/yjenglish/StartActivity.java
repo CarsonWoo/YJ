@@ -40,16 +40,16 @@ public class StartActivity extends AppCompatActivity {
 
         mLayout = findViewById(R.id.start_layout);
 
-        if (Build.VERSION.SDK_INT >= 23) {
-            requestPermission();
-        }
+
+        requestPermission();
+
 
     }
 
     private void requestPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             //2、申请权限: 参数二：权限的数组；参数三：请求码
-            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+            ActivityCompat.requestPermissions(this, new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE }, 1);
         } else {
             File recordDirectory = new File(Environment.getExternalStorageDirectory().getPath() +
                     "/背呗背单词/");
@@ -96,18 +96,58 @@ public class StartActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            File recordDirectory = new File(Environment.getExternalStorageDirectory().getPath() +
-                    "/背呗背单词/");
-            if (!recordDirectory.exists()) {
-                recordDirectory.mkdirs();
-                Log.e("Start", "cacheDir");
-            }
+        if (requestCode == 1) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                File recordDirectory = new File(Environment.getExternalStorageDirectory().getPath() +
+                        "/背呗背单词/");
+                if (!recordDirectory.exists()) {
+                    recordDirectory.mkdirs();
+                    Log.e("Start", "cacheDir");
+                }
 
-            mLayout.postDelayed(new Runnable() {
-                @Override
-                public void run() {
+                mLayout.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (!UserConfig.getToken(StartActivity.this).isEmpty()) {
+                            startActivity(new Intent(StartActivity.this, HomeActivity.class));
+                            overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                        } else {
+                            if (UserConfig.getIsFirstTimeUser(MyApplication.getContext())) {
+                                startActivity(new Intent(StartActivity.this, RegisterActivity.class));
+                                overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                            } else {
+                                startActivity(new Intent(StartActivity.this, LoginActivity.class));
+                                overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
+                            }
+                        }
+                        finish();
+                    }
+                }, 2000);
+            } else {
+                if (times < 1) {
+                    DialogUtils du = DialogUtils.getInstance(this);
+                    Dialog mDialog = du.newTipsDialog("取消授权将可能导致音频无法播放噢~小呗建议您授权噢~",
+                            View.TEXT_ALIGNMENT_CENTER);
+                    mDialog.show();
+                    WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
+                    lp.width = ScreenUtils.dp2px(this, 260);
+                    lp.height = ScreenUtils.dp2px(this, 240);
+                    lp.gravity = Gravity.CENTER;
+                    mDialog.getWindow().setAttributes(lp);
+
+                    du.setTipsListener(new DialogUtils.OnTipsListener() {
+                        @Override
+                        public void onConfirm() {
+                            requestPermission();
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            requestPermission();
+                        }
+                    });
+                    times ++;
+                } else {
                     if (!UserConfig.getToken(StartActivity.this).isEmpty()) {
                         startActivity(new Intent(StartActivity.this, HomeActivity.class));
                         overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
@@ -122,47 +162,9 @@ public class StartActivity extends AppCompatActivity {
                     }
                     finish();
                 }
-            }, 2000);
-        } else {
-            if (times < 1) {
-                DialogUtils du = DialogUtils.getInstance(this);
-                Dialog mDialog = du.newTipsDialog("取消授权将可能导致音频无法播放噢~小呗建议您授权噢~",
-                        View.TEXT_ALIGNMENT_CENTER);
-                mDialog.show();
-                WindowManager.LayoutParams lp = mDialog.getWindow().getAttributes();
-                lp.width = ScreenUtils.dp2px(this, 260);
-                lp.height = ScreenUtils.dp2px(this, 240);
-                lp.gravity = Gravity.CENTER;
-                mDialog.getWindow().setAttributes(lp);
-
-                du.setTipsListener(new DialogUtils.OnTipsListener() {
-                    @Override
-                    public void onConfirm() {
-                        requestPermission();
-                    }
-
-                    @Override
-                    public void onCancel() {
-                        requestPermission();
-                    }
-                });
-                times ++;
-            } else {
-                if (!UserConfig.getToken(StartActivity.this).isEmpty()) {
-                    startActivity(new Intent(StartActivity.this, HomeActivity.class));
-                    overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
-                } else {
-                    if (UserConfig.getIsFirstTimeUser(MyApplication.getContext())) {
-                        startActivity(new Intent(StartActivity.this, RegisterActivity.class));
-                        overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
-                    } else {
-                        startActivity(new Intent(StartActivity.this, LoginActivity.class));
-                        overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
-                    }
-                }
-                finish();
             }
-
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 }

@@ -343,13 +343,12 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                 if (Build.VERSION.SDK_INT >= 23) {
                     if (ContextCompat.checkSelfPermission(MyApplication.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                         //2、申请权限: 参数二：权限的数组；参数三：请求码
-                        ActivityCompat.requestPermissions(getActivity(),new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
-                    } else {
-                        if (UserConfig.getUsername(getContext()).isEmpty()) {
-                            UserConfig.cacheUsername(getContext(), "独角鲸");
+                        if (getActivity() != null) {
+                            ActivityCompat.requestPermissions(getActivity(), new String[] { Manifest.permission.WRITE_EXTERNAL_STORAGE}, 2);
                         }
+                    } else {
                         Intent toSign = new Intent(getContext(), SignAty.class);
-                        toSign.putExtra("username", UserConfig.getUsername(getContext()))
+                        toSign.putExtra("username", UserConfig.getUsername(MyApplication.getContext()))
                                 .putExtra("insist_day", mLoadData.getInsistCount())
                                 .putExtra("learned_word", mLoadData.getWordsCount());
                         startActivityForResult(toSign, REQUEST_SIGN_CODE);
@@ -358,11 +357,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                         }
                     }
                 } else {
-                    if (UserConfig.getUsername(getContext()).isEmpty()) {
-                        UserConfig.cacheUsername(getContext(), "独角鲸");
-                    }
                     Intent toSign = new Intent(getContext(), SignAty.class);
-                    toSign.putExtra("username", UserConfig.getUsername(getContext()))
+                    toSign.putExtra("username", UserConfig.getUsername(MyApplication.getContext()))
                             .putExtra("insist_day", mLoadData.getInsistCount())
                             .putExtra("learned_word", mLoadData.getWordsCount());
                     startActivityForResult(toSign, REQUEST_SIGN_CODE);
@@ -464,17 +460,21 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 //            Log.e(TAG, "today finish");
             if (data != null) {
                 String learned_word = data.getStringExtra("learned_word");
-                if (learned_word != null) {
-                    mLoadData.setWordsCount(mLoadData.getWordsCount() +
-                            Integer.parseInt(learned_word));
+                if (mLoadData != null) {
+                    if (learned_word != null) {
+                        mLoadData.setWordsCount(mLoadData.getWordsCount() +
+                                Integer.parseInt(learned_word));
+                    }
+                    mLoadData.setInsistCount(mLoadData.getInsistCount() + 1);
                 }
-                mLoadData.setInsistCount(mLoadData.getInsistCount() + 1);
             }
-            float progress = ((float) mLoadData.getWordsCount() * 100 /
-                    mLoadData.getTargetCount());
-            mLoadData.setProgress(progress);
-            mLoadData.setTodayFinish(true);
-            mLoadData.save();
+            if (mLoadData != null) {
+                float progress = ((float) mLoadData.getWordsCount() * 100 /
+                        mLoadData.getTargetCount());
+                mLoadData.setProgress(progress);
+                mLoadData.setTodayFinish(true);
+                mLoadData.save();
+            }
             mAdapter.notifyItemChanged(0);
 //            onRefreshHomeItem();
             Intent toSign = new Intent(getContext(), SignAty.class);
@@ -573,7 +573,6 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             Intent toWord = new Intent(getContext(), WordActivity.class);
             toWord.putExtra("type", REQUEST_WORD_CODE);
@@ -582,11 +581,8 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
                 getActivity().overridePendingTransition(R.anim.ani_right_get_into, R.anim.ani_left_sign_out);
             }
         }  else if (requestCode == 2 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            if (UserConfig.getUsername(getContext()).isEmpty()) {
-                UserConfig.cacheUsername(getContext(), "独角鲸");
-            }
             Intent toSign = new Intent(getContext(), SignAty.class);
-            toSign.putExtra("username", UserConfig.getUsername(getContext()))
+            toSign.putExtra("username", UserConfig.getUsername(MyApplication.getContext()))
                     .putExtra("insist_day", mLoadData.getInsistCount())
                     .putExtra("learned_word", mLoadData.getWordsCount());
             startActivityForResult(toSign, REQUEST_SIGN_CODE);
@@ -595,6 +591,7 @@ public class HomeFragment extends Fragment implements HomeListAdapter.OnVideoLis
             }
         } else {
             Toast.makeText(getContext(), "小呗可能无法正常播放音频和进行分享噢，请在设置中开放权限吧~", Toast.LENGTH_SHORT).show();
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

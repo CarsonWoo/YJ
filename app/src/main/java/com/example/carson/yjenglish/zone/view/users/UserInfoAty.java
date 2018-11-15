@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
 import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.StatusBarUtil;
@@ -75,11 +76,11 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
                     View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-            getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
-        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+//        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
+//            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+//        }
         setContentView(R.layout.activity_user_info);
         user_id = getIntent().getStringExtra("user_id");
         bindViews();
@@ -95,37 +96,40 @@ public class UserInfoAty extends AppCompatActivity implements ActiveFragment.OnA
             @Override
             public void onResponse(Call<OtherUsersPlanInfo> call, Response<OtherUsersPlanInfo> response) {
                 OtherUsersPlanInfo info = response.body();
-                if (info.getStatus().equals("200")) {
-                    author_username = info.getData().getAuthor_username();
-                    author_signature = info.getData().getAuthor_personality_signature();
-                    portraitUrl = info.getData().getAuthor_portrait();
-                    mGender = info.getData().getAuthor_gender();
-                    learned_word = info.getData().getLearned_word();
+                if (info != null && info.getData() != null) {
+                    if (info.getStatus().equals("200")) {
+                        author_username = info.getData().getAuthor_username();
+                        author_signature = info.getData().getAuthor_personality_signature();
+                        portraitUrl = info.getData().getAuthor_portrait();
+                        mGender = info.getData().getAuthor_gender();
+                        learned_word = info.getData().getLearned_word();
 
-                    plans = info.getData().getIts_plan();
+                        plans = info.getData().getIts_plan();
 
-                    List<OthersPlan> othersPlans = new ArrayList<>();
-                    for (int i = 0; i < plans.size(); i++) {
-                        OthersPlan plan = new OthersPlan();
-                        plan.setPlan(plans.get(i).getPlan());
-                        plan.setLearned_word_number(plans.get(i).getLearned_word_number());
-                        plan.setWord_number(plans.get(i).getWord_number());
-                        othersPlans.add(plan);
-                    }
+                        List<OthersPlan> othersPlans = new ArrayList<>();
+                        for (int i = 0; i < plans.size(); i++) {
+                            OthersPlan plan = new OthersPlan();
+                            plan.setPlan(plans.get(i).getPlan());
+                            plan.setLearned_word_number(plans.get(i).getLearned_word_number());
+                            plan.setWord_number(plans.get(i).getWord_number());
+                            othersPlans.add(plan);
+                        }
 
-                    if (mGender.equals("1")) {
-                        tabLayout.getTabAt(0).setText("她的动态");
-                        tabLayout.getTabAt(1).setText("她的计划");
+                        if (mGender.equals("1")) {
+                            tabLayout.getTabAt(0).setText("她的动态");
+                            tabLayout.getTabAt(1).setText("她的计划");
+                        } else {
+                            tabLayout.getTabAt(0).setText("他的动态");
+                            tabLayout.getTabAt(1).setText("他的计划");
+                        }
+
+                        activeFragment = ActiveFragment.newInstance(user_id);
+                        planFragment = PlanFragment.newInstance(othersPlans);
+                        initViews();
                     } else {
-                        tabLayout.getTabAt(0).setText("他的动态");
-                        tabLayout.getTabAt(1).setText("他的计划");
+//                        Log.e("UserInfo", info.getMsg());
+                        Toast.makeText(MyApplication.getContext(), info.getMsg(), Toast.LENGTH_SHORT).show();
                     }
-
-                    activeFragment = ActiveFragment.newInstance(user_id);
-                    planFragment = PlanFragment.newInstance(othersPlans);
-                    initViews();
-                } else {
-                    Log.e("UserInfo", info.getMsg());
                 }
             }
 

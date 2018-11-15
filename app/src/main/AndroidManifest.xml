@@ -38,20 +38,19 @@
                 android:resource="@xml/photo_provider_paths"
                 tools:replace="android:resource" />
         </provider>
-
-        
         <provider
-            android:authorities="${applicationId}.fileProvider"
             android:name=".utils.BuglyFileProvider"
+            android:authorities="${applicationId}.fileProvider"
             android:exported="false"
             android:grantUriPermissions="true"
             tools:replace="name,authorities,exported,grantUriPermissions">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/provider_paths"
-                tools:replace="name,resource"/>
+                tools:replace="name,resource" />
         </provider>
-  <!--      <meta-data
+        <!--
+            <meta-data
             android:name="BUGLY_APPID"
             android:value="e48367ed64" />
         &lt;!&ndash; 配置APP版本号 &ndash;&gt;
@@ -65,14 +64,15 @@
         &lt;!&ndash; 配置Bugly调试模式（true或者false）&ndash;&gt;
         <meta-data
             android:name="BUGLY_ENABLE_DEBUG"
-            android:value="true" />-->
+            android:value="true" />
+        -->
 
-        <!--bugly 指定activity-->
+
+        <!-- bugly 指定activity -->
         <activity
             android:name="com.tencent.bugly.beta.ui.BetaActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|locale"
             android:theme="@android:style/Theme.Translucent" />
-
         <activity
             android:name=".HomeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -106,12 +106,14 @@
             android:name=".login.view.LoginActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".register.view.RegisterActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:theme="@style/TransparentTheme" />
+            android:theme="@style/TransparentTheme"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".checkcode.view.CodeActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -121,7 +123,8 @@
             android:name=".login.view.ForgetActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
-            android:theme="@style/TransparentTheme" />
+            android:theme="@style/TransparentTheme"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".StartActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -151,7 +154,8 @@
         <activity
             android:name=".home.view.word.EditAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan|stateHidden" />
         <activity
             android:name=".home.view.word.SignInAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -192,8 +196,8 @@
         <service
             android:name=".service.MusicService"
             android:exported="false" />
-        
-        <service android:name=".service.AlarmService"
+        <service
+            android:name=".service.AlarmService"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -217,7 +221,8 @@
         <activity
             android:name=".register.view.SetupPasswordActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".zone.view.setting.RememSettingAty"
             android:configChanges="keyboardHidden|orientation|screenSize"
@@ -279,6 +284,7 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan|stateHidden" />
+        <activity android:name=".discover.WebViewAty"></activity>
     </application>
 
 </manifest>

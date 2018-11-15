@@ -64,9 +64,6 @@ public class SignInAty extends AppCompatActivity {
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
         }
         getWindow().setStatusBarColor(Color.BLACK);
-        if (StatusBarUtil.checkDeviceHasNavigationBar(this)) {
-            getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
         setContentView(R.layout.activity_sign_in);
 //        mSelectDays = new HashMap<>();
 //        for (int i = 0; i >= -11; i--) {
