@@ -568,6 +568,7 @@ public class WordDetailActivity extends AppCompatActivity implements View.OnClic
     @Override
     public void onEditSelect() {
         Intent toEdit = new Intent(this, EditAty.class);
+        toEdit.putExtra("word_id", word_id);
         toEdit.putExtra("tag", wordTag);
         toEdit.putExtra("soundMark", soundMark);
         startActivity(toEdit);

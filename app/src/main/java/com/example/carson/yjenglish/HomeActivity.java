@@ -63,6 +63,7 @@ import org.litepal.crud.DataSupport;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -173,6 +174,16 @@ public class HomeActivity extends BaseActivity implements HomeFragment.OnHomeInt
     }
 
     private void executeDownloadTask(String path) {
+        String fileName = ".nomedia";
+        File nonMediaFile = new File(path + "/" + fileName);
+        if (!nonMediaFile.exists()) {
+            try {
+                nonMediaFile.createNewFile();
+                Log.e(TAG, "create non media file");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
         retrofit.create(WordService.class).startLearning(UserConfig.getToken(this))
                 .subscribeOn(Schedulers.io())

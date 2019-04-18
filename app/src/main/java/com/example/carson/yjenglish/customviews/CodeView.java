@@ -27,6 +27,7 @@ import java.util.List;
 
 public class CodeView extends RelativeLayout implements View.OnFocusChangeListener {
 
+    //设验证码有4位
     private EditText first, second, third, fourth;
 
     private String text;
@@ -92,8 +93,8 @@ public class CodeView extends RelativeLayout implements View.OnFocusChangeListen
     }
 
     @Override
-    public void onFocusChange(View view, boolean b) {
-        if (b) {
+    public void onFocusChange(View view, boolean focus) {
+        if (focus) {
             focus();
         }
     }
@@ -123,7 +124,7 @@ public class CodeView extends RelativeLayout implements View.OnFocusChangeListen
     private void focus() {
         EditText editText;
         //利用for循环找出前面还没被输入字符的EditText
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < mEdits.size(); i++) {
             editText = mEdits.get(i);
             if (editText.getText().length() < 1) {
 //                editText.setCursorVisible(true);
@@ -134,7 +135,7 @@ public class CodeView extends RelativeLayout implements View.OnFocusChangeListen
                 editText.setCursorVisible(false);
             }
         }
-        EditText lastEditText = mEdits.get(3);
+        EditText lastEditText = mEdits.get(mEdits.size() - 1);
         if (lastEditText.getText().length() > 0) {
             //收起软键盘 并不允许编辑
             getResponse();
@@ -157,7 +158,7 @@ public class CodeView extends RelativeLayout implements View.OnFocusChangeListen
     }
 
     public void setText(String text) {
-        if (text.length() == 4) {
+        if (text.length() == mEdits.size()) {
             StringBuilder sb = new StringBuilder(text);
             first.setText(sb.substring(0, 1));
             second.setText(sb.substring(1, 2));

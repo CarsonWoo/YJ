@@ -84,7 +84,7 @@ import static android.content.Context.MODE_PRIVATE;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class DiscoverFragment extends Fragment implements DiscoverInfoContract.View {
+public class DiscoverFragment extends Fragment implements DiscoverInfoContract.View, DiscoverAdapters.OnDiscoverItemClickListener {
 
     private enum DOWN_LOAD_TYPE {DOWNLOAD, SHARE_QQ, SHARE_QZONE, SHARE_WECHAT, SHARE_TIMELINE};
 
@@ -211,6 +211,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
 //        viewPager.setPageMargin(getResources().getDimensionPixelSize(R.dimen.page_margin));
 
         mAdapter = new DiscoverAdapters.AtyAdapter(getContext(), mList);
+        mAdapter.setListener(this);
         rvAty.setAdapter(mAdapter);
         rvAty.setHasFixedSize(true);
         initRecycler(rvAty, "暂时没有更多活动噢\n小语正在努力筹划~", R.mipmap.welfare_place_holder);
@@ -269,6 +270,14 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
                 ViewGroup.LayoutParams.WRAP_CONTENT);
         emptyView.setLayoutParams(params);
         rv.setEmptyView(emptyView);
+    }
+
+    @Override
+    public void onActivityClick(String url) {
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        startActivity(intent);
     }
 
     @Override
@@ -406,7 +415,7 @@ public class DiscoverFragment extends Fragment implements DiscoverInfoContract.V
                     })
                     .diskCacheStrategy(DiskCacheStrategy.RESULT)
                     .dontAnimate()
-                    .thumbnail(0.1f)
+                   /* .thumbnail(0.1f)*/
                     .into(bg);
             container.addView(itemView);
             return itemView;

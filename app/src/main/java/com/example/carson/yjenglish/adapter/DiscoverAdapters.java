@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -26,6 +27,8 @@ public class DiscoverAdapters {
 
         private Context ctx;
         private List<DiscoverInfo.DiscoverItem.WelfareService> mList;
+
+        private OnDiscoverItemClickListener listener;
 
         private static final int VIEW_TYPE_EMPTY = 0;
         private static final int VIEW_TYPE_COMMON = 1;
@@ -59,6 +62,11 @@ public class DiscoverAdapters {
             holder.info.setText(info);
             Glide.with(holder.bg.getContext()).load(holder.item.getPic()).thumbnail(0.1f)
                     .into(holder.bg);
+            holder.itemView.setOnClickListener(v -> {
+                if (listener != null) {
+                    listener.onActivityClick(holder.item.getUrl());
+                }
+            });
         }
 
         @Override
@@ -66,19 +74,29 @@ public class DiscoverAdapters {
             return mList.size();
         }
 
+        public void setListener(OnDiscoverItemClickListener listener) {
+            this.listener = listener;
+        }
+
         public class AtyHolder extends BaseViewHolder {
 
+            View itemView;
             RoundRectImageView bg;
             TextView title, slogan, info;
             DiscoverInfo.DiscoverItem.WelfareService item;
 
             public AtyHolder(View itemView) {
                 super(itemView);
+                this.itemView = itemView;
                 bg = itemView.findViewById(R.id.bg_welfare);
                 title = itemView.findViewById(R.id.welfare_title);
                 slogan = itemView.findViewById(R.id.welfare_slogan);
                 info = itemView.findViewById(R.id.welfare_info);
             }
         }
+    }
+
+    public interface OnDiscoverItemClickListener {
+        void onActivityClick(String url);
     }
 }

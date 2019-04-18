@@ -183,6 +183,18 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
         filePath = Environment.getExternalStorageDirectory().getPath() + "/背呗背单词/"
                 + UserConfig.getSelectedPlan(this) + "/";
 
+        //为了不让系统检测到图片
+        String fileName = ".nomedia";
+        File nonMediaFile = new File(filePath + fileName);
+        if (!nonMediaFile.exists()) {
+            try {
+                nonMediaFile.createNewFile();
+                Log.e(TAG, "create non media file");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
 //
 //        File directory = new File(filePath);
 //        if (!directory.exists()) {

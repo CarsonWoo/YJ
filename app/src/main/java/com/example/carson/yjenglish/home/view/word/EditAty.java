@@ -15,7 +15,16 @@ import android.widget.Toast;
 
 import com.example.carson.yjenglish.MyApplication;
 import com.example.carson.yjenglish.R;
+import com.example.carson.yjenglish.home.HomeService;
+import com.example.carson.yjenglish.utils.CommonInfo;
+import com.example.carson.yjenglish.utils.NetUtils;
 import com.example.carson.yjenglish.utils.StatusBarUtil;
+import com.example.carson.yjenglish.utils.UserConfig;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class EditAty extends AppCompatActivity {
 
@@ -25,6 +34,8 @@ public class EditAty extends AppCompatActivity {
     private TextView word;
     private TextView soundMark;
     private TextView submit;
+
+    private String word_id;
 
     private String wordStr;
     private String soundMarkStr;
@@ -55,14 +66,19 @@ public class EditAty extends AppCompatActivity {
         Intent fromData = getIntent();
         wordStr = fromData.getStringExtra("tag");
         soundMarkStr = fromData.getStringExtra("soundMark");
+        word_id = fromData.getStringExtra("word_id");
 
         word.setText(wordStr);
         soundMark.setText(soundMarkStr);
 
         edit.addTextChangedListener(new MyTextWatcher());
         SharedPreferences pref = getSharedPreferences("YJEnglish", MODE_PRIVATE);
-        if (pref != null) {
-            edit.setText(pref.getString(wordStr, ""));
+        String note = pref.getString(wordStr, "");
+        if (note != null && !note.isEmpty()) {
+            edit.setText(note);
+        } else {
+            //如果没有则访问网络查看是否存在
+            executeGetTask();
         }
 
         back.setOnClickListener(view -> onBackPressed());
@@ -70,6 +86,7 @@ public class EditAty extends AppCompatActivity {
         submit.setOnClickListener(v -> {
             SharedPreferences sp = getSharedPreferences("YJEnglish", MODE_PRIVATE);
             if (!edit.getText().toString().isEmpty()) {
+                executeSubmitTask();
                 sp.edit().putString(wordStr, edit.getText().toString()).apply();
                 Toast.makeText(MyApplication.getContext(), "保存成功", Toast.LENGTH_SHORT).show();
             } else {
@@ -79,6 +96,47 @@ public class EditAty extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void executeSubmitTask() {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).uploadEditNote(UserConfig.getToken(this),
+                word_id, edit.getText().toString()).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+//                CommonInfo info = response.body();
+//                if (info != null && info.getStatus().equals("200")) {
+//
+//                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void executeGetTask() {
+        Retrofit retrofit = NetUtils.getInstance().getRetrofitInstance(UserConfig.HOST);
+        retrofit.create(HomeService.class).getEditNote(UserConfig.getToken(this),
+                word_id).enqueue(new Callback<CommonInfo>() {
+            @Override
+            public void onResponse(Call<CommonInfo> call, Response<CommonInfo> response) {
+                CommonInfo info = response.body();
+                if (info != null && info.getStatus() != null) {
+                    if (info.getStatus().equals("200")) {
+                        String note = info.getData();
+                        edit.setText(note);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CommonInfo> call, Throwable t) {
+
+            }
+        });
     }
 
     private class MyTextWatcher implements TextWatcher {

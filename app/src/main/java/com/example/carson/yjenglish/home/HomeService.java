@@ -129,11 +129,13 @@ public interface HomeService {
     Call<CommonInfo> postSubCommentLike(@Header("token") String token,
                                         @Field("id") String id);
 
+    @POST("home/upload_word_note.do")
     @FormUrlEncoded
     Call<CommonInfo> uploadEditNote(@Header("token") String token,
                                     @Field("word_id") String word_id,
                                     @Field("word_note") String word_note);
 
+    @POST("home/show_word_note.do")
     @FormUrlEncoded
     Call<CommonInfo> getEditNote(@Header("token") String token,
                                  @Field("word_id") String word_id);

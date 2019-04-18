@@ -316,14 +316,11 @@ public class InfoAty extends AppCompatActivity implements UserInfoContract.View 
                 ObjectAnimator trans = ObjectAnimator.ofFloat(photoView, "translationX",
                         0f, 1300f).setDuration(300);
                 trans.start();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        setViewsClickable(true);
-                        getWindow().setStatusBarColor(Color.TRANSPARENT);
-                        photoView.setVisibility(View.GONE);
-                        photoView.removeAllViews();
-                    }
+                new Handler().postDelayed(() -> {
+                    setViewsClickable(true);
+                    getWindow().setStatusBarColor(Color.TRANSPARENT);
+                    photoView.setVisibility(View.GONE);
+                    photoView.removeAllViews();
                 }, 500);
 
             }
