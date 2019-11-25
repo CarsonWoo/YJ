@@ -692,7 +692,11 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
             }
             String[] sentencePieces = sentence.split(totalList.get(mCurPos - 1).getWord());
             //为句子中的单词设置不同颜色与大小
-            setmSentence(sentencePieces);
+            try{
+                setmSentence(sentencePieces);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
@@ -1352,9 +1356,16 @@ public class WordActivity extends AppCompatActivity implements WordInfoContract.
                             }
                         }
                         if (!target.equals(word)) {
-                            mSentence = mSentence.split(target)[0] +
-                                    "<big><font color=\"#5ee1c9\">"
-                                    + target + "</font></big>" + mSentence.split(target)[1];
+                            if (mSentence.split(target).length>1){
+                                mSentence = mSentence.split(target)[0] +
+                                        "<big><font color=\"#5ee1c9\">"
+                                        + target + "</font></big>"+ mSentence.split(target)[1] ;
+                            }else{
+                                mSentence = mSentence.split(target)[0] +
+                                        "<big><font color=\"#5ee1c9\">"
+                                        + target + "</font></big>" ;
+                            }
+
                         }
                     }
                     senStart.setText(Html.fromHtml(mSentence));
